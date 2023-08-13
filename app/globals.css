@@ -25,3 +25,15 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+.richshadow {
+  box-shadow: 0px 0px 15px 0px rgba(255, 255, 255, 0.4);
+}
+.richshadow:hover{
+  box-shadow: 0px 0px 15px 0px rgba(245, 184, 92, 0.4);
+}
+.richtrans{
+  transition: all ease 0.5s;
+}
+.richtrans:hover{
+  transform: translateY(-5px);
+}
