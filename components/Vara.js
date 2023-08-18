@@ -20,7 +20,7 @@ function VaraComponent({ text }) {
     );
 
     // Clean up the vara instance when the component unmounts
-    return () => vara.destroy();
+    return () => vara.animationEnd();
   }, [text]); // Add `text` as a dependency
 
   return <div id="vara-container" className="z-[20]"></div>;
