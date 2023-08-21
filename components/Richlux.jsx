@@ -16,8 +16,8 @@ function Richlux() {
     <div className="w-screen h-[90vh] bg-gray-900 flex items-center justify-center relative">
       <div className="items-center justify-center flex flex-col md:w-4/5 w-full">
         <VaraComponent text="Richlux Properties" />
-        <div className="mt-5 flex flex-col items-center justify-between md:w-[50%] w-full space-x-3 md:px-0 px-4">
-          <div className="w-full flex items-center justify-between mb-7">
+        <div className="mt-5 flex flex-col items-center justify-between md:w-[50%] w-full md:px-0 px-4 ">
+          <div className="w-full flex items-center justify-center space-x-4 px-4 mb-7">
             <div className="flex flex-col items-center text-white p-3 rounded-lg richshadow richtrans cursor-pointer ">
               <div className="flex items-center justify-center space-x-2">
                 <BiHomeCircle size={30} className="text-orange-300" />
@@ -47,7 +47,7 @@ function Richlux() {
             </div>
           </div>
           <div
-            className="flex w-full items-center justify-center  text-white p-3 rounded-full richshadow richtrans cursor-pointer"
+            className="flex w-full items-center justify-center text-white p-2  richshadow richtrans cursor-pointer"
             onClick={handleRequest}
           >
             <div className="flex flex-col px-4">
