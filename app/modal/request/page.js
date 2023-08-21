@@ -68,8 +68,6 @@ function RequestModal({ visible, handleClose, CloseIcon }) {
           </div>
           <form className="md:p-4 p-2 w-full">
             <textarea
-              // rows={7}
-              // cols={40}
               className="p-2 md:w-96 md:h-44 w-full"
               placeholder="Eg. I am looking for a mini-flat at Oluyole..."
             />
