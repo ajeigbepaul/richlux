@@ -4,8 +4,9 @@ import SubmitButton from "@/components/SubmitButton";
 import React, { useState } from "react";
 
 function RequestModal({ visible, handleClose, CloseIcon }) {
-  if (!visible) return null;
   const [isLoading, setIsLoading] = useState(false);
+  if (!visible) return null;
+  
   return (
     <div className="md:w-3/5 w-full h-[75%] bg-gray-800 absolute  top-24 md:top-20 z-50 rounded-md p-2">
       <div className="md:flex md:space-x-2 w-full">
