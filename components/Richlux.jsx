@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import VaraComponent from "./Vara";
-import { BiHomeHeart, BiSupport } from "react-icons/bi";
+import { BiHomeHeart, BiSupport, BiHomeCircle } from "react-icons/bi";
 import { MdOutlineSell, MdClose } from "react-icons/md";
 import RequestModal from "@/app/modal/request/page";
 function Richlux() {
@@ -9,14 +9,43 @@ function Richlux() {
   const handleRequest = () => {
     setRequestModal(!requestModal);
   };
-  const handleClose =()=>{
+  const handleClose = () => {
     setRequestModal(!requestModal);
-  }
+  };
   return (
     <div className="w-screen h-[90vh] bg-gray-900 flex items-center justify-center relative">
-      <div className="items-center justify-center flex flex-col md:w-4/5 w-full ">
+      <div className="items-center justify-center flex flex-col md:w-4/5 w-full">
         <VaraComponent text="Richlux Properties" />
-        <div className="mt-5 flex items-center justify-between md:w-[50%] w-full space-x-3 md:px-0 px-4">
+        <div className="mt-5 flex flex-col items-center justify-between md:w-[50%] w-full space-x-3 md:px-0 px-4">
+          <div className="w-full flex items-center justify-between mb-7">
+            <div className="flex flex-col items-center text-white p-3 rounded-lg richshadow richtrans cursor-pointer ">
+              <div className="flex items-center justify-center space-x-2">
+                <BiHomeCircle size={30} className="text-orange-300" />
+                <h2>Buy</h2>
+              </div>
+              <span className="text-xs text-gray-400 hidden md:flex">
+                We sell comfort
+              </span>
+            </div>
+            <div className="flex flex-col items-center text-white p-3 rounded-lg richshadow richtrans cursor-pointer ">
+              <div className="flex items-center justify-center space-x-2">
+                <MdOutlineSell size={30} className="text-orange-300" />
+                <h2>Rent</h2>
+              </div>
+              <span className="text-xs text-gray-400 hidden md:flex">
+                Peace of mind
+              </span>
+            </div>
+            <div className="flex flex-col items-center text-white p-3 rounded-lg richshadow richtrans cursor-pointer">
+              <div className="flex items-center justify-center space-x-2">
+                <BiSupport size={30} className="text-orange-300" />
+                <h2>Contact</h2>
+              </div>
+              <span className="text-xs text-gray-400 hidden md:flex">
+                For all enquiries
+              </span>
+            </div>
+          </div>
           <div
             className="flex w-full items-center justify-center  text-white p-3 rounded-full richshadow richtrans cursor-pointer"
             onClick={handleRequest}
@@ -30,35 +59,14 @@ function Richlux() {
               </span>
             </div>
             <BiHomeHeart size={40} className="text-red-400" />
-            {/* <div className="flex items-center justify-center space-x-2">
-              <BiHomeHeart size={30} className="text-orange-300" />
-              <h2>Buy</h2>
-            </div>
-            <span className="text-sm text-gray-400 hidden md:flex">
-              We sell comfort
-            </span> */}
           </div>
-          {/* <div className="flex flex-col items-center text-white p-3 rounded-lg richshadow richtrans cursor-pointer ">
-            <div className="flex items-center justify-center space-x-2">
-              <MdOutlineSell size={30} className="text-orange-300" />
-              <h2>Rent</h2>
-            </div>
-            <span className="text-sm text-gray-400 hidden md:flex">
-              Peace of mind
-            </span>
-          </div>
-          <div className="flex flex-col items-center text-white p-3 rounded-lg richshadow richtrans cursor-pointer">
-            <div className="flex items-center justify-center space-x-2">
-              <BiSupport size={30} className="text-orange-300" />
-              <h2>Contact</h2>
-            </div>
-            <span className="text-sm text-gray-400 hidden md:flex">
-              For all enquiries
-            </span>
-          </div> */}
         </div>
       </div>
-      <RequestModal visible={requestModal} handleClose={handleClose} CloseIcon={MdClose} />
+      <RequestModal
+        visible={requestModal}
+        handleClose={handleClose}
+        CloseIcon={MdClose}
+      />
     </div>
   );
 }
