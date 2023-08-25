@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { FaUser } from "react-icons/fa";
@@ -17,6 +17,26 @@ function Header() {
 
   const auth = session?.user;
   //  console.log(auth);
+  const [userreq, setUserReq] = useState([]);
+  const FetchUsersRequest = async () => {
+    try {
+      const res = await fetch("/api/userrequest", {
+        cache: "no-cache",
+      });
+      if (!res.ok) {
+        throw new Error("Fail to fetch");
+      }
+      const data = await res.json();
+      setUserReq(data);
+    } catch (error) {
+      console.log("Something went wrong", error);
+    }
+  };
+
+  useEffect(() => {
+    FetchUsersRequest();
+  }, []);
+
   return (
     <header className="text-white z-40 bg-gray-900 p-4 md:max-w-5xl flex flex-col md:flex-row items-center justify-center md:justify-between mx-auto mt-0 shadow-xl rounded-lg">
       <div className="mb-3 md:mb-0">
@@ -84,7 +104,7 @@ function Header() {
         </div>
         <div className="relative space-x-2">
           <BiHomeHeart size={30} className="text-red-400" />
-          <span className="absolute top-0 -right-3 font-semibold">4</span>
+          <span className="absolute top-0 -right-3 font-semibold">{userreq?.length}</span>
         </div>
       </div>
     </header>

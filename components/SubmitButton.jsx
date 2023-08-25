@@ -1,13 +1,13 @@
 import React from "react";
 import ClipLoader from "react-spinners/ClipLoader";
 
-function SubmitButton({ className, title, isLoading }) {
+function SubmitButton({ className, title, isLoading,onClick }) {
   const override = {
     display: "block",
     margin: "0 auto",
   };
   return (
-    <button className={className} type="submit">
+    <button className={className} type="submit" onClick={onClick}>
       {isLoading ? (
         <ClipLoader
           color=""

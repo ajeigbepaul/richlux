@@ -1,11 +1,16 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import VaraComponent from "./Vara";
 import { BiHomeHeart, BiSupport, BiHomeCircle } from "react-icons/bi";
 import { MdOutlineSell, MdClose } from "react-icons/md";
 import RequestModal from "@/app/modal/request/page";
-function Richlux() {
+import { useRouter } from "next/navigation";
+async function Richlux() {
+
+  // const { usersrequest } = await FetchUsersRequest();
+  const router = useRouter();
   const [requestModal, setRequestModal] = useState(false);
+  
   const handleRequest = () => {
     setRequestModal(!requestModal);
   };
