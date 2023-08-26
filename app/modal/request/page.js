@@ -32,10 +32,10 @@ function RequestModal({ visible, handleClose, CloseIcon }) {
       !budget ||
       !request
     ) {
-     setError("All fields must be entered.");
-     setTimeout(() => {
-       setError("");
-     }, 3000);
+      setError("All fields must be entered.");
+      setTimeout(() => {
+        setError("");
+      }, 3000);
 
       return;
     }
@@ -59,11 +59,11 @@ function RequestModal({ visible, handleClose, CloseIcon }) {
       });
       if (!res.ok) {
         throw new Error("Could not make request successfully");
-      } else {
-        toast.success("Request submitted");
-        handleClose()
-        // router.push("/")
       }
+      toast.success("Request submitted");
+      handleClose();
+      
+      // router.push("/")
     } catch (error) {
       console.log("something went wrong", error);
     } finally {

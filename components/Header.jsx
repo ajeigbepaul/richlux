@@ -20,25 +20,34 @@ function Header() {
   const auth = session?.user;
   //  console.log(auth);
   const [userreq, setUserReq] = useState([]);
-  const FetchUsersRequest = async () => {
+  const fetchUsersRequest = async () => {
     try {
       const res = await fetch("/api/userrequest", {
         cache: "no-cache",
       });
       if (!res.ok) {
-        throw new Error("Fail to fetch");
+        throw new Error("Failed to fetch");
       }
       const data = await res.json();
       setUserReq(data);
-      router.refresh();
     } catch (error) {
       console.log("Something went wrong", error);
     }
   };
 
-  useEffect(() => {
-    FetchUsersRequest();
-  }, []);
+
+   useEffect(() => {
+     fetchUsersRequest(); // Initial fetch
+
+     // Fetch data every 10 seconds
+     const interval = setInterval(() => {
+       fetchUsersRequest();
+     }, 30000);
+
+     return () => {
+       clearInterval(interval); // Clear the interval on component unmount
+     };
+   }, []);
 
   return (
     <header className="text-white z-40 bg-gray-900 p-4 md:max-w-5xl flex flex-col md:flex-row items-center justify-center md:justify-between mx-auto mt-0 shadow-xl rounded-lg">
@@ -103,10 +112,10 @@ function Header() {
         <div className="relative space-x-2">
           <BiHomeHeart size={30} className="text-red-400" />
 
-          <span className="absolute top-0 -right-3 font-semibold">
+          <div className="absolute top-0 -right-[18px] px-2 font-semibold w-6 h-6 rounded-full flex items-center justify-center border border-red-400">
             {" "}
             {userreq?.length}
-          </span>
+          </div>
         </div>
       </div>
     </header>
