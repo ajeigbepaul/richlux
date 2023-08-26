@@ -7,8 +7,6 @@ import { useRouter } from "next/navigation";
 
 function RequestModal({ visible, handleClose, CloseIcon }) {
   const router = useRouter();
-  if (!visible) return null;
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [fullname, setFullname] = useState("");
@@ -19,6 +17,9 @@ function RequestModal({ visible, handleClose, CloseIcon }) {
   const [intendinglocation, setIntendingLocation] = useState("");
   const [budget, setBudget] = useState("");
   const [request, setRequest] = useState("");
+  if (!visible) return null;
+
+  
 
   const handleRequest = async (e) => {
     e.preventDefault();
