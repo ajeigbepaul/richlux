@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { FaTimes } from "react-icons/fa";
 
-function RequestModal({ visible, handleClose }) {
+function RequestModal({ visible, setRequestModal, requestModal }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -24,7 +24,7 @@ function RequestModal({ visible, handleClose }) {
   if (!visible) return null;
 
    const handleCloseClick = () => {
-     handleClose(); // Close the modal when close icon is clicked
+    setRequestModal(!requestModal) // Close the modal when close icon is clicked
    };
 
 
