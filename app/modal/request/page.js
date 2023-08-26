@@ -4,8 +4,9 @@ import SubmitButton from "@/components/SubmitButton";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { FaTimes } from "react-icons/fa";
 
-function RequestModal({ visible, handleClose, CloseIcon }) {
+function RequestModal({ visible, handleClose }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -17,6 +18,9 @@ function RequestModal({ visible, handleClose, CloseIcon }) {
   const [intendinglocation, setIntendingLocation] = useState("");
   const [budget, setBudget] = useState("");
   const [request, setRequest] = useState("");
+  //  const handleClose = () => {
+  //    setRequestModal(!requestModal);
+  //  };
   if (!visible) return null;
 
   
@@ -82,7 +86,7 @@ function RequestModal({ visible, handleClose, CloseIcon }) {
               className="w-8 h-8 bg-white rounded-full md:hidden flex items-center justify-center shadow-lg"
               onClick={handleClose}
             >
-              <CloseIcon
+              <FaTimes // Use the close icon component
                 size={24}
                 className="font-bold cursor-pointer"
                 color="red"
@@ -157,7 +161,11 @@ function RequestModal({ visible, handleClose, CloseIcon }) {
               className="w-8 h-8 bg-white rounded-full hidden md:flex items-center justify-center shadow-lg"
               onClick={handleClose}
             >
-              <CloseIcon size={24} className="font-bold cursor-pointer" />
+              <FaTimes // Use the close icon component
+                size={24}
+                className="font-bold cursor-pointer"
+                color="red"
+              />
             </div>
           </div>
           <div className="md:p-4 p-2 w-full">
