@@ -23,7 +23,10 @@ function RequestModal({ visible, handleClose }) {
   //  };
   if (!visible) return null;
 
-  
+   const handleCloseClick = () => {
+     handleClose(); // Close the modal when close icon is clicked
+   };
+
 
   const handleRequest = async (e) => {
     e.preventDefault();
@@ -84,7 +87,7 @@ function RequestModal({ visible, handleClose }) {
             <h2 className=" text-white font-medium">Personal Information</h2>
             <div
               className="w-8 h-8 bg-white rounded-full md:hidden flex items-center justify-center shadow-lg"
-              onClick={handleClose}
+              onClick={handleCloseClick}
             >
               <FaTimes // Use the close icon component
                 size={24}
@@ -159,7 +162,7 @@ function RequestModal({ visible, handleClose }) {
             </h2>
             <div
               className="w-8 h-8 bg-white rounded-full hidden md:flex items-center justify-center shadow-lg"
-              onClick={handleClose}
+              onClick={handleCloseClick}
             >
               <FaTimes // Use the close icon component
                 size={24}
