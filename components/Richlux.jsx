@@ -156,11 +156,11 @@ function Richlux() {
           </div>
         </div>
       </div>
-      {/* <RequestModal
+      <RequestModal
         visible={requestModal}
-        handleClose={handleClose}
-        CloseIcon={MdClose}
-      /> */}
+        setRequestModal={setRequestModal}
+        requestModal={requestModal}
+      />
     </div>
   );
 }
