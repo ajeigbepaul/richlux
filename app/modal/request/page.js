@@ -1,3 +1,4 @@
+"use client"
 import Input from "@/components/Input";
 import SubmitButton from "@/components/SubmitButton";
 import React, { useState } from "react";
