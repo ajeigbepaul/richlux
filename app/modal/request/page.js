@@ -21,7 +21,7 @@ function RequestModal({ visible, setRequestModal, requestModal }) {
   if (!visible) return null;
 
    const handleCloseClick = () => {
-    setRequestModal(!requestModal) // Close the modal when close icon is clicked
+    setRequestModal(!requestModal) 
    };
 
 
@@ -67,8 +67,6 @@ function RequestModal({ visible, setRequestModal, requestModal }) {
       }
       toast.success("Request submitted");
       handleClose();
-      
-      // router.push("/")
     } catch (error) {
       console.log("something went wrong", error);
     } finally {
@@ -78,15 +76,15 @@ function RequestModal({ visible, setRequestModal, requestModal }) {
 
   return (
     <div className="md:w-3/5 w-full h-[75%] bg-gray-800 absolute  top-24 md:top-20 z-50 rounded-md p-2">
-      <div className="md:flex md:space-x-2 w-full">
+      {/* <div className="md:flex md:space-x-2 w-full">
         <div className="flex flex-col bg-gray-900 w-full h-full text-white">
           <div className="flex justify-between items-center w-full md:p-2 p-2 bg-orange-400">
             <h2 className=" text-white font-medium">Personal Information</h2>
             <div
               className="w-8 h-8 bg-white rounded-full md:hidden flex items-center justify-center shadow-lg"
-              // onClick={handleCloseClick}
+              onClick={handleCloseClick}
             >
-              <FaTimes // Use the close icon component
+              <FaTimes 
                 size={24}
                 className="font-bold cursor-pointer"
                 color="red"
@@ -159,9 +157,9 @@ function RequestModal({ visible, setRequestModal, requestModal }) {
             </h2>
             <div
               className="w-8 h-8 bg-white rounded-full hidden md:flex items-center justify-center shadow-lg"
-              // onClick={handleCloseClick}
+              onClick={handleCloseClick}
             >
-              <FaTimes // Use the close icon component
+              <FaTimes 
                 size={24}
                 className="font-bold cursor-pointer"
                 color="red"
@@ -186,7 +184,8 @@ function RequestModal({ visible, setRequestModal, requestModal }) {
             />
           </div>
         </div>
-      </div>
+      </div> */}
+      <h2>Hello There</h2>
     </div>
   );
 }
