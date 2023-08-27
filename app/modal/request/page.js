@@ -84,7 +84,7 @@ function RequestModal({ visible, setRequestModal, requestModal }) {
             <h2 className=" text-white font-medium">Personal Information</h2>
             <div
               className="w-8 h-8 bg-white rounded-full md:hidden flex items-center justify-center shadow-lg"
-              onClick={handleCloseClick}
+              // onClick={handleCloseClick}
             >
               <FaTimes // Use the close icon component
                 size={24}
@@ -159,7 +159,7 @@ function RequestModal({ visible, setRequestModal, requestModal }) {
             </h2>
             <div
               className="w-8 h-8 bg-white rounded-full hidden md:flex items-center justify-center shadow-lg"
-              onClick={handleCloseClick}
+              // onClick={handleCloseClick}
             >
               <FaTimes // Use the close icon component
                 size={24}
