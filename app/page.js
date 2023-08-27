@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import Richlux from "@/components/Richlux";
+// import Richlux from "@/components/Richlux";
 export default function Home() {
   return (
     <main className="flex relative flex-col items-center justify-between overflow-x-hidden">
@@ -9,7 +9,7 @@ export default function Home() {
       </div>
 
       <div className="w-screen bg-gray-900">
-        <Richlux />
+        {/* <Richlux /> */}
       </div>
       <div className="w-full h-full">
         <Hero />
