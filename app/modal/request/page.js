@@ -1,4 +1,4 @@
-"use client";
+
 import Input from "@/components/Input";
 import SubmitButton from "@/components/SubmitButton";
 import React, { useState } from "react";
@@ -18,9 +18,6 @@ function RequestModal({ visible, setRequestModal, requestModal }) {
   const [intendinglocation, setIntendingLocation] = useState("");
   const [budget, setBudget] = useState("");
   const [request, setRequest] = useState("");
-  //  const handleClose = () => {
-  //    setRequestModal(!requestModal);
-  //  };
   if (!visible) return null;
 
    const handleCloseClick = () => {

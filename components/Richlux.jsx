@@ -95,9 +95,6 @@ function Richlux() {
   const handleRequest = () => {
     setRequestModal(!requestModal);
   };
-  // const handleClose = () => {
-  //   setRequestModal(!requestModal);
-  // };
   return (
     <div className="w-screen h-[90vh] bg-gray-900 flex items-center justify-center relative">
       <div className="items-center justify-center flex flex-col md:w-4/5 w-full">
@@ -155,10 +152,8 @@ function Richlux() {
       </div>
       <RequestModal
         visible={requestModal}
-        // handleClose={handleClose}
         setRequestModal={setRequestModal}
         requestModal={requestModal}
-        // CloseIcon={MdClose}
       />
     </div>
   );
