@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 
 function Input({ type, placeholder, className, value, name, onChange,max }) {
