@@ -150,11 +150,11 @@ function Richlux() {
           </div>
         </div>
       </div>
-      <RequestModal
+      {/* <RequestModal
         visible={requestModal}
         setRequestModal={setRequestModal}
         requestModal={requestModal}
-      />
+      /> */}
     </div>
   );
 }
