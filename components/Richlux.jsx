@@ -78,9 +78,10 @@
 
 // export default Richlux;
 "use client";
+
 import React, { useState } from "react";
-import {Caveat,Sacramento,Qwigley,Parisienne,Satisfy,Alex_Brush,Rochester} from "next/font/google"
-import VaraComponent from "./Vara";
+import {Rochester} from "next/font/google"
+// import VaraComponent from "./Vara";
 import { BiHomeHeart, BiSupport, BiHomeCircle } from "react-icons/bi";
 import { MdOutlineSell, MdClose } from "react-icons/md";
 import RequestModal from "@/app/modal/request/page";
@@ -95,12 +96,17 @@ function Richlux() {
   const handleRequest = () => {
     setRequestModal(!requestModal);
   };
+  const handleClose = () => {
+    setRequestModal(!requestModal);
+  };
   return (
     <div className="w-screen h-[90vh] bg-gray-900 flex items-center justify-center relative">
       <div className="items-center justify-center flex flex-col md:w-4/5 w-full">
         {/* <VaraComponent text="Richlux Properties" /> */}
         <div>
-          <h2 className={`${stylish.className} md:text-7xl text-4xl text-orange-300`}>
+          <h2
+            className={`${stylish.className} md:text-7xl text-4xl text-orange-300`}
+          >
             Richlux Properties
           </h2>
         </div>
@@ -150,11 +156,11 @@ function Richlux() {
           </div>
         </div>
       </div>
-      {/* <RequestModal
+      <RequestModal
         visible={requestModal}
-        setRequestModal={setRequestModal}
-        requestModal={requestModal}
-      /> */}
+        handleClose={handleClose}
+        CloseIcon={MdClose}
+      />
     </div>
   );
 }
