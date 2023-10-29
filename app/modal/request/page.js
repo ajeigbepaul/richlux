@@ -106,6 +106,8 @@ function RequestModal({ visible, setRequestModal, requestModal }) {
   const [presentlocation, setPresentLocation] = useState("");
   const [intendinglocation, setIntendingLocation] = useState("");
   const [budget, setBudget] = useState("");
+  const [type, setType] = useState("");
+  const [bed, setBed] = useState("");
   const [request, setRequest] = useState("");
   if (!visible) return null;
 
@@ -123,6 +125,8 @@ function RequestModal({ visible, setRequestModal, requestModal }) {
       !presentlocation ||
       !intendinglocation ||
       !budget ||
+      !type ||
+      !bed ||
       !request
     ) {
       setError("All fields must be entered.");
@@ -147,6 +151,8 @@ function RequestModal({ visible, setRequestModal, requestModal }) {
           presentlocation,
           intendinglocation,
           budget,
+          type,
+          bed,
           request,
         }),
       });
@@ -154,7 +160,7 @@ function RequestModal({ visible, setRequestModal, requestModal }) {
         throw new Error("Could not make request successfully");
       }
       toast.success("Request submitted");
-      handleClose();
+      handleCloseClick();
     } catch (error) {
       console.log("something went wrong", error);
     } finally {
@@ -163,7 +169,7 @@ function RequestModal({ visible, setRequestModal, requestModal }) {
   };
 
   return (
-    <div className="md:w-3/5 w-full h-[75%] bg-gray-800 absolute  top-24 md:top-20 z-50 rounded-md p-2">
+    <div className="md:w-3/5 w-full h-[85%] bg-gray-800 absolute  top-24 md:top-20 z-0 rounded-md p-2">
       <div className="md:flex md:space-x-2 w-full">
         <div className="flex flex-col bg-gray-900 w-full h-full text-white">
           <div className="flex justify-between items-center w-full md:p-2 p-2 bg-orange-400">
@@ -218,7 +224,21 @@ function RequestModal({ visible, setRequestModal, requestModal }) {
               type="text"
               value={intendinglocation}
               onChange={(e) => setIntendingLocation(e.target.value)}
-              placeholder="intending location"
+              placeholder="preferred location"
+              className="p-1 text-gray-700 placeholder:text-orange-400 placeholder:text-sm"
+            />
+            <Input
+              type="text"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              placeholder="Type of apartment E.g : Flat, duplex, bangalow etc"
+              className="p-1 text-gray-700 placeholder:text-orange-400 placeholder:text-sm"
+            />
+            <Input
+              type="text"
+              value={bed}
+              onChange={(e) => setBed(e.target.value)}
+              placeholder="How many bed space ? E.g: 2 bed, 3 bed etc"
               className="p-1 text-gray-700 placeholder:text-orange-400 placeholder:text-sm"
             />
             <Input

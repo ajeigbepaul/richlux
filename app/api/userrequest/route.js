@@ -1,6 +1,8 @@
 import UserRequest from "@/model/UserRequest";
 import { connectToDB } from "@/utils/database";
 import { NextResponse } from "next/server";
+
+// GET ALL REQUEST.
 export const GET = async () => {
     await connectToDB()
     const usersrequest = await UserRequest.find()
@@ -17,6 +19,8 @@ export async function POST(req) {
       presentlocation,
       intendinglocation,
       sex,
+      type,
+      bed,
       budget,
     } = await req.json();
     await connectToDB();
@@ -28,6 +32,8 @@ export async function POST(req) {
       presentlocation,
       intendinglocation,
       sex,
+      type,
+      bed,
       budget,
     });
     return NextResponse.json({ message: "Request Created" }, { status: 201 });
@@ -35,3 +41,5 @@ export async function POST(req) {
     console.log("Something went wrong", error);
   }
 }
+
+

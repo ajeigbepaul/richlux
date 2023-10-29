@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
+import Listings from "@/components/Listings";
 import Richlux from "@/components/Richlux";
 export default function Home() {
   return (
@@ -13,6 +14,11 @@ export default function Home() {
       </div>
       <div className="w-full h-full">
         <Hero />
+      </div>
+      {/* add a toogle for this section alone.
+       It will be able to toggle between an arrays of four colors. black, white, orange and lemon.. */}
+      <div className="w-full h-full">
+        <Listings />
       </div>
     </main>
   );

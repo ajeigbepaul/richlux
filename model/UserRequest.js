@@ -7,8 +7,10 @@ const userRequestSchema = new Schema(
     request: String,
     presentlocation: String,
     sex: String,
+    type: String,
+    bed: String,
     budget: String,
-    intendinglocation:String,
+    intendinglocation: String,
   },
   {
     timestamps: true,
