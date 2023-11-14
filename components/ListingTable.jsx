@@ -1,165 +1,139 @@
-"use client"
-import React, { useState } from 'react';
-import { useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableFooter from '@mui/material/TableFooter';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton';
-import FirstPageIcon from '@mui/icons-material/FirstPage';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import LastPageIcon from '@mui/icons-material/LastPage';
-
-function TablePaginationActions(props) {
-  const theme = useTheme();
-  const { count, page, rowsPerPage, onPageChange } = props;
-
-  const handleFirstPageButtonClick = (event) => {
-    onPageChange(event, 0);
+"use client";
+import React, { useState } from "react";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableFooter from "@mui/material/TableFooter";
+import TableHead from '@mui/material/TableHead';
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import ReactPaginate from "react-paginate";
+export default function ListingTable({ data }) {
+  const [PerItem, setPerItem] = useState(10);
+  const [currentPage, setCurrentPage] = useState(0);
+  //   Start for Pagination
+  const handlePageClick = ({ selected: selectedPage }) => {
+    setCurrentPage(selectedPage);
   };
 
-  const handleBackButtonClick = (event) => {
-    onPageChange(event, page - 1);
-  };
+  function truncateEmail(email) {
+    const atIndex = email.indexOf("@");
+    if (atIndex !== -1) {
+      return email.substring(0, atIndex + 1); // Include the "@" symbol
+    }
+    return email; // Return the original email if "@" is not found
+  }
 
-  const handleNextButtonClick = (event) => {
-    onPageChange(event, page + 1);
-  };
-
-  const handleLastPageButtonClick = (event) => {
-    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-  };
-
+  const offset = currentPage * Number(PerItem);
+  const currentItem = data?.slice(offset, offset + Number(PerItem)) || [];
+  const pageCount = Math.ceil(data?.length / Number(PerItem));
+  //End of Pagination
+  console.log(data);
   return (
-    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
-      <IconButton
-        onClick={handleFirstPageButtonClick}
-        disabled={page === 0}
-        aria-label="first page"
-      >
-        {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
-      </IconButton>
-      <IconButton
-        onClick={handleBackButtonClick}
-        disabled={page === 0}
-        aria-label="previous page"
-      >
-        {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-      </IconButton>
-      <IconButton
-        onClick={handleNextButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page"
-      >
-        {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-      </IconButton>
-      <IconButton
-        onClick={handleLastPageButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page"
-      >
-        {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
-      </IconButton>
-    </Box>
-  );
-}
-
-function createData(name, calories, fat) {
-  return { name, calories, fat };
-}
-
-const rows = [
-  createData('Cupcake', 305, 3.7),
-  createData('Donut', 452, 25.0),
-  createData('Eclair', 262, 16.0),
-  createData('Frozen yoghurt', 159, 6.0),
-  createData('Gingerbread', 356, 16.0),
-  createData('Honeycomb', 408, 3.2),
-  createData('Ice cream sandwich', 237, 9.0),
-  createData('Jelly Bean', 375, 0.0),
-  createData('KitKat', 518, 26.0),
-  createData('Lollipop', 392, 0.2),
-  createData('Marshmallow', 318, 0),
-  createData('Nougat', 360, 19.0),
-  createData('Oreo', 437, 18.0),
-].sort((a, b) => (a.calories < b.calories ? -1 : 1));
-
-export default function ListingTable() {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
-        <TableBody>
-          {(rowsPerPage > 0
-            ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            : rows
-          ).map((row) => (
-            <TableRow key={row.name}>
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell style={{ width: 160 }} align="right">
-                {row.calories}
-              </TableCell>
-              <TableCell style={{ width: 160 }} align="right">
-                {row.fat}
-              </TableCell>
-              <TableCell style={{ width: 160 }} align="right">
-                {"John Does"}
-              </TableCell>
-              <TableCell style={{ width: 160 }} align="right">
-                {"Action"}
-              </TableCell>
-            </TableRow>
-          ))}
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={3} />
-            </TableRow>
-          )}
-        </TableBody>
-        <TableFooter>
+    <div>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+        <TableHead>
           <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-              colSpan={3}
-              count={rows.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              SelectProps={{
-                inputProps: {
-                  'aria-label': 'rows per page',
-                },
-                native: true,
-              }}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
-            />
+            <TableCell style={{fontWeight:700}}>Fullname</TableCell>
+            <TableCell align="right" style={{ width: 50,fontWeight:700 }}>Gender</TableCell>
+            <TableCell align="right" style={{ width: 100,fontWeight:700 }}>Location</TableCell>
+            <TableCell align="left" style={{fontWeight:700}}>Bed</TableCell>
+            <TableCell align="right" style={{fontWeight:700}}>Type</TableCell>
+            <TableCell align="left" style={{fontWeight:700}}>Request</TableCell>
+            <TableCell align="right" style={{fontWeight:700}}>Budget</TableCell>
+            <TableCell align="left" style={{fontWeight:700}}>Status</TableCell>
+            <TableCell align="right" style={{fontWeight:700}}>Action</TableCell>
           </TableRow>
-        </TableFooter>
-      </Table>
-    </TableContainer>
+        </TableHead>
+          <TableBody>
+            {currentItem?.map((row) => (
+              <TableRow key={row._id}>
+                <TableCell component="th" scope="row">
+                  {row.fullname}
+                </TableCell>
+                <TableCell style={{ width: 50}} align="left">
+                  {row.sex}
+                </TableCell>
+                <TableCell style={{ width: 100}} align="left">
+                  {row.intendinglocation}
+                </TableCell>
+                <TableCell style={{ width: 90}} align="left">
+                {row.bed}
+                </TableCell>
+                <TableCell style={{ width: 100 }} align="right">
+                {row.type}
+                </TableCell>
+                <TableCell style={{ width: 320 }} align="justify">
+                {row.request}
+                </TableCell>
+                <TableCell style={{ width: 130}} align="right">
+                ₦ {row.budget.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,")}
+                
+                </TableCell>
+                <TableCell style={{ width: 100}} align="left">
+                {"open"}
+                </TableCell>
+                
+                <TableCell style={{ width: 100 }} align="right">
+                  <button className="p-2 border-1 rounded-md text-sm bg-red-400 text-white">View</button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+          {/* <TableFooter></TableFooter> */}
+        </Table>
+      </TableContainer>
+      <div className="flex flex-col md:flex-row p-2">
+        <div className="md:w-6/12 lg:w-6/12 md:mb-0 mb-8">
+          <div className="md:flex w-60 md:items-center space-y-2 md:space-y-0 md:space-x-4 mt-10 md:mt-0">
+            <label
+              htmlFor="select"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Showing
+            </label>
+            <select
+              value={PerItem}
+              onChange={(e) => setPerItem(e.target.value)}
+              id="select"
+              aria-label="form-select-sm"
+              className="block w-full p-1 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200 focus:border-indigo-300 sm:text-sm"
+            >
+              <option disabled value="">
+                --Select--
+              </option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="75">75</option>
+              <option value="100">100</option>
+            </select>
+            <span className="text-sm text-gray-500 flex w-80">
+              of {data?.data?.length} entries
+            </span>
+          </div>
+        </div>
+        <div className="md:w-7/12 lg:w-7/12 md:justify-end">
+          <div className="mt-8 md:mt-0">
+            <ReactPaginate
+              previousLabel={"← Previous"}
+              nextLabel={"Next →"}
+              pageCount={pageCount}
+              onPageChange={handlePageClick}
+              pageRangeDisplayed={1}
+              containerClassName={"flex items-center space-x-2"}
+              previousLinkClassName={"text-gray-600"}
+              nextLinkClassName={"text-gray-600"}
+              disabledClassName={"text-gray-400"}
+              activeClassName={
+                "text-gray-400 font-bold w-7 h-7 border-2 flex items-center justify-center rounded-lg space-x-2"
+              }
+            />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

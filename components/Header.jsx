@@ -21,7 +21,7 @@ function Header() {
   const { data, error, isLoading } = useSWR("/api/userrequest", fetcher);
   return (
     <header className="text-white z-50 bg-gray-900 p-4 md:max-w-5xl flex flex-col md:flex-row items-center justify-center md:justify-between mx-auto mt-0 shadow-xl rounded-lg">
-      <div className="mb-3 md:mb-0">
+      <div className="mb-3 md:mb-0 cursor-pointer" onClick={()=>router.push("/")}>
         <h2>RICHL-U-X</h2>
       </div>
       <div className="flex items-center justify-center space-x-2 w-fit">

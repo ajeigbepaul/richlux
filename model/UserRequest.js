@@ -9,7 +9,7 @@ const userRequestSchema = new Schema(
     sex: String,
     type: String,
     bed: String,
-    budget: String,
+    budget: Number,
     intendinglocation: String,
   },
   {
