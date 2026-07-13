@@ -77,20 +77,24 @@ export const authOptions = {
     // round-trip on every request. A role change made by a Super Admin only
     // takes effect once this token refreshes (default 30-day maxAge).
     async jwt({ token, user }) {
-      if (user?.email) {
-        await connectToDB();
-        const dbUser = await User.findOne({ email: user.email });
-        if (dbUser) {
-          token.role = dbUser.role;
-          token.id = dbUser._id.toString();
+      try {
+        if (user?.email) {
+          await connectToDB();
+          const dbUser = await User.findOne({ email: user.email });
+          if (dbUser) {
+            token.role = dbUser.role;
+            token.id = dbUser._id.toString();
+          }
+        } else if (token?.email && !token.role) {
+          await connectToDB();
+          const dbUser = await User.findOne({ email: token.email });
+          if (dbUser) {
+            token.role = dbUser.role;
+            token.id = dbUser._id.toString();
+          }
         }
-      } else if (token?.email && !token.role) {
-        await connectToDB();
-        const dbUser = await User.findOne({ email: token.email });
-        if (dbUser) {
-          token.role = dbUser.role;
-          token.id = dbUser._id.toString();
-        }
+      } catch (error) {
+        console.error("jwt callback error", error);
       }
       return token;
     },

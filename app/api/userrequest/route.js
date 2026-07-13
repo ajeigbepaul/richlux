@@ -49,7 +49,10 @@ export async function POST(req) {
     });
     return NextResponse.json({ message: "Request Created" }, { status: 201 });
   } catch (error) {
-    console.log("Something went wrong", error);
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
   }
 }
 

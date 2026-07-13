@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 export const POST = async (req, res) => {
   const { username, email, password } = await req.json();
   try {
-    connectToDB();
+    await connectToDB();
     // Do a check for already existing email.
     const existingUser = await User.findOne({ email });
     if (existingUser)

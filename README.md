@@ -1,34 +1,66 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Richlux Properties
 
-## Getting Started
+Real-estate lead-gen and listings app for Richlux Property (house sales, property management, shortlet, rentals, land sales), built on Next.js (App Router), MongoDB/Mongoose, NextAuth, and Cloudinary.
 
-First, run the development server:
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Create a `.env.local` in the project root with:
 
-## Learn More
+```bash
+# MongoDB
+MONGODB_URI=
 
-To learn more about Next.js, take a look at the following resources:
+# NextAuth
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=http://localhost:3000
+GOOGLE_ID=
+GOOGLE_CLIENT_SECRET=
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Credentials-provider password hashing
+SALT=10
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+# Cloudinary (media storage/optimization for listing images & video)
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
+```
 
-## Deploy on Vercel
+## First-time setup: creating a Super Admin
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+There is no self-service way to become an admin. After registering a normal account (via `/register` or Google sign-in):
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+1. Run the role backfill once against your database (safe to run anytime, only touches accounts missing a `role`):
+   ```bash
+   node -r dotenv/config scripts/backfillUserRoles.js dotenv_config_path=.env.local
+   ```
+2. Promote your account to Super Admin:
+   ```bash
+   node -r dotenv/config scripts/promoteSuperAdmin.js dotenv_config_path=.env.local you@example.com
+   ```
+
+From there, the Super Admin can manage other users' roles from `/admin/users`.
+
+## Roles
+
+- **Super Admin** — full access, including user/role management (`/admin/users`).
+- **Manager** — manages all listings and leads (`/admin/listings`, `/admin/leads`).
+- **Agent** — manages only their own listings (`/admin/listings`).
+
+## Project structure
+
+- `app/` — routes (App Router). Public site, auth, and `/admin/*` (role-gated).
+- `components/` — shared UI (`components/ui/`), admin-only (`components/admin/`), and page sections.
+- `model/` — Mongoose schemas (`User`, `UserRequest`, `Listing`).
+- `constants/listing.js` — Listing category/status enums shared by client and server code.
+- `utils/` — `database.js` (Mongo connection), `authOptions.js` (NextAuth config), `auth.js` (RBAC helpers), `cloudinary.js` (server-side Cloudinary SDK config).
+- `proxy.js` — Next.js 16's route-middleware convention; gates `/admin/*` by role.
