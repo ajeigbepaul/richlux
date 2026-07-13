@@ -33,7 +33,7 @@ function Hero() {
     >
       {banner.map((banr, i) => (
         <SwiperSlide key={i} className="swiperslide">
-          <Slider img={banr.image} />
+          <Slider img={banr.image} alt={banr.name} priority={i === 0} />
         </SwiperSlide>
       ))}
     </Swiper>

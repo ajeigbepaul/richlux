@@ -1,14 +1,16 @@
 "use client";
 import Image from "next/image";
-function Slider({ img }) {
+function Slider({ img, alt, priority = false }) {
   return (
-    <div>
+    <div className="relative w-full h-[90vh]">
       <Image
         src={img}
-        alt="bannerimg"
-        width={1500}
-        height={750}
-        className="w-full h-[90vh] object-cover"
+        alt={alt || "Richlux property banner"}
+        fill
+        sizes="100vw"
+        priority={priority}
+        loading={priority ? undefined : "lazy"}
+        className="object-cover"
       />
     </div>
   );

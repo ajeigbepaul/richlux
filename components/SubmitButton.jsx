@@ -1,27 +1,18 @@
-
 import React from "react";
-import ClipLoader from "react-spinners/ClipLoader";
+import Button from "./ui/Button";
 
-function SubmitButton({ className, title, isLoading,onClick }) {
-  const override = {
-    display: "block",
-    margin: "0 auto",
-  };
+// Kept as a thin wrapper around ui/Button so existing call sites
+// (login/register/modal forms) don't need to change.
+function SubmitButton({ className, title, isLoading, onClick }) {
   return (
-    <button className={className} type="submit" onClick={onClick}>
-      {isLoading ? (
-        <ClipLoader
-          color=""
-          loading={isLoading}
-          cssOverride={override}
-          size={25}
-          aria-label="Loading Spinner"
-          data-testid="loader"
-        />
-      ) : (
-        title
-      )}
-    </button>
+    <Button
+      type="submit"
+      className={className}
+      isLoading={isLoading}
+      onClick={onClick}
+    >
+      {title}
+    </Button>
   );
 }
 
