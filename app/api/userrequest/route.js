@@ -1,12 +1,21 @@
 import UserRequest from "@/model/UserRequest";
 import { connectToDB } from "@/utils/database";
+import { requireRole } from "@/utils/auth";
 import { NextResponse } from "next/server";
 
-// GET ALL REQUEST.
+// GET ALL REQUEST. Leads are internal business data -- manager/superadmin only.
 export const GET = async () => {
-    await connectToDB()
-    const usersrequest = await UserRequest.find()
-    return NextResponse.json(usersrequest)
+  try {
+    await requireRole(["superadmin", "manager"]);
+    await connectToDB();
+    const usersrequest = await UserRequest.find();
+    return NextResponse.json(usersrequest);
+  } catch (error) {
+    return NextResponse.json(
+      { message: error.message },
+      { status: error.status || 500 }
+    );
+  }
 };
 
 export async function POST(req) {
@@ -22,6 +31,7 @@ export async function POST(req) {
       type,
       bed,
       budget,
+      listingId,
     } = await req.json();
     await connectToDB();
     await UserRequest.create({
@@ -35,6 +45,7 @@ export async function POST(req) {
       type,
       bed,
       budget,
+      listingId: listingId || undefined,
     });
     return NextResponse.json({ message: "Request Created" }, { status: 201 });
   } catch (error) {

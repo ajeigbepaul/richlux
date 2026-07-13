@@ -17,6 +17,7 @@ export const POST = async (req, res) => {
       username: username,
       email: email,
       password: hashPassword,
+      role: "user", // public self-registration never grants elevated roles
     });
     await user.save();
     return new Response(JSON.stringify(user), { status: 201 });

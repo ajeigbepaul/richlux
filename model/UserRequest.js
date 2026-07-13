@@ -11,6 +11,12 @@ const userRequestSchema = new Schema(
     bed: String,
     budget: Number,
     intendinglocation: String,
+    listingId: { type: Schema.Types.ObjectId, ref: "Listing" },
+    status: {
+      type: String,
+      enum: ["open", "contacted", "closed"],
+      default: "open",
+    },
   },
   {
     timestamps: true,
