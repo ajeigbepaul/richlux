@@ -1,7 +1,7 @@
 import React from 'react'
 
-function page({params}) {
-  const {id} = params
+async function page({params}) {
+  const {id} = await params
   return (
     <div>{id}</div>
   )
