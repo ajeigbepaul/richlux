@@ -9,7 +9,7 @@ const mongoose = require("mongoose");
 const { User } = require("../model/User");
 
 async function run() {
-  const email = process.argv[2];
+  const email = process.argv[2]?.trim().toLowerCase();
   if (!email) {
     throw new Error("Usage: node scripts/promoteSuperAdmin.js <email>");
   }

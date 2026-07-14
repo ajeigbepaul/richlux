@@ -22,7 +22,9 @@ export const authOptions = {
       async authorize(credentials) {
         await connectToDB();
         const { email, password } = credentials;
-        const currentUser = await User.findOne({ email });
+        const currentUser = await User.findOne({
+          email: email?.trim().toLowerCase(),
+        });
         if (!currentUser) {
           throw new Error("Invalid Email or Password");
         }
@@ -55,10 +57,11 @@ export const authOptions = {
       try {
         await connectToDB();
         if (account?.provider === "google") {
-          const existingUser = await User.findOne({ email: user.email });
+          const normalizedEmail = user.email?.trim().toLowerCase();
+          const existingUser = await User.findOne({ email: normalizedEmail });
           if (!existingUser) {
             await User.create({
-              email: user.email,
+              email: normalizedEmail,
               username: (profile?.name || user.name || user.email.split("@")[0])
                 .replace(/\s+/g, "")
                 .toLowerCase(),
@@ -80,14 +83,18 @@ export const authOptions = {
       try {
         if (user?.email) {
           await connectToDB();
-          const dbUser = await User.findOne({ email: user.email });
+          const dbUser = await User.findOne({
+            email: user.email.trim().toLowerCase(),
+          });
           if (dbUser) {
             token.role = dbUser.role;
             token.id = dbUser._id.toString();
           }
         } else if (token?.email && !token.role) {
           await connectToDB();
-          const dbUser = await User.findOne({ email: token.email });
+          const dbUser = await User.findOne({
+            email: token.email.trim().toLowerCase(),
+          });
           if (dbUser) {
             token.role = dbUser.role;
             token.id = dbUser._id.toString();

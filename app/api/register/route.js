@@ -6,8 +6,9 @@ export const POST = async (req, res) => {
   const { username, email, password } = await req.json();
   try {
     await connectToDB();
+    const normalizedEmail = email?.trim().toLowerCase();
     // Do a check for already existing email.
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser)
       return new Response("User already exist", { status: 409 });
     // Hash password
@@ -15,7 +16,7 @@ export const POST = async (req, res) => {
     const hashPassword = await bcrypt.hash(password, salt);
     const user = new User({
       username: username,
-      email: email,
+      email: normalizedEmail,
       password: hashPassword,
       role: "user", // public self-registration never grants elevated roles
     });
