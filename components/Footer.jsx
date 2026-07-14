@@ -101,9 +101,12 @@ function Footer() {
         </div>
       </Container>
 
-      {/* Decorative oversized wordmark, bleeding off the bottom edge. */}
-      <div className="pointer-events-none select-none absolute inset-x-0 bottom-0 overflow-hidden" aria-hidden="true">
-        <p className="whitespace-nowrap font-sans font-extrabold leading-none text-white/5 text-[20vw] md:text-[11rem] -mb-4 md:-mb-10 pl-4">
+      {/* Decorative oversized wordmark, bleeding off the bottom edge, centered. */}
+      <div
+        className="pointer-events-none select-none absolute inset-x-0 bottom-0 overflow-hidden flex justify-center"
+        aria-hidden="true"
+      >
+        <p className="whitespace-nowrap font-sans font-extrabold leading-none text-white/5 text-[20vw] md:text-[11rem] -mb-4 md:-mb-10">
           RICHLUX
         </p>
       </div>

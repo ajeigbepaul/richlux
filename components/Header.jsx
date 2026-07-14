@@ -27,7 +27,7 @@ function Header() {
         <div className="flex items-center justify-between py-3">
           <Link href="/" className="flex items-center shrink-0">
             <Image
-              src="/richlux.jpeg"
+              src="/richlux.png"
               alt="Richlux Property"
               width={871}
               height={369}
