@@ -27,11 +27,19 @@ function Header() {
         <div className="flex items-center justify-between py-3">
           <Link href="/" className="flex items-center shrink-0">
             <Image
-              src="/richluxlogo.jpg"
+              src="/richlux.jpeg"
               alt="Richlux Property"
-              width={140}
-              height={48}
-              className="h-10 w-auto object-contain rounded"
+              width={871}
+              height={369}
+              className="h-10 w-auto object-contain dark:hidden"
+              priority
+            />
+            <Image
+              src="/richluxlogowhite.png"
+              alt="Richlux Property"
+              width={3264}
+              height={1836}
+              className="h-10 w-auto object-contain hidden dark:block"
               priority
             />
           </Link>

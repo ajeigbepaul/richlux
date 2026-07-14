@@ -12,11 +12,11 @@ function Footer() {
         <div className="py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <Image
-              src="/richluxlogo.jpg"
+              src="/richluxlogowhite.png"
               alt="Richlux Property"
-              width={140}
-              height={48}
-              className="h-10 w-auto object-contain bg-white rounded-md p-1"
+              width={3264}
+              height={1836}
+              className="h-10 w-auto object-contain"
             />
             <p className="mt-4 text-sm text-ink-300 dark:text-slate-400">
               Your No 1 realtor -- house sales, property management, shortlet,
