@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
+import React, { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { BiHomeHeart, BiSupport, BiHomeCircle } from "react-icons/bi";
 import Container from "@/components/ui/Container";
+import RequestWizardModal from "@/components/RequestWizardModal";
 
 const QUICK_LINKS = [
   { icon: BiHomeCircle, label: "Buy", caption: "We sell comfort" },
@@ -12,6 +13,8 @@ const QUICK_LINKS = [
 ];
 
 function Richlux() {
+  const [requestOpen, setRequestOpen] = useState(false);
+
   return (
     <div className="w-full bg-white dark:bg-surface-900 relative overflow-hidden">
       <div className="absolute inset-0 bg-brand-blob opacity-70 pointer-events-none" />
@@ -40,8 +43,9 @@ function Richlux() {
             ))}
           </div>
 
-          <Link
-            href="/request"
+          <button
+            type="button"
+            onClick={() => setRequestOpen(true)}
             className="mt-10 flex items-center bg-brand-400 hover:bg-brand-500 transition-colors text-white px-6 py-4 rounded-xl shadow-card cursor-pointer"
           >
             <div className="flex flex-col text-left px-2">
@@ -53,9 +57,15 @@ function Richlux() {
               </span>
             </div>
             <BiHomeHeart size={36} className="ml-4" />
-          </Link>
+          </button>
         </div>
       </Container>
+
+      <AnimatePresence>
+        {requestOpen && (
+          <RequestWizardModal onClose={() => setRequestOpen(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

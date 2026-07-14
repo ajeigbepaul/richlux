@@ -19,6 +19,7 @@
     "eslint": "^9.17.0",
     "eslint-config-next": "16.2.10",
     "@eslint/eslintrc": "^3.2.0",
+    "framer-motion": "^12.42.2",
     "mongodb": "^5.7.0",
     "mongoose": "^7.4.2",
     "next": "16.2.10",

@@ -67,27 +67,32 @@ export async function POST(req) {
     const sex = ["male", "female"].includes(String(body.sex).toLowerCase())
       ? String(body.sex).toLowerCase()
       : undefined;
+    // Unselected optional <select>s submit "" (not absent), and Mongoose's
+    // enum validator rejects "" just like any other value that isn't one of
+    // the allowed strings -- an empty string is a value, not a missing one.
+    // Normalize every optional enum field the same way before create().
+    const orUndefined = (value) => (value === "" ? undefined : value);
 
     const userRequest = await UserRequest.create({
       userId: session.user.id, // server-derived, never trusted from body
       fullname: body.fullname,
       email: body.email,
       phonenumber: body.phonenumber,
-      preferredContactMethod: body.preferredContactMethod,
-      preferredContactTime: body.preferredContactTime,
+      preferredContactMethod: orUndefined(body.preferredContactMethod),
+      preferredContactTime: orUndefined(body.preferredContactTime),
       sex,
       category,
       type: body.type,
       bedrooms,
       bathrooms: body.bathrooms,
-      furnishing: body.furnishing,
+      furnishing: orUndefined(body.furnishing),
       parkingSpaces: body.parkingSpaces,
       amenities: body.amenities,
       householdSize: body.householdSize,
       budgetMin: body.budgetMin,
       budgetMax,
-      priceFrequency: body.priceFrequency,
-      moveInTimeframe: body.moveInTimeframe,
+      priceFrequency: orUndefined(body.priceFrequency),
+      moveInTimeframe: orUndefined(body.moveInTimeframe),
       checkInDate: body.checkInDate,
       checkOutDate: body.checkOutDate,
       numberOfGuests: body.numberOfGuests,
