@@ -101,6 +101,22 @@ const emptyForm = {
   request: "",
 };
 
+// Budget fields display as "5,000,000" while typing -- strip everything but
+// digits, then re-format with thousand separators. The underlying form state
+// stores this formatted string directly; unformatNumber() strips the commas
+// back out wherever the raw numeric value is actually needed (validation,
+// submit payload).
+function formatNumberWithCommas(value) {
+  const digits = String(value).replace(/[^\d]/g, "");
+  if (!digits) return "";
+  return Number(digits).toLocaleString("en-US");
+}
+
+function unformatNumber(value) {
+  const digits = String(value).replace(/[^\d]/g, "");
+  return digits === "" ? undefined : Number(digits);
+}
+
 // components/Input.jsx hardcodes the native `required` attribute, which is
 // right for auth forms but would block fields that are intentionally left
 // blank (they aren't required by model/UserRequest.js). Mirrors the
@@ -261,7 +277,7 @@ function RequestWizardModal({ onClose }) {
       if (
         form.budgetMin &&
         form.budgetMax &&
-        Number(form.budgetMax) < Number(form.budgetMin)
+        unformatNumber(form.budgetMax) < unformatNumber(form.budgetMin)
       ) {
         stepErrors.budgetMax = "Must be more than budget min";
       }
@@ -314,8 +330,8 @@ function RequestWizardModal({ onClose }) {
         amenities,
         householdSize:
           form.householdSize === "" ? undefined : Number(form.householdSize),
-        budgetMin: form.budgetMin === "" ? undefined : Number(form.budgetMin),
-        budgetMax: form.budgetMax === "" ? undefined : Number(form.budgetMax),
+        budgetMin: unformatNumber(form.budgetMin),
+        budgetMax: unformatNumber(form.budgetMax),
         priceFrequency: form.priceFrequency,
         moveInTimeframe: form.moveInTimeframe,
         presentlocation: form.presentlocation,
@@ -511,19 +527,23 @@ function RequestWizardModal({ onClose }) {
           <div className="grid grid-cols-2 gap-3">
             <Input
               label="Budget min (NGN)"
-              type="number"
+              type="text"
               name="budgetMin"
               value={form.budgetMin}
               error={errors.budgetMin}
-              onChange={(e) => update("budgetMin", e.target.value)}
+              onChange={(e) =>
+                update("budgetMin", formatNumberWithCommas(e.target.value))
+              }
             />
             <Input
               label="Budget max (NGN)"
-              type="number"
+              type="text"
               name="budgetMax"
               value={form.budgetMax}
               error={errors.budgetMax}
-              onChange={(e) => update("budgetMax", e.target.value)}
+              onChange={(e) =>
+                update("budgetMax", formatNumberWithCommas(e.target.value))
+              }
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
