@@ -7,7 +7,7 @@ import Container from "@/components/ui/Container";
 
 function Footer() {
   return (
-    <footer className="w-full bg-ink-900 dark:bg-surface-950 text-ink-100 dark:text-slate-300 mt-16">
+    <footer className="w-full bg-ink-900 dark:bg-surface-950 text-ink-100 dark:text-slate-300">
       <Container>
         <div className="py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
