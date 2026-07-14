@@ -40,9 +40,11 @@ function uploadToCloudinary({ file, signature, timestamp, folder, apiKey, cloudN
   });
 }
 
-// props: { value: media[], onChange(nextMedia) } -- lifts state to the parent
-// listing form, matching how the rest of the listing form fields work.
-function MediaUploader({ value = [], onChange }) {
+// props: { value: media[], onChange(nextMedia), folder } -- lifts state to
+// the parent form, matching how the rest of the form fields work. `folder`
+// defaults to the original listing-media folder so existing call sites don't
+// need to change; the offer form passes folder="richlux/offers".
+function MediaUploader({ value = [], onChange, folder = "richlux/listings" }) {
   const [uploading, setUploading] = useState({}); // { [tempId]: progressPercent }
 
   const handleFiles = async (event) => {
@@ -57,7 +59,7 @@ function MediaUploader({ value = [], onChange }) {
         const signRes = await fetch("/api/cloudinary/sign", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ folder: "richlux/listings" }),
+          body: JSON.stringify({ folder }),
         });
         if (!signRes.ok) throw new Error("Could not sign upload");
         const { signature, timestamp, folder, apiKey, cloudName } = await signRes.json();
