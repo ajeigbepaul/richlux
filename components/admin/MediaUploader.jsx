@@ -113,13 +113,13 @@ function MediaUploader({ value = [], onChange }) {
         accept="image/*,video/*"
         multiple
         onChange={handleFiles}
-        className="block w-full text-sm text-ink-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-brand-400 file:text-white file:font-medium hover:file:bg-brand-500"
+        className="block w-full text-sm text-ink-700 dark:text-surface-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-brand-400 file:text-white file:font-medium hover:file:bg-brand-500"
       />
 
       {uploadingEntries.length > 0 && (
         <div className="space-y-2">
           {uploadingEntries.map(([id, pct]) => (
-            <div key={id} className="w-full bg-ink-200 rounded-full h-2 overflow-hidden">
+            <div key={id} className="w-full bg-ink-200 dark:bg-surface-700 rounded-full h-2 overflow-hidden">
               <div className="bg-brand-400 h-2 transition-all" style={{ width: `${pct}%` }} />
             </div>
           ))}
@@ -131,7 +131,7 @@ function MediaUploader({ value = [], onChange }) {
           {value.map((item) => (
             <div
               key={item.publicId}
-              className="relative aspect-square rounded-lg overflow-hidden bg-ink-200 group"
+              className="relative aspect-square rounded-lg overflow-hidden bg-ink-200 dark:bg-surface-700 group"
             >
               {item.type === "video" ? (
                 <video src={item.secureUrl} className="w-full h-full object-cover" muted />

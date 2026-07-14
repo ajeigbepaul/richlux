@@ -41,9 +41,9 @@ export default function EditListingPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-white">Edit Listing</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-ink-900 dark:text-white">Edit Listing</h1>
       {isLoading ? (
-        <p className="text-surface-400">Loading listing...</p>
+        <p className="text-ink-500 dark:text-surface-400">Loading listing...</p>
       ) : error || listing?.message === "Not found" ? (
         <p className="text-danger">Could not load this listing.</p>
       ) : (

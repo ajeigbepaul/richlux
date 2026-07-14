@@ -10,7 +10,7 @@ function MediaGallery({ media = [], title }) {
 
   if (media.length === 0) {
     return (
-      <div className="w-full aspect-[16/10] bg-ink-200 rounded-2xl flex items-center justify-center text-ink-500">
+      <div className="w-full aspect-[16/10] bg-ink-200 dark:bg-surface-800 rounded-2xl flex items-center justify-center text-ink-500 dark:text-slate-400">
         No media yet
       </div>
     );

@@ -25,7 +25,7 @@ function ListingItem({ listing }) {
   return (
     <Link href={`/listings/${_id}`} className="block w-full">
       <Card hoverLift className="overflow-hidden h-full flex flex-col">
-        <div className="relative w-full aspect-[4/3] bg-ink-200">
+        <div className="relative w-full aspect-[4/3] bg-ink-200 dark:bg-surface-800">
           {cover ? (
             <Image
               src={cover.secureUrl}
@@ -35,28 +35,28 @@ function ListingItem({ listing }) {
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-ink-500 text-sm">
+            <div className="w-full h-full flex items-center justify-center text-ink-500 dark:text-slate-400 text-sm">
               No image yet
             </div>
           )}
-          <Badge status={status} className="absolute top-3 left-3 bg-white/90" />
+          <Badge status={status} className="absolute top-3 left-3 bg-white/90 dark:bg-surface-800/90" />
         </div>
         <div className="p-4 flex flex-col flex-1">
-          <span className="text-caption uppercase tracking-wide text-brand-500 font-semibold">
+          <span className="text-caption uppercase tracking-wide text-brand-500 dark:text-brand-400 font-semibold">
             {LISTING_CATEGORY_LABELS[category] || category}
           </span>
-          <h2 className="text-ink-900 font-semibold mt-1">{title}</h2>
+          <h2 className="text-ink-900 dark:text-white font-semibold mt-1">{title}</h2>
           {location?.city && (
-            <p className="text-caption text-ink-500 mt-0.5">
+            <p className="text-caption text-ink-500 dark:text-slate-400 mt-0.5">
               {[location.address, location.city].filter(Boolean).join(", ")}
             </p>
           )}
-          <p className="text-caption text-ink-500 mt-2 flex-1">
+          <p className="text-caption text-ink-500 dark:text-slate-400 mt-2 flex-1">
             {trunc(description, 15)}
           </p>
           <div className="flex items-center justify-between mt-3">
-            <span className="font-bold text-ink-900">{formatNaira(price)}</span>
-            <span className="text-caption font-medium text-brand-500">
+            <span className="font-bold text-ink-900 dark:text-white">{formatNaira(price)}</span>
+            <span className="text-caption font-medium text-brand-500 dark:text-brand-400">
               View details →
             </span>
           </div>

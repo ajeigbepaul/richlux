@@ -5,17 +5,11 @@ import Richlux from "@/components/Richlux";
 import Footer from "@/components/Footer";
 export default function Home() {
   return (
-    <main className="flex relative flex-col items-center justify-between overflow-x-hidden w-full">
+    <main className="w-full overflow-x-hidden bg-white dark:bg-surface-900">
       <Header />
-      <div className="w-full">
-        <Richlux />
-      </div>
-      <div className="w-full h-full">
-        <Hero />
-      </div>
-      <div className="w-full h-full">
-        <Listings />
-      </div>
+      <Richlux />
+      <Hero />
+      <Listings />
       <Footer />
     </main>
   );

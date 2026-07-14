@@ -56,7 +56,7 @@ export default async function ListingDetailPage({ params }) {
   const serializedRelated = JSON.parse(JSON.stringify(related));
 
   return (
-    <main className="w-full">
+    <main className="w-full bg-white dark:bg-surface-900">
       <Header />
       <Container className="py-10">
         <div className="grid lg:grid-cols-3 gap-10">
@@ -67,16 +67,16 @@ export default async function ListingDetailPage({ params }) {
             />
 
             <div className="mt-6">
-              <span className="text-caption uppercase tracking-wide text-brand-500 font-semibold">
+              <span className="text-caption uppercase tracking-wide text-brand-500 dark:text-brand-400 font-semibold">
                 {LISTING_CATEGORY_LABELS[serializedListing.category] ||
                   serializedListing.category}
               </span>
               <div className="flex items-center justify-between mt-1">
-                <h1 className="text-h1 text-ink-900">{serializedListing.title}</h1>
+                <h1 className="text-h1 text-ink-900 dark:text-white">{serializedListing.title}</h1>
                 <Badge status={serializedListing.status} />
               </div>
               {serializedListing.location?.city && (
-                <p className="text-ink-500 mt-1">
+                <p className="text-ink-500 dark:text-slate-400 mt-1">
                   {[
                     serializedListing.location.address,
                     serializedListing.location.city,
@@ -87,7 +87,7 @@ export default async function ListingDetailPage({ params }) {
                 </p>
               )}
 
-              <div className="flex flex-wrap gap-6 mt-4 text-ink-700">
+              <div className="flex flex-wrap gap-6 mt-4 text-ink-700 dark:text-slate-200">
                 {typeof serializedListing.bedrooms === "number" && (
                   <span>{serializedListing.bedrooms} Bedrooms</span>
                 )}
@@ -99,19 +99,19 @@ export default async function ListingDetailPage({ params }) {
                 )}
               </div>
 
-              <p className="mt-6 text-body text-ink-700 whitespace-pre-line">
+              <p className="mt-6 text-body text-ink-700 dark:text-slate-200 whitespace-pre-line">
                 {serializedListing.description}
               </p>
             </div>
           </div>
 
           <div>
-            <div className="bg-white rounded-2xl shadow-card p-6 sticky top-24">
-              <span className="text-caption text-ink-500">Price</span>
-              <h2 className="text-h1 text-ink-900">
+            <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-6 sticky top-24">
+              <span className="text-caption text-ink-500 dark:text-slate-400">Price</span>
+              <h2 className="text-h1 text-ink-900 dark:text-white">
                 {formatNaira(serializedListing.price)}
                 {serializedListing.priceFrequency !== "one-time" && (
-                  <span className="text-caption text-ink-500 font-normal">
+                  <span className="text-caption text-ink-500 dark:text-slate-400 font-normal">
                     {" "}
                     / {serializedListing.priceFrequency.replace("per-", "")}
                   </span>
@@ -126,7 +126,7 @@ export default async function ListingDetailPage({ params }) {
 
         {serializedRelated.length > 0 && (
           <div className="mt-16">
-            <h2 className="text-h2 text-ink-900 mb-6">Related Listings</h2>
+            <h2 className="text-h2 text-ink-900 dark:text-white mb-6">Related Listings</h2>
             <div className="grid md:grid-cols-3 grid-cols-1 gap-6">
               {serializedRelated.map((item) => (
                 <ListingItem key={item._id} listing={item} />

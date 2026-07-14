@@ -48,9 +48,9 @@ function Login() {
       </form>
 
       <div className="flex items-center my-4">
-        <div className="flex-1 h-px bg-ink-300" />
-        <span className="px-3 text-caption text-ink-500">or</span>
-        <div className="flex-1 h-px bg-ink-300" />
+        <div className="flex-1 h-px bg-ink-300 dark:bg-surface-700" />
+        <span className="px-3 text-caption text-ink-500 dark:text-slate-400">or</span>
+        <div className="flex-1 h-px bg-ink-300 dark:bg-surface-700" />
       </div>
 
       <Button
@@ -63,16 +63,16 @@ function Login() {
       </Button>
 
       <div className="w-full flex flex-col mt-4 space-y-1">
-        <div className="text-ink-500 w-full text-sm text-center">
+        <div className="text-ink-500 dark:text-slate-400 w-full text-sm text-center">
           Forgot your password?{" "}
-          <span className="mx-1 text-xs font-semibold text-brand-500 cursor-pointer">
+          <span className="mx-1 text-xs font-semibold text-brand-500 dark:text-brand-400 cursor-pointer">
             Recover password
           </span>
         </div>
-        <div className="text-ink-500 w-full text-sm text-center">
+        <div className="text-ink-500 dark:text-slate-400 w-full text-sm text-center">
           You have not registered?{" "}
           <span
-            className="mx-1 text-xs font-semibold text-brand-500 cursor-pointer"
+            className="mx-1 text-xs font-semibold text-brand-500 dark:text-brand-400 cursor-pointer"
             onClick={() => router.push("/register")}
           >
             Register

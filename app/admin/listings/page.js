@@ -94,7 +94,7 @@ export default function AdminListingsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl sm:text-2xl font-bold text-white">Listings</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-ink-900 dark:text-white">Listings</h1>
         <Link
           href="/admin/listings/new"
           className="inline-flex items-center rounded-md bg-brand-400 hover:bg-brand-500 text-white text-sm font-medium px-4 py-2 transition-colors richtrans"
@@ -104,7 +104,7 @@ export default function AdminListingsPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-surface-400">Loading listings...</p>
+        <p className="text-ink-500 dark:text-surface-400">Loading listings...</p>
       ) : (
         <DataTable
           columns={columns}
@@ -120,24 +120,24 @@ export default function AdminListingsPage() {
           }}
           emptyMessage="No listings yet -- create the first one."
           renderMobileCard={(row) => (
-            <div className="bg-surface-800 rounded-lg p-4 space-y-2 richshadow">
+            <div className="bg-white dark:bg-surface-800 rounded-lg p-4 space-y-2 richshadow">
               <div className="flex justify-between items-start gap-2">
                 <div>
-                  <p className="font-semibold text-white">{row.title}</p>
-                  <p className="text-xs text-surface-400">
+                  <p className="font-semibold text-ink-900 dark:text-white">{row.title}</p>
+                  <p className="text-xs text-ink-500 dark:text-surface-400">
                     {LISTING_CATEGORY_LABELS[row.category] || row.category}
                   </p>
                 </div>
                 <Badge status={row.status} />
               </div>
-              <div className="text-sm text-surface-300 flex justify-between">
+              <div className="text-sm text-ink-500 dark:text-surface-300 flex justify-between">
                 <span>{formatNaira(row.price)}</span>
                 <span>{row.media?.length || 0} media</span>
               </div>
-              <div className="text-sm text-surface-400">
+              <div className="text-sm text-ink-500 dark:text-surface-400">
                 Agent: {row.agent?.username || "-"}
               </div>
-              <div className="flex gap-4 pt-2 border-t border-surface-700">
+              <div className="flex gap-4 pt-2 border-t border-ink-300 dark:border-surface-700">
                 <Link
                   href={`/admin/listings/${row._id}/edit`}
                   className="text-brand-400 text-sm font-medium"

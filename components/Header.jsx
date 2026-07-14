@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { FaUser, FaBars, FaTimes } from "react-icons/fa";
 import { LISTING_CATEGORIES, LISTING_CATEGORY_LABELS } from "@/constants/listing";
 import Container from "@/components/ui/Container";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 const ADMIN_ROLES = ["superadmin", "manager", "agent"];
 
@@ -21,7 +22,7 @@ function Header() {
   const logOut = () => signOut();
 
   return (
-    <header className="bg-white/90 backdrop-blur sticky top-0 z-50 shadow-sm">
+    <header className="w-full bg-white/90 dark:bg-surface-900/90 backdrop-blur sticky top-0 z-50 shadow-sm">
       <Container>
         <div className="flex items-center justify-between py-3">
           <Link href="/" className="flex items-center shrink-0">
@@ -30,7 +31,7 @@ function Header() {
               alt="Richlux Property"
               width={140}
               height={48}
-              className="h-10 w-auto object-contain"
+              className="h-10 w-auto object-contain rounded"
               priority
             />
           </Link>
@@ -40,7 +41,7 @@ function Header() {
               <Link
                 key={category}
                 href={`/listings?category=${category}`}
-                className="text-ink-700 hover:text-brand-500 text-sm font-medium transition-colors"
+                className="text-ink-700 dark:text-slate-200 hover:text-brand-500 dark:hover:text-brand-400 text-sm font-medium transition-colors"
               >
                 {LISTING_CATEGORY_LABELS[category]}
               </Link>
@@ -48,10 +49,11 @@ function Header() {
           </nav>
 
           <div className="hidden lg:flex items-center space-x-4">
+            <ThemeToggle className="text-ink-700 dark:text-slate-200 hover:bg-ink-100 dark:hover:bg-surface-800" />
             {isStaff && (
               <Link
                 href="/admin"
-                className="text-sm font-medium text-brand-600 hover:text-brand-700"
+                className="text-sm font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300"
               >
                 Admin
               </Link>
@@ -75,7 +77,7 @@ function Header() {
             ) : (
               <Link
                 href="/logininterface"
-                className="flex items-center space-x-2 text-sm font-medium text-ink-700 hover:text-brand-500"
+                className="flex items-center space-x-2 text-sm font-medium text-ink-700 dark:text-slate-200 hover:text-brand-500 dark:hover:text-brand-400"
               >
                 <FaUser size={16} />
                 <span>Sign In</span>
@@ -83,13 +85,16 @@ function Header() {
             )}
           </div>
 
-          <button
-            className="lg:hidden text-ink-700"
-            onClick={() => setMenuOpen((open) => !open)}
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
-          </button>
+          <div className="flex items-center space-x-2 lg:hidden">
+            <ThemeToggle className="text-ink-700 dark:text-slate-200 hover:bg-ink-100 dark:hover:bg-surface-800" />
+            <button
+              className="text-ink-700 dark:text-slate-200"
+              onClick={() => setMenuOpen((open) => !open)}
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
+            </button>
+          </div>
         </div>
 
         {menuOpen && (
@@ -98,7 +103,7 @@ function Header() {
               <Link
                 key={category}
                 href={`/listings?category=${category}`}
-                className="text-ink-700 hover:text-brand-500 text-sm font-medium"
+                className="text-ink-700 dark:text-slate-200 hover:text-brand-500 dark:hover:text-brand-400 text-sm font-medium"
                 onClick={() => setMenuOpen(false)}
               >
                 {LISTING_CATEGORY_LABELS[category]}
@@ -107,7 +112,7 @@ function Header() {
             {isStaff && (
               <Link
                 href="/admin"
-                className="text-sm font-medium text-brand-600"
+                className="text-sm font-medium text-brand-600 dark:text-brand-400"
                 onClick={() => setMenuOpen(false)}
               >
                 Admin
@@ -123,7 +128,7 @@ function Header() {
             ) : (
               <Link
                 href="/logininterface"
-                className="text-sm font-medium text-ink-700"
+                className="text-sm font-medium text-ink-700 dark:text-slate-200"
                 onClick={() => setMenuOpen(false)}
               >
                 Sign In

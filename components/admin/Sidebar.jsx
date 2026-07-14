@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 // Nav is role-scoped: agents only ever manage their own listings, leads and
 // user management are internal-business data manager/superadmin should see.
@@ -26,13 +27,13 @@ function Sidebar() {
   const navItems = NAV_BY_ROLE[role] || [];
 
   return (
-    <aside className="w-full lg:w-64 shrink-0 bg-surface-950 border-b lg:border-b-0 lg:border-r border-surface-700 flex flex-col">
+    <aside className="w-full lg:w-64 shrink-0 bg-ink-100 dark:bg-surface-950 border-b lg:border-b-0 lg:border-r border-ink-300 dark:border-surface-700 flex flex-col">
       <div className="p-4 sm:p-6 flex items-center justify-between lg:block">
-        <Link href="/admin" className="text-lg font-bold text-white">
+        <Link href="/admin" className="text-lg font-bold text-ink-900 dark:text-white">
           Richlux <span className="text-brand-400">Admin</span>
         </Link>
         {session?.user && (
-          <p className="text-xs text-surface-400 mt-0 lg:mt-1 capitalize">
+          <p className="text-xs text-ink-500 dark:text-surface-400 mt-0 lg:mt-1 capitalize">
             {session.user.role} &middot; {session.user.name || session.user.email}
           </p>
         )}
@@ -48,7 +49,7 @@ function Sidebar() {
               className={`whitespace-nowrap px-3 py-2 rounded-md text-sm font-medium richtrans ${
                 active
                   ? "bg-brand-400/10 text-brand-400 richshadow"
-                  : "text-surface-300 hover:bg-surface-800 hover:text-white"
+                  : "text-ink-500 dark:text-surface-300 hover:bg-ink-200 dark:hover:bg-surface-800 hover:text-ink-900 dark:hover:text-white"
               }`}
             >
               {item.label}
@@ -57,8 +58,12 @@ function Sidebar() {
         })}
       </nav>
 
-      <div className="p-4 sm:p-6 border-t border-surface-800 flex flex-row lg:flex-col items-center lg:items-stretch justify-between lg:justify-start gap-2">
-        <Link href="/" className="text-sm text-surface-300 hover:text-brand-400 richtrans">
+      <div className="p-4 sm:p-6 border-t border-ink-300 dark:border-surface-800 flex flex-row lg:flex-col items-center lg:items-stretch justify-between lg:justify-start gap-2">
+        <div className="flex items-center justify-between lg:justify-start gap-2 lg:mb-2 order-first lg:order-none">
+          <span className="text-sm text-ink-500 dark:text-surface-300 lg:hidden">Theme</span>
+          <ThemeToggle className="text-ink-500 dark:text-surface-300 hover:bg-ink-200 dark:hover:bg-surface-800" />
+        </div>
+        <Link href="/" className="text-sm text-ink-500 dark:text-surface-300 hover:text-brand-400 richtrans">
           Back to site
         </Link>
         <button

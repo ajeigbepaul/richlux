@@ -36,10 +36,10 @@ function ListingsBrowser() {
   };
 
   return (
-    <main className="w-full">
+    <main className="w-full bg-white dark:bg-surface-900">
       <Header />
       <Container className="py-10">
-        <h1 className="text-h1 text-ink-900">All Listings</h1>
+        <h1 className="text-h1 text-ink-900 dark:text-white">All Listings</h1>
 
         <div className="mt-6 flex flex-wrap gap-2">
           <button
@@ -47,7 +47,7 @@ function ListingsBrowser() {
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               !activeCategory
                 ? "bg-brand-400 text-white"
-                : "bg-white text-ink-700 border border-ink-300"
+                : "bg-white dark:bg-surface-800 text-ink-700 dark:text-slate-200 border border-ink-300 dark:border-surface-700"
             }`}
           >
             All
@@ -59,7 +59,7 @@ function ListingsBrowser() {
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 activeCategory === category
                   ? "bg-brand-400 text-white"
-                  : "bg-white text-ink-700 border border-ink-300"
+                  : "bg-white dark:bg-surface-800 text-ink-700 dark:text-slate-200 border border-ink-300 dark:border-surface-700"
               }`}
             >
               {LISTING_CATEGORY_LABELS[category]}
@@ -69,9 +69,9 @@ function ListingsBrowser() {
 
         <div className="mt-8">
           {isLoading ? (
-            <p className="text-ink-500">Loading listings...</p>
+            <p className="text-ink-500 dark:text-slate-400">Loading listings...</p>
           ) : items.length === 0 ? (
-            <p className="text-ink-500">No listings match this category yet.</p>
+            <p className="text-ink-500 dark:text-slate-400">No listings match this category yet.</p>
           ) : (
             <div className="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
               {items.map((listing) => (
@@ -86,17 +86,17 @@ function ListingsBrowser() {
             <button
               disabled={page <= 1}
               onClick={() => setPage((p) => p - 1)}
-              className="text-sm font-medium text-brand-500 disabled:text-ink-300"
+              className="text-sm font-medium text-brand-500 dark:text-brand-400 disabled:text-ink-300 dark:disabled:text-surface-700"
             >
               ← Previous
             </button>
-            <span className="text-sm text-ink-500">
+            <span className="text-sm text-ink-500 dark:text-slate-400">
               Page {data.page} of {data.pages}
             </span>
             <button
               disabled={page >= data.pages}
               onClick={() => setPage((p) => p + 1)}
-              className="text-sm font-medium text-brand-500 disabled:text-ink-300"
+              className="text-sm font-medium text-brand-500 dark:text-brand-400 disabled:text-ink-300 dark:disabled:text-surface-700"
             >
               Next →
             </button>

@@ -7,14 +7,14 @@ const STATUS_STYLES = {
   open: "bg-success/10 text-success",
   pending: "bg-warning/10 text-warning",
   contacted: "bg-warning/10 text-warning",
-  sold: "bg-ink-500/10 text-ink-500",
-  rented: "bg-brand-100 text-brand-700",
-  closed: "bg-ink-500/10 text-ink-500",
+  sold: "bg-ink-500/10 text-ink-500 dark:text-slate-400",
+  rented: "bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300",
+  closed: "bg-ink-500/10 text-ink-500 dark:text-slate-400",
   "off-market": "bg-danger/10 text-danger",
 };
 
 function Badge({ status, children, className = "" }) {
-  const style = STATUS_STYLES[status] || "bg-ink-200 text-ink-700";
+  const style = STATUS_STYLES[status] || "bg-ink-200 text-ink-700 dark:bg-surface-800 dark:text-slate-200";
   return (
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-caption font-medium capitalize ${style} ${className}`}

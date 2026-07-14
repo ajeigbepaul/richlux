@@ -30,7 +30,7 @@ export default function NewListingPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-white">New Listing</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-ink-900 dark:text-white">New Listing</h1>
       <ListingForm onSubmit={handleSubmit} isSaving={isSaving} submitLabel="Create Listing" />
     </div>
   );

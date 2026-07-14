@@ -62,10 +62,10 @@ function Register() {
       </form>
 
       <div className="w-full flex flex-col mt-4">
-        <div className="text-ink-500 w-full text-sm text-center">
+        <div className="text-ink-500 dark:text-slate-400 w-full text-sm text-center">
           Already have an account?{" "}
           <span
-            className="mx-1 text-xs font-semibold text-brand-500 cursor-pointer"
+            className="mx-1 text-xs font-semibold text-brand-500 dark:text-brand-400 cursor-pointer"
             onClick={() => router.push("/login")}
           >
             Login

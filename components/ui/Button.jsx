@@ -3,8 +3,8 @@ import ClipLoader from "react-spinners/ClipLoader";
 
 const VARIANTS = {
   primary: "bg-brand-400 text-white hover:bg-brand-500",
-  secondary: "border border-brand-400 text-brand-400 hover:bg-brand-50",
-  ghost: "text-brand-500 hover:bg-brand-50",
+  secondary: "border border-brand-400 text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/30",
+  ghost: "text-brand-500 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/30",
   danger: "bg-danger text-white hover:opacity-90",
 };
 

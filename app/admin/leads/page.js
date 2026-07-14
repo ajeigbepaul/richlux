@@ -32,7 +32,8 @@ function StatusSelect({ value, onChange, className }) {
   return (
     <select
       className={
-        className || "text-xs bg-surface-800 text-white border border-surface-600 rounded px-1 py-0.5"
+        className ||
+        "text-xs bg-white dark:bg-surface-800 text-ink-900 dark:text-white border border-ink-300 dark:border-surface-600 rounded px-1 py-0.5"
       }
       value={value}
       onChange={onChange}
@@ -112,9 +113,9 @@ export default function AdminLeadsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-white">Leads</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-ink-900 dark:text-white">Leads</h1>
       {isLoading ? (
-        <p className="text-surface-400">Loading leads...</p>
+        <p className="text-ink-500 dark:text-surface-400">Loading leads...</p>
       ) : (
         <DataTable
           columns={columns}
@@ -130,22 +131,22 @@ export default function AdminLeadsPage() {
           }}
           emptyMessage="No leads yet."
           renderMobileCard={(row) => (
-            <div className="bg-surface-800 rounded-lg p-4 space-y-2 richshadow">
+            <div className="bg-white dark:bg-surface-800 rounded-lg p-4 space-y-2 richshadow">
               <div className="flex justify-between items-start gap-2">
-                <p className="font-semibold text-white">{row.fullname}</p>
+                <p className="font-semibold text-ink-900 dark:text-white">{row.fullname}</p>
                 <Badge status={row.status} />
               </div>
-              <p className="text-sm text-surface-300">{row.intendinglocation}</p>
-              <p className="text-sm text-surface-400">{truncate(row.request, 20)}</p>
-              <div className="flex justify-between text-sm text-surface-300">
+              <p className="text-sm text-ink-500 dark:text-surface-300">{row.intendinglocation}</p>
+              <p className="text-sm text-ink-500 dark:text-surface-400">{truncate(row.request, 20)}</p>
+              <div className="flex justify-between text-sm text-ink-500 dark:text-surface-300">
                 <span>{formatNaira(row.budget)}</span>
                 <span>
                   {row.bed} bed &middot; {row.type}
                 </span>
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-surface-700">
+              <div className="flex items-center justify-between pt-2 border-t border-ink-300 dark:border-surface-700">
                 <StatusSelect
-                  className="text-xs bg-surface-900 text-white border border-surface-600 rounded px-1 py-0.5"
+                  className="text-xs bg-ink-100 dark:bg-surface-900 text-ink-900 dark:text-white border border-ink-300 dark:border-surface-600 rounded px-1 py-0.5"
                   value={row.status}
                   onChange={(e) => handleStatusChange(row._id, e.target.value)}
                 />

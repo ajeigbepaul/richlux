@@ -16,14 +16,14 @@ function Richlux() {
   const handleRequest = () => setRequestModal(!requestModal);
 
   return (
-    <div className="w-full bg-white relative overflow-hidden">
+    <div className="w-full bg-white dark:bg-surface-900 relative overflow-hidden">
       <div className="absolute inset-0 bg-brand-blob opacity-70 pointer-events-none" />
       <Container>
         <div className="relative py-20 flex flex-col items-center text-center">
-          <h1 className="font-display text-display-md md:text-display-lg text-ink-900">
+          <h1 className="font-display text-display-md md:text-display-lg text-ink-900 dark:text-white">
             Richlux Properties
           </h1>
-          <p className="mt-4 max-w-2xl text-body text-ink-500">
+          <p className="mt-4 max-w-2xl text-body text-ink-500 dark:text-slate-400">
             Are you currently building or selling a new home? Let our real
             estate agency handle it.
           </p>
@@ -32,11 +32,11 @@ function Richlux() {
             {QUICK_LINKS.map(({ icon: Icon, label, caption }) => (
               <div
                 key={label}
-                className="flex flex-col items-center bg-white shadow-card p-4 rounded-xl richtrans cursor-pointer w-32"
+                className="flex flex-col items-center bg-white dark:bg-surface-800 shadow-card p-4 rounded-xl richtrans cursor-pointer w-32"
               >
                 <Icon size={28} className="text-brand-400" />
-                <h2 className="mt-1 font-semibold text-ink-900">{label}</h2>
-                <span className="text-caption text-ink-500 text-center">
+                <h2 className="mt-1 font-semibold text-ink-900 dark:text-white">{label}</h2>
+                <span className="text-caption text-ink-500 dark:text-slate-400 text-center">
                   {caption}
                 </span>
               </div>

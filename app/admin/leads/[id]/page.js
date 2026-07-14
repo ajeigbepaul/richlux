@@ -24,7 +24,7 @@ export default function LeadDetailPage() {
   const lead = Array.isArray(data) ? data.find((item) => item._id === id) : null;
 
   if (isLoading) {
-    return <p className="text-surface-400">Loading lead...</p>;
+    return <p className="text-ink-500 dark:text-surface-400">Loading lead...</p>;
   }
 
   if (!lead) {
@@ -54,22 +54,22 @@ export default function LeadDetailPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl sm:text-2xl font-bold text-white">Lead Details</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-ink-900 dark:text-white">Lead Details</h1>
         <Badge status={lead.status} />
       </div>
 
-      <div className="bg-surface-800 rounded-2xl p-4 sm:p-6 richshadow">
+      <div className="bg-white dark:bg-surface-800 rounded-2xl p-4 sm:p-6 richshadow">
         <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {fields.map(([label, value]) => (
             <div key={label}>
-              <dt className="text-xs uppercase tracking-wide text-surface-400">{label}</dt>
-              <dd className="text-white mt-0.5">{value || "-"}</dd>
+              <dt className="text-xs uppercase tracking-wide text-ink-500 dark:text-surface-400">{label}</dt>
+              <dd className="text-ink-900 dark:text-white mt-0.5">{value || "-"}</dd>
             </div>
           ))}
         </dl>
-        <div className="mt-4 pt-4 border-t border-surface-700">
-          <dt className="text-xs uppercase tracking-wide text-surface-400">Request</dt>
-          <dd className="text-white mt-0.5 whitespace-pre-wrap">{lead.request}</dd>
+        <div className="mt-4 pt-4 border-t border-ink-300 dark:border-surface-700">
+          <dt className="text-xs uppercase tracking-wide text-ink-500 dark:text-surface-400">Request</dt>
+          <dd className="text-ink-900 dark:text-white mt-0.5 whitespace-pre-wrap">{lead.request}</dd>
         </div>
       </div>
 

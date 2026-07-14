@@ -71,9 +71,9 @@ function toFormState(listing) {
 function OptionalField({ label, ...props }) {
   return (
     <div className="w-full">
-      <label className="block text-sm font-medium text-ink-700 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-ink-700 dark:text-surface-300 mb-1">{label}</label>
       <input
-        className="w-full px-3 py-2 rounded-md border border-ink-300 focus:outline-none focus:ring-2 focus:ring-brand-400"
+        className="w-full px-3 py-2 rounded-md border border-ink-300 dark:border-surface-600 bg-white dark:bg-surface-900 text-ink-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-400"
         {...props}
       />
     </div>
@@ -118,7 +118,7 @@ function ListingForm({ initialListing, onSubmit, isSaving, submitLabel = "Save L
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
-      <div className="bg-white rounded-2xl shadow-card p-4 sm:p-6 space-y-4">
+      <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-4 sm:p-6 space-y-4">
         <Input
           label="Title"
           name="title"
@@ -126,9 +126,9 @@ function ListingForm({ initialListing, onSubmit, isSaving, submitLabel = "Save L
           onChange={(e) => update("title", e.target.value)}
         />
         <div>
-          <label className="block text-sm font-medium text-ink-700 mb-1">Description</label>
+          <label className="block text-sm font-medium text-ink-700 dark:text-surface-300 mb-1">Description</label>
           <textarea
-            className="w-full px-3 py-2 rounded-md border border-ink-300 focus:outline-none focus:ring-2 focus:ring-brand-400 min-h-[120px]"
+            className="w-full px-3 py-2 rounded-md border border-ink-300 dark:border-surface-600 bg-white dark:bg-surface-900 text-ink-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-400 min-h-[120px]"
             value={form.description}
             onChange={(e) => update("description", e.target.value)}
             required
@@ -171,8 +171,8 @@ function ListingForm({ initialListing, onSubmit, isSaving, submitLabel = "Save L
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-card p-4 sm:p-6 space-y-4">
-        <h2 className="text-h2 text-ink-900">Location</h2>
+      <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-4 sm:p-6 space-y-4">
+        <h2 className="text-h2 text-ink-900 dark:text-white">Location</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Input
             label="Address"
@@ -195,8 +195,8 @@ function ListingForm({ initialListing, onSubmit, isSaving, submitLabel = "Save L
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-card p-4 sm:p-6 space-y-4">
-        <h2 className="text-h2 text-ink-900">Details</h2>
+      <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-4 sm:p-6 space-y-4">
+        <h2 className="text-h2 text-ink-900 dark:text-white">Details</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <OptionalField
             label="Bedrooms"
@@ -221,7 +221,7 @@ function ListingForm({ initialListing, onSubmit, isSaving, submitLabel = "Save L
           value={form.amenities}
           onChange={(e) => update("amenities", e.target.value)}
         />
-        <label className="flex items-center gap-2 text-sm text-ink-700">
+        <label className="flex items-center gap-2 text-sm text-ink-700 dark:text-surface-300">
           <input
             type="checkbox"
             checked={form.isFeatured}
@@ -231,8 +231,8 @@ function ListingForm({ initialListing, onSubmit, isSaving, submitLabel = "Save L
         </label>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-card p-4 sm:p-6 space-y-4">
-        <h2 className="text-h2 text-ink-900">Media</h2>
+      <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-4 sm:p-6 space-y-4">
+        <h2 className="text-h2 text-ink-900 dark:text-white">Media</h2>
         <MediaUploader value={form.media} onChange={(media) => update("media", media)} />
       </div>
 

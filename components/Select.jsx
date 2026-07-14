@@ -7,7 +7,7 @@ function SelectInput({ value, onChange, options, placeholder, label, name, class
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-ink-700 mb-1"
+          className="block text-sm font-medium text-ink-700 dark:text-slate-200 mb-1"
         >
           {label}
         </label>
@@ -17,7 +17,7 @@ function SelectInput({ value, onChange, options, placeholder, label, name, class
         name={name}
         className={
           className ||
-          "w-full px-3 py-2 rounded-md border border-ink-300 text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-400"
+          "w-full px-3 py-2 rounded-md border border-ink-300 dark:border-surface-700 bg-white dark:bg-surface-800 text-ink-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-400"
         }
         value={value}
         onChange={onChange}

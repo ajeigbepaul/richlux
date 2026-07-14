@@ -68,17 +68,20 @@ function DataTable({
       {/* Mobile: stacked label/value cards instead of a cramped table. */}
       <div className="sm:hidden space-y-3">
         {rows.length === 0 ? (
-          <p className="text-center text-surface-400 py-6">{emptyMessage}</p>
+          <p className="text-center text-ink-500 dark:text-surface-400 py-6">{emptyMessage}</p>
         ) : (
           rows.map((row) =>
             renderMobileCard ? (
               <div key={getRowId(row)}>{renderMobileCard(row)}</div>
             ) : (
-              <div key={getRowId(row)} className="bg-surface-800 rounded-lg p-4 space-y-1">
+              <div
+                key={getRowId(row)}
+                className="bg-white dark:bg-surface-800 rounded-lg p-4 space-y-1"
+              >
                 {columns.map((col) => (
                   <div key={col.key} className="flex justify-between gap-3 text-sm">
-                    <span className="text-surface-400">{col.label}</span>
-                    <span className="text-right text-white">
+                    <span className="text-ink-500 dark:text-surface-400">{col.label}</span>
+                    <span className="text-right text-ink-900 dark:text-white">
                       {col.render ? col.render(row) : row[col.key]}
                     </span>
                   </div>

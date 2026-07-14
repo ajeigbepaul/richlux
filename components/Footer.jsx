@@ -7,7 +7,7 @@ import Container from "@/components/ui/Container";
 
 function Footer() {
   return (
-    <footer className="bg-ink-900 text-ink-100 mt-16">
+    <footer className="w-full bg-ink-900 dark:bg-surface-950 text-ink-100 dark:text-slate-300 mt-16">
       <Container>
         <div className="py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
@@ -18,7 +18,7 @@ function Footer() {
               height={48}
               className="h-10 w-auto object-contain bg-white rounded-md p-1"
             />
-            <p className="mt-4 text-sm text-ink-300">
+            <p className="mt-4 text-sm text-ink-300 dark:text-slate-400">
               Your No 1 realtor -- house sales, property management, shortlet,
               rentals, and land sales.
             </p>
@@ -33,7 +33,7 @@ function Footer() {
                 <li key={category}>
                   <Link
                     href={`/listings?category=${category}`}
-                    className="text-sm text-ink-300 hover:text-white transition-colors"
+                    className="text-sm text-ink-300 dark:text-slate-400 hover:text-white transition-colors"
                   >
                     {LISTING_CATEGORY_LABELS[category]}
                   </Link>
@@ -48,12 +48,12 @@ function Footer() {
             </h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-sm text-ink-300 hover:text-white transition-colors">
+                <Link href="/" className="text-sm text-ink-300 dark:text-slate-400 hover:text-white transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/listings" className="text-sm text-ink-300 hover:text-white transition-colors">
+                <Link href="/listings" className="text-sm text-ink-300 dark:text-slate-400 hover:text-white transition-colors">
                   All Listings
                 </Link>
               </li>
@@ -65,19 +65,19 @@ function Footer() {
               Contact
             </h3>
             <ul className="space-y-3">
-              <li className="flex items-center space-x-2 text-sm text-ink-300">
+              <li className="flex items-center space-x-2 text-sm text-ink-300 dark:text-slate-400">
                 <FaPhone size={14} />
                 <a href="tel:+2349026482403" className="hover:text-white transition-colors">
                   +234 902 648 2403
                 </a>
               </li>
-              <li className="flex items-center space-x-2 text-sm text-ink-300">
+              <li className="flex items-center space-x-2 text-sm text-ink-300 dark:text-slate-400">
                 <FaEnvelope size={14} />
                 <a href="mailto:Richluxng@gmail.com" className="hover:text-white transition-colors">
                   Richluxng@gmail.com
                 </a>
               </li>
-              <li className="flex items-center space-x-2 text-sm text-ink-300">
+              <li className="flex items-center space-x-2 text-sm text-ink-300 dark:text-slate-400">
                 <FaInstagram size={14} />
                 <a
                   href="https://instagram.com/ibadan_richlux_property"
@@ -92,7 +92,7 @@ function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-ink-700 py-6 text-center text-caption text-ink-500">
+        <div className="border-t border-ink-700 dark:border-surface-700 py-6 text-center text-caption text-ink-500 dark:text-slate-500">
           © {new Date().getFullYear()} Richlux Properties. All rights reserved.
         </div>
       </Container>

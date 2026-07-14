@@ -54,12 +54,12 @@ export default function AdminUsersPage() {
   };
 
   if (status === "loading") {
-    return <p className="text-surface-400">Loading...</p>;
+    return <p className="text-ink-500 dark:text-surface-400">Loading...</p>;
   }
 
   if (!isSuperadmin) {
     return (
-      <div className="bg-surface-800 rounded-2xl p-6 text-surface-300">
+      <div className="bg-white dark:bg-surface-800 rounded-2xl p-6 text-ink-500 dark:text-surface-300 richshadow">
         You are not authorized to view this page.
       </div>
     );
@@ -76,7 +76,7 @@ export default function AdminUsersPage() {
       label: "Role",
       render: (row) => (
         <select
-          className="text-xs bg-surface-800 text-white border border-surface-600 rounded px-1 py-0.5 capitalize"
+          className="text-xs bg-white dark:bg-surface-800 text-ink-900 dark:text-white border border-ink-300 dark:border-surface-600 rounded px-1 py-0.5 capitalize"
           value={row.role}
           onChange={(e) => handleRoleChange(row._id, e.target.value)}
         >
@@ -108,9 +108,9 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-white">Users</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-ink-900 dark:text-white">Users</h1>
       {isLoading ? (
-        <p className="text-surface-400">Loading users...</p>
+        <p className="text-ink-500 dark:text-surface-400">Loading users...</p>
       ) : (
         <DataTable
           columns={columns}
@@ -126,11 +126,11 @@ export default function AdminUsersPage() {
           }}
           emptyMessage="No users yet."
           renderMobileCard={(row) => (
-            <div className="bg-surface-800 rounded-lg p-4 space-y-2 richshadow">
+            <div className="bg-white dark:bg-surface-800 rounded-lg p-4 space-y-2 richshadow">
               <div className="flex justify-between items-start gap-2">
                 <div>
-                  <p className="font-semibold text-white">{row.username}</p>
-                  <p className="text-xs text-surface-400">{row.email}</p>
+                  <p className="font-semibold text-ink-900 dark:text-white">{row.username}</p>
+                  <p className="text-xs text-ink-500 dark:text-surface-400">{row.email}</p>
                 </div>
                 <input
                   type="checkbox"
@@ -138,9 +138,9 @@ export default function AdminUsersPage() {
                   onChange={(e) => handleActiveToggle(row._id, e.target.checked)}
                 />
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-surface-700">
+              <div className="flex items-center justify-between pt-2 border-t border-ink-300 dark:border-surface-700">
                 <select
-                  className="text-xs bg-surface-900 text-white border border-surface-600 rounded px-1 py-0.5 capitalize"
+                  className="text-xs bg-ink-100 dark:bg-surface-900 text-ink-900 dark:text-white border border-ink-300 dark:border-surface-600 rounded px-1 py-0.5 capitalize"
                   value={row.role}
                   onChange={(e) => handleRoleChange(row._id, e.target.value)}
                 >
@@ -150,7 +150,7 @@ export default function AdminUsersPage() {
                     </option>
                   ))}
                 </select>
-                <span className="text-xs text-surface-400">
+                <span className="text-xs text-ink-500 dark:text-surface-400">
                   {row.createdAt ? new Date(row.createdAt).toLocaleDateString() : "-"}
                 </span>
               </div>
