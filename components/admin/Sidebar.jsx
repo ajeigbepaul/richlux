@@ -10,14 +10,17 @@ import ThemeToggle from "@/components/ui/ThemeToggle";
 // superadmin-only.
 const NAV_BY_ROLE = {
   agent: [
+    { href: "/admin", label: "Dashboard" },
     { href: "/admin/listings", label: "My Listings" },
     { href: "/admin/requests", label: "Requests" },
   ],
   manager: [
+    { href: "/admin", label: "Dashboard" },
     { href: "/admin/listings", label: "All Listings" },
     { href: "/admin/requests", label: "Requests" },
   ],
   superadmin: [
+    { href: "/admin", label: "Dashboard" },
     { href: "/admin/listings", label: "All Listings" },
     { href: "/admin/requests", label: "Requests" },
     { href: "/admin/users", label: "Users" },
@@ -45,7 +48,11 @@ function Sidebar() {
 
       <nav className="px-2 sm:px-4 pb-2 lg:pb-0 flex flex-row lg:flex-col gap-1 overflow-x-auto lg:overflow-visible lg:flex-1">
         {navItems.map((item) => {
-          const active = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+          // "/admin" itself must only match exactly -- otherwise its prefix
+          // check would also match every other /admin/* route below it.
+          const active =
+            pathname === item.href ||
+            (item.href !== "/admin" && pathname?.startsWith(`${item.href}/`));
           return (
             <Link
               key={item.href}

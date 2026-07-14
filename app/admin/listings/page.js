@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import useSWR from "swr";
 import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import DataTable from "@/components/ui/DataTable";
 import Badge from "@/components/ui/Badge";
 import { LISTING_CATEGORY_LABELS } from "@/constants/listing";
@@ -19,14 +21,24 @@ function formatNaira(price) {
 // Note: the API already scopes an authenticated agent to `agent: session.user.id`
 // server-side, and managers/superadmins see everything by default -- no
 // client-side role filtering needed here.
-export default function AdminListingsPage() {
+function AdminListingsBrowser() {
+  const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const isOversight =
+    session?.user?.role === "manager" || session?.user?.role === "superadmin";
+
+  const [approvalFilter, setApprovalFilter] = useState(
+    () => searchParams.get("approvalStatus") || ""
+  );
   const [page, setPage] = useState(0); // zero-based, matches MUI TablePagination
   const [pageSize, setPageSize] = useState(10);
 
-  const { data, isLoading, mutate } = useSWR(
-    `/api/listing?page=${page + 1}&pageSize=${pageSize}`,
-    fetcher
-  );
+  const query = new URLSearchParams();
+  query.set("page", String(page + 1));
+  query.set("pageSize", String(pageSize));
+  if (approvalFilter) query.set("approvalStatus", approvalFilter);
+
+  const { data, isLoading, mutate } = useSWR(`/api/listing?${query}`, fetcher);
 
   const items = data?.items || [];
   const total = data?.total || 0;
@@ -46,6 +58,27 @@ export default function AdminListingsPage() {
     }
   };
 
+  const handleApproval = async (id, approvalStatus) => {
+    try {
+      const res = await fetch(`/api/listing/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ approvalStatus }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.message || "Failed to update listing");
+      toast.success(approvalStatus === "approved" ? "Listing approved" : "Listing rejected");
+      mutate();
+    } catch (error) {
+      toast.error(error.message || "Failed to update listing");
+    }
+  };
+
+  const setFilter = (value) => {
+    setApprovalFilter(value);
+    setPage(0);
+  };
+
   const columns = [
     { key: "title", label: "Title", render: (row) => row.title },
     {
@@ -54,6 +87,33 @@ export default function AdminListingsPage() {
       render: (row) => LISTING_CATEGORY_LABELS[row.category] || row.category,
     },
     { key: "status", label: "Status", render: (row) => <Badge status={row.status} /> },
+    {
+      key: "approvalStatus",
+      label: "Approval",
+      render: (row) => (
+        <div className="flex items-center gap-2">
+          <Badge status={row.approvalStatus} />
+          {isOversight && row.approvalStatus === "pending" && (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => handleApproval(row._id, "approved")}
+                className="text-success hover:underline text-xs font-medium"
+              >
+                Approve
+              </button>
+              <button
+                type="button"
+                onClick={() => handleApproval(row._id, "rejected")}
+                className="text-danger hover:underline text-xs font-medium"
+              >
+                Reject
+              </button>
+            </div>
+          )}
+        </div>
+      ),
+    },
     {
       key: "price",
       label: "Price",
@@ -103,6 +163,31 @@ export default function AdminListingsPage() {
         </Link>
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => setFilter("")}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            !approvalFilter
+              ? "bg-brand-400 text-white"
+              : "bg-white dark:bg-surface-800 text-ink-700 dark:text-slate-200 border border-ink-300 dark:border-surface-700"
+          }`}
+        >
+          All
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilter("pending")}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            approvalFilter === "pending"
+              ? "bg-brand-400 text-white"
+              : "bg-white dark:bg-surface-800 text-ink-700 dark:text-slate-200 border border-ink-300 dark:border-surface-700"
+          }`}
+        >
+          Pending Approval
+        </button>
+      </div>
+
       {isLoading ? (
         <p className="text-ink-500 dark:text-surface-400">Loading listings...</p>
       ) : (
@@ -128,8 +213,29 @@ export default function AdminListingsPage() {
                     {LISTING_CATEGORY_LABELS[row.category] || row.category}
                   </p>
                 </div>
-                <Badge status={row.status} />
+                <div className="flex flex-col items-end gap-1">
+                  <Badge status={row.status} />
+                  <Badge status={row.approvalStatus} />
+                </div>
               </div>
+              {isOversight && row.approvalStatus === "pending" && (
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => handleApproval(row._id, "approved")}
+                    className="text-success text-xs font-medium"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleApproval(row._id, "rejected")}
+                    className="text-danger text-xs font-medium"
+                  >
+                    Reject
+                  </button>
+                </div>
+              )}
               <div className="text-sm text-ink-500 dark:text-surface-300 flex justify-between">
                 <span>{formatNaira(row.price)}</span>
                 <span>{row.media?.length || 0} media</span>
@@ -157,5 +263,13 @@ export default function AdminListingsPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function AdminListingsPage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminListingsBrowser />
+    </Suspense>
   );
 }

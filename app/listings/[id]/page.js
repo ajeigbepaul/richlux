@@ -8,6 +8,7 @@ import ListingItem from "@/components/ListingItem";
 import ListingInquiryButton from "@/components/ListingInquiryButton";
 import Listing from "@/model/Listing";
 import { connectToDB } from "@/utils/database";
+import { getCurrentSession, toIdString } from "@/utils/auth";
 import { LISTING_CATEGORY_LABELS } from "@/constants/listing";
 import { notFound } from "next/navigation";
 
@@ -34,6 +35,7 @@ async function getRelated(category, excludeId) {
   const related = await Listing.find({
     category,
     status: "available",
+    approvalStatus: "approved",
     _id: { $ne: excludeId },
   })
     .limit(3)
@@ -51,14 +53,25 @@ export default async function ListingDetailPage({ params }) {
   }
   if (!listing) return notFound();
 
+  // Unapproved listings are only visible to manager/superadmin oversight or
+  // the agent who owns them -- everyone else gets the same not-found page a
+  // deleted listing would show (mirrors the GET /api/listing/[id] gate).
+  const session = await getCurrentSession();
+  const role = session?.user?.role;
+  const isOversight = role === "superadmin" || role === "manager";
+  const isOwner = role === "agent" && toIdString(listing.agent) === toIdString(session?.user?.id);
+  if (listing.approvalStatus !== "approved" && !isOversight && !isOwner) {
+    return notFound();
+  }
+
   const related = await getRelated(listing.category, listing._id);
   const serializedListing = JSON.parse(JSON.stringify(listing));
   const serializedRelated = JSON.parse(JSON.stringify(related));
 
   return (
-    <main className="w-full bg-white dark:bg-surface-900">
+    <main className="w-full bg-white dark:bg-surface-900 min-h-screen flex flex-col">
       <Header />
-      <Container className="py-10">
+      <Container className="py-10 flex-1">
         <div className="grid lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2">
             <MediaGallery

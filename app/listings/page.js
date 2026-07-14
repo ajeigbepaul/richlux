@@ -24,6 +24,11 @@ function ListingsBrowser() {
   if (activeCategory) query.set("category", activeCategory);
   query.set("page", String(page));
   query.set("pageSize", "12");
+  // Explicit status/approvalStatus so a logged-in staff visitor browsing the
+  // public storefront never sees unapproved/off-market listings just because
+  // they're staff.
+  query.set("status", "available");
+  query.set("approvalStatus", "approved");
 
   const { data, isLoading } = useSWR(`/api/listing?${query.toString()}`, fetcher);
   const items = data?.items || [];
@@ -36,9 +41,9 @@ function ListingsBrowser() {
   };
 
   return (
-    <main className="w-full bg-white dark:bg-surface-900">
+    <main className="w-full bg-white dark:bg-surface-900 min-h-screen flex flex-col">
       <Header />
-      <Container className="py-10">
+      <Container className="py-10 flex-1">
         <h1 className="text-h1 text-ink-900 dark:text-white">All Listings</h1>
 
         <div className="mt-6 flex flex-wrap gap-2">

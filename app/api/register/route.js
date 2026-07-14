@@ -3,7 +3,7 @@ import { User } from "@/model/User";
 import bcrypt from "bcrypt";
 
 export const POST = async (req, res) => {
-  const { username, email, password } = await req.json();
+  const { username, email, password, phone, applyAsAgent, message } = await req.json();
   try {
     await connectToDB();
     const normalizedEmail = email?.trim().toLowerCase();
@@ -18,7 +18,13 @@ export const POST = async (req, res) => {
       username: username,
       email: normalizedEmail,
       password: hashPassword,
-      role: "user", // public self-registration never grants elevated roles
+      phone,
+      role: "user", // public self-registration never grants elevated roles --
+      // "apply as agent" only records a pending application below, a
+      // superadmin still has to approve it before the role actually changes.
+      agentApplication: applyAsAgent
+        ? { status: "pending", message, appliedAt: new Date() }
+        : undefined,
     });
     await user.save();
     return new Response(JSON.stringify(user), { status: 201 });

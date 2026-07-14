@@ -15,6 +15,9 @@ const STATUS_STYLES = {
   accepted: "bg-success/10 text-success",
   declined: "bg-danger/10 text-danger",
   withdrawn: "bg-ink-500/10 text-ink-500 dark:text-slate-400",
+  // Listing/agent-application approval statuses
+  approved: "bg-success/10 text-success",
+  rejected: "bg-danger/10 text-danger",
 };
 
 function Badge({ status, children, className = "" }) {

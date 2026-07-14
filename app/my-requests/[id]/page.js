@@ -274,9 +274,9 @@ export default function MyRequestDetailPage() {
   const hasError = data && data.message && !data._id;
 
   return (
-    <main className="w-full bg-white dark:bg-surface-900">
+    <main className="w-full bg-white dark:bg-surface-900 min-h-screen flex flex-col">
       <Header />
-      <Container className="py-10">
+      <Container className="py-10 flex-1">
         <Link
           href="/my-requests"
           className="text-caption font-medium text-brand-500 dark:text-brand-400"

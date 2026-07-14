@@ -29,7 +29,7 @@ export async function requireRole(allowedRoles = []) {
 // -- a populated document's own String() coercion is NOT its id, so every
 // ownership check below must go through this rather than String(field)
 // directly.
-function toIdString(value) {
+export function toIdString(value) {
   if (!value) return undefined;
   return String(value._id || value);
 }

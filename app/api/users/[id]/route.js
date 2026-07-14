@@ -1,4 +1,4 @@
-import { User, ROLES } from "@/model/User";
+import { User, ROLES, AGENT_APPLICATION_STATUSES } from "@/model/User";
 import { connectToDB } from "@/utils/database";
 import { requireRole } from "@/utils/auth";
 import { NextResponse } from "next/server";
@@ -28,6 +28,16 @@ export async function PATCH(req, { params }) {
     const update = {};
     if (body.role) update.role = body.role;
     if (typeof body.isActive === "boolean") update.isActive = body.isActive;
+    // One click both decides the application and (on approval) promotes the
+    // role -- the existing plain `body.role` path above still works for a
+    // manual promotion with no application on file.
+    if (
+      body.agentApplicationStatus &&
+      AGENT_APPLICATION_STATUSES.includes(body.agentApplicationStatus)
+    ) {
+      update["agentApplication.status"] = body.agentApplicationStatus;
+      if (body.agentApplicationStatus === "approved") update.role = "agent";
+    }
 
     const user = await User.findByIdAndUpdate(id, update, { new: true }).select(
       "-password"

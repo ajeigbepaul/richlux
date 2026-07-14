@@ -65,7 +65,7 @@ function MyRequestsContent() {
   const requests = Array.isArray(data) ? data : [];
 
   return (
-    <Container className="py-10">
+    <Container className="py-10 flex-1">
       <h1 className="text-h1 text-ink-900 dark:text-white">My Requests</h1>
       <p className="text-body text-ink-500 dark:text-slate-400 mt-1">
         Track offers from agents on the housing requests you&apos;ve submitted.
@@ -99,10 +99,10 @@ export default function MyRequestsPage() {
   const { status } = useSession();
 
   return (
-    <main className="w-full bg-white dark:bg-surface-900">
+    <main className="w-full bg-white dark:bg-surface-900 min-h-screen flex flex-col">
       <Header />
       {status === "unauthenticated" ? (
-        <Container className="py-10">
+        <Container className="py-10 flex-1">
           <div className="text-center py-16">
             <h1 className="text-h1 text-ink-900 dark:text-white">My Requests</h1>
             <p className="text-body text-ink-500 dark:text-slate-400 mt-2">

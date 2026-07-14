@@ -3,6 +3,7 @@ import {
   LISTING_CATEGORIES,
   LISTING_STATUSES,
   LISTING_PRICE_FREQUENCIES,
+  LISTING_APPROVAL_STATUSES,
 } from "@/constants/listing";
 
 const MediaSchema = new Schema(
@@ -48,6 +49,15 @@ const ListingSchema = new Schema(
       type: String,
       enum: LISTING_STATUSES,
       default: "available",
+      index: true,
+    },
+    // Moderation gate, orthogonal to `status` (sale-state) -- an agent-created
+    // listing starts "pending" and stays off the public storefront until a
+    // manager/superadmin approves it; staff-created listings publish immediately.
+    approvalStatus: {
+      type: String,
+      enum: LISTING_APPROVAL_STATUSES,
+      default: "approved",
       index: true,
     },
     agent: {

@@ -33,3 +33,7 @@ export const LISTING_PRICE_FREQUENCIES = [
 ];
 
 export const USER_ROLES = ["superadmin", "manager", "agent", "user"];
+
+export const AGENT_APPLICATION_STATUSES = ["none", "pending", "approved", "rejected"];
+
+export const LISTING_APPROVAL_STATUSES = ["pending", "approved", "rejected"];

@@ -9,7 +9,13 @@ import Container from "@/components/ui/Container";
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 function Listings() {
-  const { data, isLoading } = useSWR("/api/listing?pageSize=6", fetcher);
+  // Explicit status/approvalStatus so a logged-in staff visitor browsing the
+  // storefront never sees unapproved/off-market listings mixed into
+  // "Featured Properties" just because they're staff.
+  const { data, isLoading } = useSWR(
+    "/api/listing?pageSize=6&status=available&approvalStatus=approved",
+    fetcher
+  );
   const items = data?.items || [];
 
   return (

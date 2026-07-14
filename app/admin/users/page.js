@@ -5,6 +5,7 @@ import useSWR from "swr";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import DataTable from "@/components/ui/DataTable";
+import Badge from "@/components/ui/Badge";
 import { USER_ROLES } from "@/constants/listing";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -53,6 +54,26 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleAgentApplication = async (id, agentApplicationStatus) => {
+    try {
+      const res = await fetch(`/api/users/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ agentApplicationStatus }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.message || "Failed to update application");
+      toast.success(
+        agentApplicationStatus === "approved"
+          ? "Application approved -- they'll get agent access after their next login"
+          : "Application rejected"
+      );
+      mutate();
+    } catch (error) {
+      toast.error(error.message || "Failed to update application");
+    }
+  };
+
   if (status === "loading") {
     return <p className="text-ink-500 dark:text-surface-400">Loading...</p>;
   }
@@ -98,6 +119,43 @@ export default function AdminUsersPage() {
           onChange={(e) => handleActiveToggle(row._id, e.target.checked)}
         />
       ),
+    },
+    {
+      key: "agentApplication",
+      label: "Agent App",
+      render: (row) =>
+        !row.agentApplication || row.agentApplication.status === "none" ? (
+          "-"
+        ) : (
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Badge status={row.agentApplication.status} />
+              {row.agentApplication.status === "pending" && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleAgentApplication(row._id, "approved")}
+                    className="text-success hover:underline text-xs font-medium"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleAgentApplication(row._id, "rejected")}
+                    className="text-danger hover:underline text-xs font-medium"
+                  >
+                    Reject
+                  </button>
+                </>
+              )}
+            </div>
+            {row.agentApplication.message && (
+              <p className="text-xs text-ink-500 dark:text-surface-400 max-w-xs">
+                {row.agentApplication.message}
+              </p>
+            )}
+          </div>
+        ),
     },
     {
       key: "createdAt",
@@ -154,6 +212,36 @@ export default function AdminUsersPage() {
                   {row.createdAt ? new Date(row.createdAt).toLocaleDateString() : "-"}
                 </span>
               </div>
+              {row.agentApplication && row.agentApplication.status !== "none" && (
+                <div className="pt-2 border-t border-ink-300 dark:border-surface-700 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Badge status={row.agentApplication.status} />
+                    {row.agentApplication.status === "pending" && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleAgentApplication(row._id, "approved")}
+                          className="text-success text-xs font-medium"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleAgentApplication(row._id, "rejected")}
+                          className="text-danger text-xs font-medium"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  {row.agentApplication.message && (
+                    <p className="text-xs text-ink-500 dark:text-surface-400">
+                      {row.agentApplication.message}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           )}
         />

@@ -21,6 +21,7 @@ const QUICK_LINKS = [
   { href: "/request", label: "Submit a Request" },
   { href: "/my-requests", label: "My Requests" },
   { href: "/logininterface", label: "Sign In" },
+  { href: "/become-agent", label: "Become an Agent" },
 ];
 
 function Footer() {

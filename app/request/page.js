@@ -25,24 +25,26 @@ export default function RequestPage() {
   const [open, setOpen] = React.useState(true);
 
   return (
-    <main className="w-full bg-white dark:bg-surface-900 min-h-screen">
+    <main className="w-full bg-white dark:bg-surface-900 min-h-screen flex flex-col">
       <Header />
-      {status === "loading" ? (
-        <div className="flex items-center justify-center py-24">
-          <p className="text-ink-500 dark:text-slate-400">Loading...</p>
-        </div>
-      ) : (
-        <AnimatePresence>
-          {open && (
-            <RequestWizardModal
-              onClose={() => {
-                setOpen(false);
-                router.push("/");
-              }}
-            />
-          )}
-        </AnimatePresence>
-      )}
+      <div className="flex-1">
+        {status === "loading" ? (
+          <div className="flex items-center justify-center py-24">
+            <p className="text-ink-500 dark:text-slate-400">Loading...</p>
+          </div>
+        ) : (
+          <AnimatePresence>
+            {open && (
+              <RequestWizardModal
+                onClose={() => {
+                  setOpen(false);
+                  router.push("/");
+                }}
+              />
+            )}
+          </AnimatePresence>
+        )}
+      </div>
       <Footer />
     </main>
   );

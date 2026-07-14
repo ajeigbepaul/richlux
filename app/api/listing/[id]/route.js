@@ -1,6 +1,6 @@
 import Listing from "@/model/Listing";
 import { connectToDB } from "@/utils/database";
-import { requireRole, canManageListing } from "@/utils/auth";
+import { getCurrentSession, requireRole, canManageListing, toIdString } from "@/utils/auth";
 import cloudinary from "@/utils/cloudinary";
 import { NextResponse } from "next/server";
 
@@ -16,6 +16,18 @@ export async function GET(req, { params }) {
     if (!listing) {
       return NextResponse.json({ message: "Not found" }, { status: 404 });
     }
+
+    // Unapproved listings are only visible to manager/superadmin oversight or
+    // the agent who owns them -- everyone else gets the same "Not found" a
+    // deleted listing would return, never a 403 that reveals it exists.
+    const session = await getCurrentSession();
+    const role = session?.user?.role;
+    const isOversight = role === "superadmin" || role === "manager";
+    const isOwner = role === "agent" && toIdString(listing.agent) === toIdString(session?.user?.id);
+    if (listing.approvalStatus !== "approved" && !isOversight && !isOwner) {
+      return NextResponse.json({ message: "Not found" }, { status: 404 });
+    }
+
     return NextResponse.json(listing);
   } catch (error) {
     return NextResponse.json({ message: error.message }, { status: 500 });
@@ -37,6 +49,15 @@ export async function PATCH(req, { params }) {
     }
 
     const body = await req.json();
+    const isOversight = session.user.role === "superadmin" || session.user.role === "manager";
+
+    if ("approvalStatus" in body) {
+      if (!isOversight) {
+        return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+      }
+      listing.approvalStatus = body.approvalStatus;
+    }
+
     const editable = [
       "title",
       "description",
@@ -52,8 +73,18 @@ export async function PATCH(req, { params }) {
       "status",
       "isFeatured",
     ];
+    let ownerEditedContent = false;
     for (const field of editable) {
-      if (field in body) listing[field] = body[field];
+      if (field in body) {
+        listing[field] = body[field];
+        ownerEditedContent = true;
+      }
+    }
+    // An agent editing their own already-approved listing sends it back for
+    // re-review -- guarantees a manager/superadmin always sees the final
+    // content before it's public again. Staff edits never trigger this.
+    if (!isOversight && ownerEditedContent && listing.approvalStatus === "approved") {
+      listing.approvalStatus = "pending";
     }
     // agent ownership is never client-editable, even by whoever owns the listing
     await listing.save();

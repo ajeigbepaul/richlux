@@ -1,7 +1,11 @@
 import Listing from "@/model/Listing";
 import { connectToDB } from "@/utils/database";
 import { getCurrentSession, requireRole } from "@/utils/auth";
-import { LISTING_CATEGORIES, LISTING_STATUSES } from "@/constants/listing";
+import {
+  LISTING_CATEGORIES,
+  LISTING_STATUSES,
+  LISTING_APPROVAL_STATUSES,
+} from "@/constants/listing";
 import { NextResponse } from "next/server";
 
 // Public listing index -- unauthenticated requests only ever see "available"
@@ -18,6 +22,7 @@ export async function GET(req) {
     const bed = searchParams.get("bed");
     const location = searchParams.get("location");
     const agentId = searchParams.get("agentId");
+    const approvalStatus = searchParams.get("approvalStatus");
     const page = Math.max(Number(searchParams.get("page")) || 1, 1);
     const pageSize = Math.min(Number(searchParams.get("pageSize")) || 12, 50);
 
@@ -33,6 +38,16 @@ export async function GET(req) {
       query.status = status;
     } else if (!isStaff) {
       query.status = "available";
+    }
+    // Same pattern as `status`: staff who explicitly ask for a scope get it
+    // (e.g. the storefront components below always pass approvalStatus=approved
+    // even when the visitor happens to be staff; the admin approval queue
+    // passes approvalStatus=pending); non-staff are always locked to approved
+    // regardless of what they pass, as a defense-in-depth backstop.
+    if (approvalStatus && LISTING_APPROVAL_STATUSES.includes(approvalStatus) && isStaff) {
+      query.approvalStatus = approvalStatus;
+    } else if (!isStaff) {
+      query.approvalStatus = "approved";
     }
     if (minPrice || maxPrice) {
       query.price = {};
@@ -90,6 +105,10 @@ export async function POST(req) {
       status: body.status,
       isFeatured: body.isFeatured,
       agent: session.user.id, // always server-derived, never trusted from body
+      // Agent-created listings need manager/superadmin review before going
+      // live; staff-created listings publish immediately (they already
+      // bypass ownership checks everywhere else). Never trust a client value.
+      approvalStatus: session.user.role === "agent" ? "pending" : "approved",
     });
 
     return NextResponse.json(listing, { status: 201 });
