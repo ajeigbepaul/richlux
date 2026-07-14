@@ -3,14 +3,23 @@ import Input from "@/components/Input";
 import SubmitButton from "@/components/SubmitButton";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import Link from "next/link";
 import { FaTimes } from "react-icons/fa";
+import { useSession } from "next-auth/react";
+import Button from "@/components/ui/Button";
 import SelectInput from "@/components/Select";
 
 function RequestModal({ visible, setRequestModal, requestModal, listingId }) {
+  const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [fullname, setFullname] = useState("");
-  const [email, setEmail] = useState("");
+  // Lazy initializers: by the time this modal is opened (a user click),
+  // the session has already resolved via the app-wide SessionProvider, so
+  // prefilling here avoids a setState-in-effect cascade.
+  const [fullname, setFullname] = useState(
+    () => session?.user?.name || session?.user?.username || ""
+  );
+  const [email, setEmail] = useState(() => session?.user?.email || "");
   const [phonenumber, setPhonenumber] = useState("");
   const [sex, setSex] = useState("");
   const [presentlocation, setPresentLocation] = useState("");
@@ -19,11 +28,41 @@ function RequestModal({ visible, setRequestModal, requestModal, listingId }) {
   const [type, setType] = useState("");
   const [bed, setBed] = useState("");
   const [request, setRequest] = useState("");
+
   if (!visible) return null;
 
   const handleCloseClick = () => {
     setRequestModal(!requestModal);
   };
+
+  if (status === "unauthenticated") {
+    return (
+      <div className="md:w-3/5 w-full bg-white dark:bg-surface-900 shadow-2xl absolute top-24 md:top-20 z-40 rounded-md p-6 left-1/2 -translate-x-1/2">
+        <div className="flex justify-between items-center w-full pb-4">
+          <h2 className="text-ink-900 dark:text-white font-bold">
+            Sign in to make an inquiry
+          </h2>
+          <div
+            className="w-8 h-8 bg-ink-100 dark:bg-surface-800 rounded-full flex items-center justify-center shadow-lg cursor-pointer"
+            onClick={handleCloseClick}
+          >
+            <FaTimes size={20} className="text-danger" />
+          </div>
+        </div>
+        <p className="text-ink-500 dark:text-slate-400 text-sm mb-6">
+          Please sign in or create an account to send this inquiry.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/login?callbackUrl=/listings">
+            <Button variant="primary">Sign In</Button>
+          </Link>
+          <Link href="/register?callbackUrl=/listings">
+            <Button variant="secondary">Create an account</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const handleRequest = async (e) => {
     e.preventDefault();

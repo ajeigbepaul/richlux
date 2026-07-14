@@ -24,12 +24,22 @@ export async function requireRole(allowedRoles = []) {
   return session;
 }
 
+// Extracts a comparable id string whether the field is a raw ObjectId or a
+// populated sub-document (e.g. UserRequest.userId after .populate("userId"))
+// -- a populated document's own String() coercion is NOT its id, so every
+// ownership check below must go through this rather than String(field)
+// directly.
+function toIdString(value) {
+  if (!value) return undefined;
+  return String(value._id || value);
+}
+
 // Agents may only manage their own listings; manager/superadmin bypass ownership.
 export function canManageListing(session, listing) {
   const role = session?.user?.role;
   if (role === "superadmin" || role === "manager") return true;
   if (role === "agent") {
-    return String(listing.agent) === String(session.user.id);
+    return toIdString(listing.agent) === toIdString(session?.user?.id);
   }
   return false;
 }
@@ -41,7 +51,7 @@ export function canManageListing(session, listing) {
 export function canManageRequest(session, userRequest) {
   const role = session?.user?.role;
   if (role === "superadmin" || role === "manager") return true;
-  return String(userRequest.userId) === String(session?.user?.id);
+  return toIdString(userRequest.userId) === toIdString(session?.user?.id);
 }
 
 // Only the agent/manager who created an offer, or staff oversight
@@ -51,7 +61,7 @@ export function canManageRequest(session, userRequest) {
 export function canManageOffer(session, offer) {
   const role = session?.user?.role;
   if (role === "superadmin" || role === "manager") return true;
-  return String(offer.agent) === String(session?.user?.id);
+  return toIdString(offer.agent) === toIdString(session?.user?.id);
 }
 
 // Single source of truth for sealed-bid visibility: the requester and staff
@@ -60,7 +70,7 @@ export function canManageOffer(session, offer) {
 export function offerVisibilityFilter(session, userRequest) {
   const role = session?.user?.role;
   const isOversight = role === "superadmin" || role === "manager";
-  const isRequester = String(userRequest.userId) === String(session?.user?.id);
+  const isRequester = toIdString(userRequest.userId) === toIdString(session?.user?.id);
   if (isOversight || isRequester) return {};
   return { agent: session?.user?.id };
 }

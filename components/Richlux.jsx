@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
+import Link from "next/link";
 import { BiHomeHeart, BiSupport, BiHomeCircle } from "react-icons/bi";
-import RequestModal from "@/app/modal/request/page";
 import Container from "@/components/ui/Container";
 
 const QUICK_LINKS = [
@@ -12,9 +12,6 @@ const QUICK_LINKS = [
 ];
 
 function Richlux() {
-  const [requestModal, setRequestModal] = useState(false);
-  const handleRequest = () => setRequestModal(!requestModal);
-
   return (
     <div className="w-full bg-white dark:bg-surface-900 relative overflow-hidden">
       <div className="absolute inset-0 bg-brand-blob opacity-70 pointer-events-none" />
@@ -43,8 +40,8 @@ function Richlux() {
             ))}
           </div>
 
-          <div
-            onClick={handleRequest}
+          <Link
+            href="/request"
             className="mt-10 flex items-center bg-brand-400 hover:bg-brand-500 transition-colors text-white px-6 py-4 rounded-xl shadow-card cursor-pointer"
           >
             <div className="flex flex-col text-left px-2">
@@ -56,14 +53,9 @@ function Richlux() {
               </span>
             </div>
             <BiHomeHeart size={36} className="ml-4" />
-          </div>
+          </Link>
         </div>
       </Container>
-      <RequestModal
-        visible={requestModal}
-        setRequestModal={setRequestModal}
-        requestModal={requestModal}
-      />
     </div>
   );
 }

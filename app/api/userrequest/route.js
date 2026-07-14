@@ -1,4 +1,5 @@
 import UserRequest from "@/model/UserRequest";
+import Listing from "@/model/Listing";
 import { connectToDB } from "@/utils/database";
 import { requireRole } from "@/utils/auth";
 import { LISTING_CATEGORIES } from "@/constants/listing";
@@ -32,15 +33,40 @@ export const GET = async (req) => {
 };
 
 // Login required to submit a request -- ties every request to a real account.
+//
+// Two lanes hit this same endpoint: the full marketplace form (app/request)
+// sends the new field names directly; the older listing-specific quick
+// inquiry (app/modal/request/page.js) was deliberately left unchanged and
+// still sends its original simple fields (bed/budget/intendinglocation, no
+// category -- the linked listing already implies one). Normalize/fall back
+// so neither the requester's typed data nor the request itself gets silently
+// dropped or rejected.
 export async function POST(req) {
   try {
     const session = await requireRole([]);
     await connectToDB();
     const body = await req.json();
 
-    if (!LISTING_CATEGORIES.includes(body.category)) {
+    let category = body.category;
+    if (!category && body.listingId) {
+      const listing = await Listing.findById(body.listingId).select("category");
+      category = listing?.category;
+    }
+    if (!LISTING_CATEGORIES.includes(category)) {
       return NextResponse.json({ message: "Invalid category" }, { status: 400 });
     }
+
+    const bedrooms =
+      body.bedrooms ??
+      (body.bed ? parseInt(body.bed, 10) || undefined : undefined);
+    const budgetMax =
+      body.budgetMax ?? (body.budget ? Number(body.budget) : undefined);
+    const preferredLocations =
+      body.preferredLocations ??
+      (body.intendinglocation ? [body.intendinglocation] : undefined);
+    const sex = ["male", "female"].includes(String(body.sex).toLowerCase())
+      ? String(body.sex).toLowerCase()
+      : undefined;
 
     const userRequest = await UserRequest.create({
       userId: session.user.id, // server-derived, never trusted from body
@@ -49,17 +75,17 @@ export async function POST(req) {
       phonenumber: body.phonenumber,
       preferredContactMethod: body.preferredContactMethod,
       preferredContactTime: body.preferredContactTime,
-      sex: body.sex,
-      category: body.category,
+      sex,
+      category,
       type: body.type,
-      bedrooms: body.bedrooms,
+      bedrooms,
       bathrooms: body.bathrooms,
       furnishing: body.furnishing,
       parkingSpaces: body.parkingSpaces,
       amenities: body.amenities,
       householdSize: body.householdSize,
       budgetMin: body.budgetMin,
-      budgetMax: body.budgetMax,
+      budgetMax,
       priceFrequency: body.priceFrequency,
       moveInTimeframe: body.moveInTimeframe,
       checkInDate: body.checkInDate,
@@ -67,7 +93,7 @@ export async function POST(req) {
       numberOfGuests: body.numberOfGuests,
       leaseDurationPreference: body.leaseDurationPreference,
       presentlocation: body.presentlocation,
-      preferredLocations: body.preferredLocations,
+      preferredLocations,
       request: body.request,
       listingId: body.listingId || undefined,
     });

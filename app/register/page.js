@@ -2,15 +2,17 @@
 import Input from "@/components/Input";
 import Button from "@/components/ui/Button";
 import AuthLayout from "@/components/ui/AuthLayout";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -25,7 +27,7 @@ function Register() {
       });
       if (response.ok) {
         toast.success("Registered!!!");
-        router.push("/login");
+        router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
       } else {
         toast.error("Could not register, please try again");
       }
@@ -66,7 +68,9 @@ function Register() {
           Already have an account?{" "}
           <span
             className="mx-1 text-xs font-semibold text-brand-500 dark:text-brand-400 cursor-pointer"
-            onClick={() => router.push("/login")}
+            onClick={() =>
+              router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`)
+            }
           >
             Login
           </span>
@@ -76,4 +80,10 @@ function Register() {
   );
 }
 
-export default Register;
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <Register />
+    </Suspense>
+  );
+}

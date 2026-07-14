@@ -10,14 +10,15 @@ function AuthLayout({ title, children }) {
   return (
     <div className="w-full min-h-screen flex flex-col md:flex-row bg-ink-100 dark:bg-surface-950 relative">
       <ThemeToggle className="absolute top-4 right-4 z-10 text-ink-700 dark:text-slate-200 hover:bg-white/50 dark:hover:bg-surface-800" />
-      <div className="md:w-1/2 w-full h-48 md:h-screen hidden md:flex items-center justify-center bg-brand-900 relative overflow-hidden">
+      <div className="md:w-1/2 w-full h-48 md:h-screen hidden md:flex items-center justify-center bg-brand-900 relative overflow-hidden p-12">
         <div className="absolute inset-0 bg-brand-blob opacity-60" />
         <Image
-          src="/richardlogo2.jpg"
+          src="/richluxlogowhite.png"
           alt="Richlux Property"
-          width={700}
-          height={900}
-          className="relative w-3/4 h-3/4 object-cover rounded-2xl shadow-card"
+          width={3264}
+          height={1836}
+          className="relative w-full h-auto object-contain"
+          priority
         />
       </div>
       <div className="md:w-1/2 w-full min-h-screen flex flex-col items-center justify-center px-4 py-10">

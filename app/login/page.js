@@ -2,14 +2,16 @@
 import Input from "@/components/Input";
 import Button from "@/components/ui/Button";
 import AuthLayout from "@/components/ui/AuthLayout";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { Suspense, useState } from "react";
 import { useRef } from "react";
 import { signIn } from "next-auth/react";
 import { FaGoogle } from "react-icons/fa";
 
 function Login() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const email = useRef(null);
   const password = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +23,7 @@ function Login() {
         email: email.current,
         password: password.current,
         redirect: true,
-        callbackUrl: "/",
+        callbackUrl,
       });
     } finally {
       setIsLoading(false);
@@ -56,7 +58,7 @@ function Login() {
       <Button
         variant="secondary"
         className="w-full flex items-center justify-center space-x-2"
-        onClick={() => signIn("google", { callbackUrl: "/" })}
+        onClick={() => signIn("google", { callbackUrl })}
       >
         <FaGoogle size={16} />
         <span>Continue with Google</span>
@@ -73,7 +75,9 @@ function Login() {
           You have not registered?{" "}
           <span
             className="mx-1 text-xs font-semibold text-brand-500 dark:text-brand-400 cursor-pointer"
-            onClick={() => router.push("/register")}
+            onClick={() =>
+              router.push(`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`)
+            }
           >
             Register
           </span>
@@ -83,4 +87,10 @@ function Login() {
   );
 }
 
-export default Login;
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <Login />
+    </Suspense>
+  );
+}
