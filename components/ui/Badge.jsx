@@ -11,6 +11,10 @@ const STATUS_STYLES = {
   rented: "bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300",
   closed: "bg-ink-500/10 text-ink-500 dark:text-slate-400",
   "off-market": "bg-danger/10 text-danger",
+  // Offer statuses
+  accepted: "bg-success/10 text-success",
+  declined: "bg-danger/10 text-danger",
+  withdrawn: "bg-ink-500/10 text-ink-500 dark:text-slate-400",
 };
 
 function Badge({ status, children, className = "" }) {

@@ -5,17 +5,21 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
-// Nav is role-scoped: agents only ever manage their own listings, leads and
-// user management are internal-business data manager/superadmin should see.
+// Nav is role-scoped. Requests are visible to all staff roles now (agents
+// and managers respond to them with offers); user management stays
+// superadmin-only.
 const NAV_BY_ROLE = {
-  agent: [{ href: "/admin/listings", label: "My Listings" }],
+  agent: [
+    { href: "/admin/listings", label: "My Listings" },
+    { href: "/admin/requests", label: "Requests" },
+  ],
   manager: [
     { href: "/admin/listings", label: "All Listings" },
-    { href: "/admin/leads", label: "Leads" },
+    { href: "/admin/requests", label: "Requests" },
   ],
   superadmin: [
     { href: "/admin/listings", label: "All Listings" },
-    { href: "/admin/leads", label: "Leads" },
+    { href: "/admin/requests", label: "Requests" },
     { href: "/admin/users", label: "Users" },
   ],
 };

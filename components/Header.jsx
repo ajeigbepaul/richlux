@@ -50,6 +50,14 @@ function Header() {
 
           <div className="hidden lg:flex items-center space-x-4">
             <ThemeToggle className="text-ink-700 dark:text-slate-200 hover:bg-ink-100 dark:hover:bg-surface-800" />
+            {auth && (
+              <Link
+                href="/my-requests"
+                className="text-sm font-medium text-ink-700 dark:text-slate-200 hover:text-brand-500 dark:hover:text-brand-400"
+              >
+                My Requests
+              </Link>
+            )}
             {isStaff && (
               <Link
                 href="/admin"
@@ -109,6 +117,15 @@ function Header() {
                 {LISTING_CATEGORY_LABELS[category]}
               </Link>
             ))}
+            {auth && (
+              <Link
+                href="/my-requests"
+                className="text-sm font-medium text-ink-700 dark:text-slate-200"
+                onClick={() => setMenuOpen(false)}
+              >
+                My Requests
+              </Link>
+            )}
             {isStaff && (
               <Link
                 href="/admin"
