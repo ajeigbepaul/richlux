@@ -4,12 +4,15 @@ import { useState } from "react";
 import useSWR from "swr";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+import Spinner from "@/components/ui/Spinner";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 import OfferCard from "@/components/OfferCard";
-import OfferForm from "@/components/admin/OfferForm";
+import OfferFormModal from "@/components/admin/OfferFormModal";
 import {
   LISTING_CATEGORY_LABELS,
 } from "@/constants/listing";
@@ -18,6 +21,11 @@ import {
   FURNISHING_LABELS,
   CONTACT_METHOD_LABELS,
   CONTACT_TIME_LABELS,
+  OCCUPANCY_STATUS_LABELS,
+  MANAGEMENT_SERVICE_TYPE_LABELS,
+  LAND_TITLE_DOCUMENT_LABELS,
+  LAND_PURPOSE_LABELS,
+  LEASE_DURATION_LABELS,
 } from "@/constants/request";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -57,10 +65,15 @@ export default function RequestDetailPage() {
   const isOversight = role === "manager" || role === "superadmin";
 
   if (isLoading) {
-    return <p className="text-ink-500 dark:text-surface-400">Loading request...</p>;
+    return <Spinner className="text-brand-400 py-10" />;
   }
 
-  if (!data || data.message === "Not found" || error) {
+  // The fetcher resolves the JSON body regardless of status code (doesn't
+  // check res.ok), so a 403 ("Forbidden" -- e.g. an agent hitting a
+  // non-rental request's id directly) needs the same catch as a 404
+  // ("Not found") -- otherwise this falls through and tries to render a
+  // body that's just { message: "Forbidden" }, with every real field blank.
+  if (!data || data.message === "Not found" || data.message === "Forbidden" || error) {
     return (
       <div className="space-y-4">
         <p className="text-danger">Request not found.</p>
@@ -78,6 +91,13 @@ export default function RequestDetailPage() {
     data.status === "open" &&
     (role === "agent" || role === "manager") &&
     !ownOffer;
+  const editingOffer = offers.find((offer) => offer._id === editingOfferId) || null;
+  const offerModalOpen = showNewOfferForm || !!editingOffer;
+
+  const closeOfferModal = () => {
+    setShowNewOfferForm(false);
+    setEditingOfferId(null);
+  };
 
   const handleWithdraw = async (offerId) => {
     if (!confirm("Withdraw this offer? This cannot be undone.")) return;
@@ -113,29 +133,63 @@ export default function RequestDetailPage() {
     }
   };
 
-  const fields = [
-    ["Category", LISTING_CATEGORY_LABELS[data.category] || data.category],
-    ["Apartment type", data.type],
-    ["Bedrooms", data.bedrooms],
-    ["Bathrooms", data.bathrooms],
-    ["Furnishing", FURNISHING_LABELS[data.furnishing] || data.furnishing],
-    ["Parking spaces", data.parkingSpaces],
-    ["Household size", data.householdSize],
-    [
-      "Budget",
-      `${formatNaira(data.budgetMin)} – ${formatNaira(data.budgetMax)}${
-        data.priceFrequency && data.priceFrequency !== "one-time"
-          ? ` / ${data.priceFrequency.replace("per-", "")}`
-          : ""
-      }`,
-    ],
-    ["Move-in timeframe", MOVE_IN_TIMEFRAME_LABELS[data.moveInTimeframe] || data.moveInTimeframe],
+  // Land Sale and Property Management requests carry a fundamentally
+  // different field set from the residential search categories (rental,
+  // house sale, shortlet) -- build the field list per category rather than
+  // always showing a fixed residential base with "-" placeholders for
+  // fields that don't apply.
+  const isLandSale = data.category === "land-sale";
+  const isPropertyManagement = data.category === "property-management";
+
+  const fields = [["Category", LISTING_CATEGORY_LABELS[data.category] || data.category]];
+
+  if (isLandSale) {
+    fields.push(
+      ["Land size", data.landSize],
+      ["Title document", LAND_TITLE_DOCUMENT_LABELS[data.titleDocumentType] || data.titleDocumentType],
+      ["Purpose", LAND_PURPOSE_LABELS[data.landPurpose] || data.landPurpose]
+    );
+  } else {
+    fields.push(
+      ["Apartment type", data.type],
+      ["Bedrooms", data.bedrooms],
+      ["Bathrooms", data.bathrooms]
+    );
+    if (!isPropertyManagement) {
+      fields.push(
+        ["Furnishing", FURNISHING_LABELS[data.furnishing] || data.furnishing],
+        [
+          "Parking needed",
+          typeof data.parkingRequired === "boolean" ? (data.parkingRequired ? "Yes" : "No") : undefined,
+        ],
+        ["Household size", data.householdSize]
+      );
+    }
+  }
+
+  fields.push([
+    "Budget",
+    `${formatNaira(data.budgetMin)} – ${formatNaira(data.budgetMax)}${
+      data.priceFrequency && data.priceFrequency !== "one-time"
+        ? ` / ${data.priceFrequency.replace("per-", "")}`
+        : ""
+    }`,
+  ]);
+
+  if (!isLandSale) {
+    fields.push([
+      isPropertyManagement ? "Management start timeframe" : "Move-in timeframe",
+      MOVE_IN_TIMEFRAME_LABELS[data.moveInTimeframe] || data.moveInTimeframe,
+    ]);
+  }
+
+  fields.push(
     ["Present location", data.presentlocation],
     ["Preferred locations", (data.preferredLocations || []).join(", ")],
     ["Preferred contact method", CONTACT_METHOD_LABELS[data.preferredContactMethod] || data.preferredContactMethod],
     ["Preferred contact time", CONTACT_TIME_LABELS[data.preferredContactTime] || data.preferredContactTime],
-    ["Sex", data.sex],
-  ];
+    ["Sex", data.sex]
+  );
 
   if (data.category === "shortlet") {
     fields.push(
@@ -145,17 +199,38 @@ export default function RequestDetailPage() {
     );
   }
   if (data.category === "rental") {
-    fields.push(["Lease duration preference", data.leaseDurationPreference]);
+    fields.push([
+      "Lease duration preference",
+      LEASE_DURATION_LABELS[data.leaseDurationPreference] || data.leaseDurationPreference,
+    ]);
+  }
+  if (isPropertyManagement) {
+    fields.push(
+      ["Occupancy status", OCCUPANCY_STATUS_LABELS[data.occupancyStatus] || data.occupancyStatus],
+      [
+        "Management service needed",
+        MANAGEMENT_SERVICE_TYPE_LABELS[data.managementServiceType] || data.managementServiceType,
+      ]
+    );
   }
 
   return (
     <div className="space-y-6 max-w-5xl">
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", href: "/admin" },
+          data.listingId
+            ? { label: "Enquiries", href: "/admin/enquiries" }
+            : { label: "Requests", href: "/admin/requests" },
+          { label: LISTING_CATEGORY_LABELS[data.category] || data.category },
+        ]}
+      />
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-xl sm:text-2xl font-bold text-ink-900 dark:text-white">Request Details</h1>
         <Badge status={data.status} />
       </div>
 
-      <div className="bg-white dark:bg-surface-800 rounded-2xl p-4 sm:p-6 richshadow space-y-4">
+      <div className="bg-white dark:bg-surface-800 rounded-2xl p-4 sm:p-6 richshadow dark:shadow-none space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
             <p className="font-semibold text-ink-900 dark:text-white">{data.fullname}</p>
@@ -204,7 +279,7 @@ export default function RequestDetailPage() {
       </div>
 
       {data.listingId ? (
-        <div className="bg-white dark:bg-surface-800 rounded-2xl p-4 sm:p-6 richshadow space-y-2">
+        <div className="bg-white dark:bg-surface-800 rounded-2xl p-4 sm:p-6 richshadow dark:shadow-none space-y-2">
           <h2 className="text-h2 text-ink-900 dark:text-white">Direct Inquiry</h2>
           <p className="text-sm text-ink-500 dark:text-surface-400">
             This request is a direct inquiry for a specific listing, not eligible for the
@@ -221,20 +296,10 @@ export default function RequestDetailPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <h2 className="text-h2 text-ink-900 dark:text-white">Offers</h2>
-            {canSubmitOffer && !showNewOfferForm && (
+            {canSubmitOffer && (
               <Button onClick={() => setShowNewOfferForm(true)}>Submit an Offer</Button>
             )}
           </div>
-
-          {showNewOfferForm && (
-            <OfferForm
-              requestId={id}
-              onSuccess={() => {
-                setShowNewOfferForm(false);
-                mutate();
-              }}
-            />
-          )}
 
           {offers.length === 0 ? (
             <p className="text-ink-500 dark:text-surface-400">No offers on this request yet.</p>
@@ -242,27 +307,6 @@ export default function RequestDetailPage() {
             <div className="grid md:grid-cols-2 gap-6">
               {offers.map((offer) => {
                 const isOwnOffer = String(offer.agent?._id) === String(viewerId);
-                const isEditing = editingOfferId === offer._id;
-
-                if (isEditing) {
-                  return (
-                    <div key={offer._id} className="md:col-span-2">
-                      <OfferForm
-                        requestId={id}
-                        existingOffer={offer}
-                        onSuccess={() => {
-                          setEditingOfferId(null);
-                          mutate();
-                        }}
-                      />
-                      <div className="mt-3">
-                        <Button variant="secondary" onClick={() => setEditingOfferId(null)}>
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                }
 
                 let actions = null;
                 if (isOwnOffer && offer.status === "pending") {
@@ -317,9 +361,26 @@ export default function RequestDetailPage() {
         </div>
       )}
 
-      <Link href="/admin/requests" className="text-brand-400 hover:underline text-sm inline-block">
-        Back to Requests
+      <Link
+        href={data.listingId ? "/admin/enquiries" : "/admin/requests"}
+        className="text-brand-400 hover:underline text-sm inline-block"
+      >
+        {data.listingId ? "Back to Enquiries" : "Back to Requests"}
       </Link>
+
+      <AnimatePresence>
+        {offerModalOpen && (
+          <OfferFormModal
+            request={data}
+            existingOffer={editingOffer}
+            onClose={closeOfferModal}
+            onSuccess={() => {
+              closeOfferModal();
+              mutate();
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

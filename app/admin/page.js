@@ -59,7 +59,11 @@ export default function AdminDashboardPage() {
     role === "superadmin" ? "/api/users" : null,
     fetcher
   );
-  const usersCount = Array.isArray(users) ? users.length : 0;
+  const usersList = Array.isArray(users) ? users : [];
+  const usersCount = usersList.length;
+  const pendingApplicationsCount = usersList.filter(
+    (u) => u.agentApplication?.status === "pending"
+  ).length;
 
   return (
     <div className="space-y-6">
@@ -94,6 +98,14 @@ export default function AdminDashboardPage() {
             value={usersCount}
             isLoading={usersLoading}
             href="/admin/users"
+          />
+        )}
+        {role === "superadmin" && (
+          <StatCard
+            title="Pending Agent Applications"
+            value={pendingApplicationsCount}
+            isLoading={usersLoading}
+            href="/admin/agent-applications"
           />
         )}
       </div>

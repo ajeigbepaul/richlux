@@ -6,39 +6,63 @@ import Input from "@/components/Input";
 import Select from "@/components/Select";
 import Button from "@/components/ui/Button";
 import MediaUploader from "@/components/admin/MediaUploader";
+import LocationSelect from "@/components/LocationSelect";
 import { LISTING_PRICE_FREQUENCIES } from "@/constants/listing";
+import { formatNumberWithCommas, unformatNumber } from "@/utils/formatNumber";
 
 const frequencyOptions = LISTING_PRICE_FREQUENCIES.map((value) => ({
   value,
   name: value.replace("-", " "),
 }));
 
-const emptyForm = {
-  title: "",
-  description: "",
-  price: "",
-  priceFrequency: "one-time",
-  location: { address: "", city: "", state: "Oyo" },
-  bedrooms: "",
-  bathrooms: "",
-  media: [],
-};
+// The request wizard formats preferred locations as "<Area>, <LGA>, <State>"
+// -- best-effort parse the first one so responding to a request can prefill
+// all three levels of the offer's location cascade instead of just leaving
+// it on the defaults.
+function parsePreferredLocation(value) {
+  if (!value) return null;
+  const parts = value.split(", ");
+  if (parts.length !== 3) return null;
+  const [area, lga, state] = parts;
+  return { area, lga, state };
+}
 
-function toFormState(offer) {
-  if (!offer) return emptyForm;
+// Prefills from the request being responded to (create lane only) so an
+// agent isn't retyping what the requester already specified -- still fully
+// editable, just a head start.
+function toFormState(offer, request) {
+  if (offer) {
+    return {
+      title: offer.title || "",
+      description: offer.description || "",
+      price: offer.price ? formatNumberWithCommas(offer.price) : "",
+      priceFrequency: offer.priceFrequency || "one-time",
+      location: {
+        address: offer.location?.address || "",
+        city: offer.location?.city || "",
+        state: offer.location?.state || "Oyo",
+        area: offer.location?.area || "",
+      },
+      bedrooms: offer.bedrooms ?? "",
+      bathrooms: offer.bathrooms ?? "",
+      media: offer.media || [],
+    };
+  }
+  const parsedLocation = parsePreferredLocation(request?.preferredLocations?.[0]);
   return {
-    title: offer.title || "",
-    description: offer.description || "",
-    price: offer.price ?? "",
-    priceFrequency: offer.priceFrequency || "one-time",
+    title: "",
+    description: "",
+    price: "",
+    priceFrequency: request?.priceFrequency || "one-time",
     location: {
-      address: offer.location?.address || "",
-      city: offer.location?.city || "",
-      state: offer.location?.state || "Oyo",
+      address: "",
+      city: parsedLocation?.lga || "",
+      state: parsedLocation?.state || "Oyo",
+      area: parsedLocation?.area || "",
     },
-    bedrooms: offer.bedrooms ?? "",
-    bathrooms: offer.bathrooms ?? "",
-    media: offer.media || [],
+    bedrooms: typeof request?.bedrooms === "number" ? String(request.bedrooms) : "",
+    bathrooms: typeof request?.bathrooms === "number" ? String(request.bathrooms) : "",
+    media: [],
   };
 }
 
@@ -60,8 +84,8 @@ function OptionalField({ label, ...props }) {
 // Submitted by agents/managers responding to an open, marketplace-eligible
 // UserRequest. `existingOffer` present => edit lane (PATCH, owner-only, only
 // while still pending); absent => create lane (POST with requestId).
-function OfferForm({ requestId, existingOffer, onSuccess }) {
-  const [form, setForm] = useState(() => toFormState(existingOffer));
+function OfferForm({ requestId, request, existingOffer, onSuccess }) {
+  const [form, setForm] = useState(() => toFormState(existingOffer, request));
   const [isSaving, setIsSaving] = useState(false);
 
   const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
@@ -73,7 +97,7 @@ function OfferForm({ requestId, existingOffer, onSuccess }) {
     const payload = {
       title: form.title,
       description: form.description,
-      price: Number(form.price),
+      price: unformatNumber(form.price),
       priceFrequency: form.priceFrequency,
       location: form.location,
       bedrooms: form.bedrooms === "" ? undefined : Number(form.bedrooms),
@@ -109,7 +133,7 @@ function OfferForm({ requestId, existingOffer, onSuccess }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 text-sm">
       <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-4 sm:p-6 space-y-4">
         <Input
           label="Title"
@@ -129,10 +153,10 @@ function OfferForm({ requestId, existingOffer, onSuccess }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Price (NGN)"
-            type="number"
+            type="text"
             name="price"
             value={form.price}
-            onChange={(e) => update("price", e.target.value)}
+            onChange={(e) => update("price", formatNumberWithCommas(e.target.value))}
           />
           <Select
             label="Price Frequency"
@@ -146,31 +170,26 @@ function OfferForm({ requestId, existingOffer, onSuccess }) {
       </div>
 
       <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-4 sm:p-6 space-y-4">
-        <h2 className="text-h2 text-ink-900 dark:text-white">Location</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Input
-            label="Address"
-            name="address"
-            value={form.location.address}
-            onChange={(e) => updateLocation("address", e.target.value)}
-          />
-          <Input
-            label="City"
-            name="city"
-            value={form.location.city}
-            onChange={(e) => updateLocation("city", e.target.value)}
-          />
-          <Input
-            label="State"
-            name="state"
-            value={form.location.state}
-            onChange={(e) => updateLocation("state", e.target.value)}
-          />
-        </div>
+        <h2 className="text-lg font-semibold text-ink-900 dark:text-white">Location</h2>
+        <Input
+          label="Address"
+          name="address"
+          value={form.location.address}
+          onChange={(e) => updateLocation("address", e.target.value)}
+        />
+        <LocationSelect
+          state={form.location.state}
+          lga={form.location.city}
+          area={form.location.area}
+          onStateChange={(value) => updateLocation("state", value)}
+          onLgaChange={(value) => updateLocation("city", value)}
+          onAreaChange={(value) => updateLocation("area", value)}
+          lgaLabel="City / LGA"
+        />
       </div>
 
       <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-4 sm:p-6 space-y-4">
-        <h2 className="text-h2 text-ink-900 dark:text-white">Details</h2>
+        <h2 className="text-lg font-semibold text-ink-900 dark:text-white">Details</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <OptionalField
             label="Bedrooms"
@@ -188,7 +207,7 @@ function OfferForm({ requestId, existingOffer, onSuccess }) {
       </div>
 
       <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-4 sm:p-6 space-y-4">
-        <h2 className="text-h2 text-ink-900 dark:text-white">Media</h2>
+        <h2 className="text-lg font-semibold text-ink-900 dark:text-white">Media</h2>
         <MediaUploader
           value={form.media}
           onChange={(media) => update("media", media)}
@@ -197,7 +216,7 @@ function OfferForm({ requestId, existingOffer, onSuccess }) {
       </div>
 
       <div className="flex justify-end gap-3">
-        <Button type="submit" isLoading={isSaving}>
+        <Button type="submit" size="sm" isLoading={isSaving}>
           {existingOffer ? "Save Changes" : "Submit Offer"}
         </Button>
       </div>

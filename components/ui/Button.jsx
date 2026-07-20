@@ -3,7 +3,12 @@ import ClipLoader from "react-spinners/ClipLoader";
 
 const VARIANTS = {
   primary: "bg-brand-400 text-white hover:bg-brand-500",
-  secondary: "border border-brand-400 text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/30",
+  // Explicit bg (not just a border on a transparent background) so this
+  // reads as a proper surface/card in dark mode -- matching Input fields
+  // and every other bg-white dark:bg-surface-800 element -- instead of a
+  // near-invisible outline floating on the page background.
+  secondary:
+    "border border-brand-400 text-brand-400 bg-white dark:bg-surface-800 hover:bg-brand-50 dark:hover:bg-brand-900/30",
   ghost: "text-brand-500 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/30",
   danger: "bg-danger text-white hover:opacity-90",
 };

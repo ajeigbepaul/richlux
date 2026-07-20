@@ -5,7 +5,9 @@ import useSWR from "swr";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import DataTable from "@/components/ui/DataTable";
-import Badge from "@/components/ui/Badge";
+import Spinner from "@/components/ui/Spinner";
+import TableSkeleton from "@/components/ui/TableSkeleton";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 import { USER_ROLES } from "@/constants/listing";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -14,6 +16,10 @@ const fetcher = (...args) => fetch(...args).then((res) => res.json());
 // manager/agent hitting this specific page should see a polite message
 // rather than a 403 flowing through a raw fetch -- so the role check happens
 // client-side here, before the request is even made.
+//
+// Agent-application review/approval lives on its own page
+// (/admin/agent-applications) rather than as a column here -- keeps this
+// table focused on role/active management.
 export default function AdminUsersPage() {
   const { data: session, status } = useSession();
   const [page, setPage] = useState(0);
@@ -54,28 +60,8 @@ export default function AdminUsersPage() {
     }
   };
 
-  const handleAgentApplication = async (id, agentApplicationStatus) => {
-    try {
-      const res = await fetch(`/api/users/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ agentApplicationStatus }),
-      });
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body.message || "Failed to update application");
-      toast.success(
-        agentApplicationStatus === "approved"
-          ? "Application approved -- they'll get agent access after their next login"
-          : "Application rejected"
-      );
-      mutate();
-    } catch (error) {
-      toast.error(error.message || "Failed to update application");
-    }
-  };
-
   if (status === "loading") {
-    return <p className="text-ink-500 dark:text-surface-400">Loading...</p>;
+    return <Spinner className="text-brand-400 py-10" />;
   }
 
   if (!isSuperadmin) {
@@ -121,43 +107,6 @@ export default function AdminUsersPage() {
       ),
     },
     {
-      key: "agentApplication",
-      label: "Agent App",
-      render: (row) =>
-        !row.agentApplication || row.agentApplication.status === "none" ? (
-          "-"
-        ) : (
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <Badge status={row.agentApplication.status} />
-              {row.agentApplication.status === "pending" && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => handleAgentApplication(row._id, "approved")}
-                    className="text-success hover:underline text-xs font-medium"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleAgentApplication(row._id, "rejected")}
-                    className="text-danger hover:underline text-xs font-medium"
-                  >
-                    Reject
-                  </button>
-                </>
-              )}
-            </div>
-            {row.agentApplication.message && (
-              <p className="text-xs text-ink-500 dark:text-surface-400 max-w-xs">
-                {row.agentApplication.message}
-              </p>
-            )}
-          </div>
-        ),
-    },
-    {
       key: "createdAt",
       label: "Joined",
       render: (row) => (row.createdAt ? new Date(row.createdAt).toLocaleDateString() : "-"),
@@ -166,9 +115,10 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "Dashboard", href: "/admin" }, { label: "Users" }]} />
       <h1 className="text-xl sm:text-2xl font-bold text-ink-900 dark:text-white">Users</h1>
       {isLoading ? (
-        <p className="text-ink-500 dark:text-surface-400">Loading users...</p>
+        <TableSkeleton columns={4} />
       ) : (
         <DataTable
           columns={columns}
@@ -212,36 +162,6 @@ export default function AdminUsersPage() {
                   {row.createdAt ? new Date(row.createdAt).toLocaleDateString() : "-"}
                 </span>
               </div>
-              {row.agentApplication && row.agentApplication.status !== "none" && (
-                <div className="pt-2 border-t border-ink-300 dark:border-surface-700 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <Badge status={row.agentApplication.status} />
-                    {row.agentApplication.status === "pending" && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => handleAgentApplication(row._id, "approved")}
-                          className="text-success text-xs font-medium"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleAgentApplication(row._id, "rejected")}
-                          className="text-danger text-xs font-medium"
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
-                  </div>
-                  {row.agentApplication.message && (
-                    <p className="text-xs text-ink-500 dark:text-surface-400">
-                      {row.agentApplication.message}
-                    </p>
-                  )}
-                </div>
-              )}
             </div>
           )}
         />

@@ -31,13 +31,16 @@ const tokens = {
     100: "#f5f5f5",
     0: "#ffffff",
   },
-  // Dark neutrals reserved for the admin back-office.
+  // Dark neutrals reserved for the admin back-office (and dark mode on the
+  // public site). A true neutral charcoal rather than the earlier blue-slate
+  // scale -- reads as subtler/classier and lets the brand blue stand out
+  // instead of competing with a blue-tinted background.
   surface: {
-    950: "#0b1220",
-    900: "#0f172a",
-    800: "#1e293b",
-    700: "#334155",
-    600: "#475569",
+    950: "#09090b",
+    900: "#18181b",
+    800: "#27272a",
+    700: "#3f3f46",
+    600: "#52525b",
   },
   // Legacy accent, kept as a named token so it's phased out deliberately
   // rather than mixed ad hoc with the new brand blue.

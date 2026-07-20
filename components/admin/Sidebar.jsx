@@ -7,7 +7,9 @@ import ThemeToggle from "@/components/ui/ThemeToggle";
 
 // Nav is role-scoped. Requests are visible to all staff roles now (agents
 // and managers respond to them with offers); user management stays
-// superadmin-only.
+// superadmin-only. Enquiries (direct, single-listing inquiries -- not
+// eligible for the multi-agent offer marketplace) are oversight-only
+// (manager/superadmin), matching who can actually act on them.
 const NAV_BY_ROLE = {
   agent: [
     { href: "/admin", label: "Dashboard" },
@@ -18,12 +20,15 @@ const NAV_BY_ROLE = {
     { href: "/admin", label: "Dashboard" },
     { href: "/admin/listings", label: "All Listings" },
     { href: "/admin/requests", label: "Requests" },
+    { href: "/admin/enquiries", label: "Enquiries" },
   ],
   superadmin: [
     { href: "/admin", label: "Dashboard" },
     { href: "/admin/listings", label: "All Listings" },
     { href: "/admin/requests", label: "Requests" },
+    { href: "/admin/enquiries", label: "Enquiries" },
     { href: "/admin/users", label: "Users" },
+    { href: "/admin/agent-applications", label: "Agent Applications" },
   ],
 };
 
@@ -34,7 +39,7 @@ function Sidebar() {
   const navItems = NAV_BY_ROLE[role] || [];
 
   return (
-    <aside className="w-full lg:w-64 shrink-0 bg-ink-100 dark:bg-surface-950 border-b lg:border-b-0 lg:border-r border-ink-300 dark:border-surface-700 flex flex-col">
+    <aside className="w-full lg:w-64 shrink-0 bg-ink-100 dark:bg-surface-950 border-b lg:border-b-0 lg:border-r border-ink-300 dark:border-surface-700 flex flex-col lg:h-screen lg:sticky lg:top-0 lg:overflow-y-auto">
       <div className="p-4 sm:p-6 flex items-center justify-between lg:block">
         <Link href="/admin" className="text-lg font-bold text-ink-900 dark:text-white">
           Richlux <span className="text-brand-400">Admin</span>
@@ -59,7 +64,7 @@ function Sidebar() {
               href={item.href}
               className={`whitespace-nowrap px-3 py-2 rounded-md text-sm font-medium richtrans ${
                 active
-                  ? "bg-brand-400/10 text-brand-400 richshadow"
+                  ? "bg-brand-400/10 text-brand-400 richshadow sidenav-active"
                   : "text-ink-500 dark:text-surface-300 hover:bg-ink-200 dark:hover:bg-surface-800 hover:text-ink-900 dark:hover:text-white"
               }`}
             >

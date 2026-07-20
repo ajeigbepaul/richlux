@@ -2,6 +2,7 @@ import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Container from "@/components/ui/Container";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 import Badge from "@/components/ui/Badge";
 import MediaGallery from "@/components/ui/MediaGallery";
 import ListingItem from "@/components/ListingItem";
@@ -72,6 +73,13 @@ export default async function ListingDetailPage({ params }) {
     <main className="w-full bg-white dark:bg-surface-900 min-h-screen flex flex-col">
       <Header />
       <Container className="py-10 flex-1">
+        <Breadcrumb
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Listings", href: "/listings" },
+            { label: serializedListing.title },
+          ]}
+        />
         <div className="grid lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2">
             <MediaGallery
@@ -119,7 +127,7 @@ export default async function ListingDetailPage({ params }) {
           </div>
 
           <div>
-            <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-6 sticky top-24">
+            <div className="bg-white dark:bg-surface-800 rounded-2xl border border-ink-200 dark:border-surface-700 p-6 sticky top-24">
               <span className="text-caption text-ink-500 dark:text-slate-400">Price</span>
               <h2 className="text-h1 text-ink-900 dark:text-white">
                 {formatNaira(serializedListing.price)}
@@ -131,7 +139,10 @@ export default async function ListingDetailPage({ params }) {
                 )}
               </h2>
               <div className="mt-4">
-                <ListingInquiryButton listingId={serializedListing._id} />
+                <ListingInquiryButton
+                  listingId={serializedListing._id}
+                  category={serializedListing.category}
+                />
               </div>
             </div>
           </div>

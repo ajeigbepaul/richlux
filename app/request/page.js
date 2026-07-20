@@ -7,6 +7,7 @@ import { AnimatePresence } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RequestWizardModal from "@/components/RequestWizardModal";
+import Spinner from "@/components/ui/Spinner";
 
 // Landing on /request directly (e.g. via the login/register callbackUrl
 // round-trip) opens the same modal used from the homepage CTA -- closing it
@@ -29,9 +30,7 @@ export default function RequestPage() {
       <Header />
       <div className="flex-1">
         {status === "loading" ? (
-          <div className="flex items-center justify-center py-24">
-            <p className="text-ink-500 dark:text-slate-400">Loading...</p>
-          </div>
+          <Spinner className="text-brand-400 py-10" />
         ) : (
           <AnimatePresence>
             {open && (

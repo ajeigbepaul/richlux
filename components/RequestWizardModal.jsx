@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
-import Link from "next/link";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,7 +26,20 @@ import {
   CONTACT_TIME_LABELS,
   FURNISHING_OPTIONS,
   FURNISHING_LABELS,
+  OCCUPANCY_STATUSES,
+  OCCUPANCY_STATUS_LABELS,
+  MANAGEMENT_SERVICE_TYPES,
+  MANAGEMENT_SERVICE_TYPE_LABELS,
+  LAND_TITLE_DOCUMENTS,
+  LAND_TITLE_DOCUMENT_LABELS,
+  LAND_PURPOSES,
+  LAND_PURPOSE_LABELS,
+  LEASE_DURATION_OPTIONS,
+  LEASE_DURATION_LABELS,
 } from "@/constants/request";
+import { formatNumberWithCommas, unformatNumber } from "@/utils/formatNumber";
+import Spinner from "@/components/ui/Spinner";
+import LocationSelect from "@/components/LocationSelect";
 
 const STEP_LABELS = [
   "Your details",
@@ -49,6 +61,18 @@ const bedroomOptions = [
   { value: "4", name: "4" },
   { value: "5", name: "5+" },
 ];
+const bathroomOptions = ["1", "2", "3", "4", "5"].map((value) => ({ value, name: value }));
+const householdSizeOptions = Array.from({ length: 12 }, (_, i) => String(i + 1)).map(
+  (value) => ({ value, name: value })
+);
+const parkingOptions = [
+  { value: "yes", name: "Yes" },
+  { value: "no", name: "No" },
+];
+const leaseDurationOptions = LEASE_DURATION_OPTIONS.map((value) => ({
+  value,
+  name: LEASE_DURATION_LABELS[value] || value,
+}));
 const furnishingOptions = FURNISHING_OPTIONS.map((value) => ({
   value,
   name: FURNISHING_LABELS[value] || value,
@@ -73,6 +97,22 @@ const sexOptions = [
   { value: "male", name: "Male" },
   { value: "female", name: "Female" },
 ];
+const occupancyStatusOptions = OCCUPANCY_STATUSES.map((value) => ({
+  value,
+  name: OCCUPANCY_STATUS_LABELS[value] || value,
+}));
+const managementServiceTypeOptions = MANAGEMENT_SERVICE_TYPES.map((value) => ({
+  value,
+  name: MANAGEMENT_SERVICE_TYPE_LABELS[value] || value,
+}));
+const landTitleDocumentOptions = LAND_TITLE_DOCUMENTS.map((value) => ({
+  value,
+  name: LAND_TITLE_DOCUMENT_LABELS[value] || value,
+}));
+const landPurposeOptions = LAND_PURPOSES.map((value) => ({
+  value,
+  name: LAND_PURPOSE_LABELS[value] || value,
+}));
 
 const emptyForm = {
   fullname: "",
@@ -86,7 +126,7 @@ const emptyForm = {
   bedrooms: "",
   bathrooms: "",
   furnishing: "",
-  parkingSpaces: "",
+  parkingRequired: "",
   householdSize: "",
   budgetMin: "",
   budgetMax: "",
@@ -96,32 +136,26 @@ const emptyForm = {
   checkOutDate: "",
   numberOfGuests: "",
   leaseDurationPreference: "",
-  presentlocation: "",
-  preferredLocations: "",
+  occupancyStatus: "",
+  managementServiceType: "",
+  landSize: "",
+  titleDocumentType: "",
+  landPurpose: "",
+  presentState: "",
+  presentLga: "",
+  presentArea: "",
+  preferredState: "",
+  preferredLga: "",
+  preferredArea: "",
+  preferredLocations: [],
   request: "",
 };
-
-// Budget fields display as "5,000,000" while typing -- strip everything but
-// digits, then re-format with thousand separators. The underlying form state
-// stores this formatted string directly; unformatNumber() strips the commas
-// back out wherever the raw numeric value is actually needed (validation,
-// submit payload).
-function formatNumberWithCommas(value) {
-  const digits = String(value).replace(/[^\d]/g, "");
-  if (!digits) return "";
-  return Number(digits).toLocaleString("en-US");
-}
-
-function unformatNumber(value) {
-  const digits = String(value).replace(/[^\d]/g, "");
-  return digits === "" ? undefined : Number(digits);
-}
 
 // components/Input.jsx hardcodes the native `required` attribute, which is
 // right for auth forms but would block fields that are intentionally left
 // blank (they aren't required by model/UserRequest.js). Mirrors the
 // OptionalField helper already used in components/admin/ListingForm.jsx.
-function OptionalField({ label, helperText, ...props }) {
+function OptionalField({ label, helperText, error, ...props }) {
   return (
     <div className="w-full">
       <label className="block text-sm font-medium text-ink-700 dark:text-slate-200 mb-1">
@@ -131,6 +165,7 @@ function OptionalField({ label, helperText, ...props }) {
         className="w-full px-3 py-2 rounded-md border border-ink-300 dark:border-surface-700 bg-white dark:bg-surface-800 text-ink-900 dark:text-white placeholder:text-ink-500 dark:placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-400"
         {...props}
       />
+      {error && <p className="mt-1 text-caption text-danger">{error}</p>}
       {helperText && (
         <p className="mt-1 text-caption text-ink-500 dark:text-slate-400">
           {helperText}
@@ -191,48 +226,32 @@ function ProgressSteps({ current, completed }) {
   );
 }
 
-function SignInPrompt({ onClose }) {
-  return (
-    <div className="p-6 sm:p-10 text-center space-y-4">
-      <h1 className="text-h1 text-ink-900 dark:text-white">
-        Sign in to submit a request
-      </h1>
-      <p className="text-body text-ink-500 dark:text-slate-400">
-        Signing in ties your request to your account so you can track offers
-        from agents and compare them, all in one place.
-      </p>
-      <div className="flex flex-col sm:flex-row justify-center gap-3">
-        <Link href="/login?callbackUrl=/request">
-          <Button variant="primary" className="w-full sm:w-auto">
-            Sign In
-          </Button>
-        </Link>
-        <Link href="/register?callbackUrl=/request">
-          <Button variant="secondary" className="w-full sm:w-auto">
-            Create an account
-          </Button>
-        </Link>
-      </div>
-      <button
-        type="button"
-        onClick={onClose}
-        className="text-caption text-ink-500 dark:text-slate-400 hover:underline"
-      >
-        Maybe later
-      </button>
-    </div>
-  );
-}
-
 const slideVariants = {
   enter: (direction) => ({ x: direction > 0 ? 40 : -40, opacity: 0 }),
   center: { x: 0, opacity: 1 },
   exit: (direction) => ({ x: direction > 0 ? -40 : 40, opacity: 0 }),
 };
 
-function RequestWizardModal({ onClose }) {
+// listingId/initialCategory are set when this is opened as a listing's
+// "Make an Inquiry" button (components/ListingInquiryButton.jsx) rather than
+// the general "Make a Request" CTA -- the category is already implied by the
+// listing, so it's locked instead of asked for, and the listing gets linked
+// on the request itself.
+function RequestWizardModal({ onClose, listingId, initialCategory }) {
   const { data: session, status } = useSession();
   const router = useRouter();
+
+  // A request can only ever be tied to a real account -- rather than
+  // showing an in-modal "please sign in" card and waiting for a click,
+  // send unauthenticated visitors straight to the login screen. /request
+  // is the callback target regardless of where this modal was opened from
+  // (homepage CTA or the dedicated page) since it already knows how to
+  // reopen the wizard on its own once the session resolves.
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push(`/login?callbackUrl=${encodeURIComponent("/request")}`);
+    }
+  }, [status, router]);
 
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
@@ -247,6 +266,7 @@ function RequestWizardModal({ onClose }) {
     ...emptyForm,
     fullname: session?.user?.name || session?.user?.username || "",
     email: session?.user?.email || "",
+    category: initialCategory || emptyForm.category,
   }));
   const [amenities, setAmenities] = useState([]);
 
@@ -268,8 +288,12 @@ function RequestWizardModal({ onClose }) {
     }
     if (index === 1) {
       if (!form.category) stepErrors.category = "Required";
-      if (!form.type) stepErrors.type = "Required";
-      if (!form.bedrooms) stepErrors.bedrooms = "Required";
+      if (form.category === "land-sale") {
+        if (!form.landSize) stepErrors.landSize = "Required";
+      } else {
+        if (!form.type) stepErrors.type = "Required";
+        if (!form.bedrooms) stepErrors.bedrooms = "Required";
+      }
     }
     if (index === 2) {
       if (!form.budgetMin) stepErrors.budgetMin = "Required";
@@ -283,7 +307,9 @@ function RequestWizardModal({ onClose }) {
       }
     }
     if (index === 3) {
-      if (!form.presentlocation) stepErrors.presentlocation = "Required";
+      if (!form.presentState || !form.presentLga || !form.presentArea) {
+        stepErrors.presentlocation = "Select your present state, LGA, and area";
+      }
     }
     return stepErrors;
   };
@@ -313,6 +339,18 @@ function RequestWizardModal({ onClose }) {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
+      // A preferred-location State+LGA+Area the user picked but never
+      // clicked "+ Add" for (easy to miss -- unlike Present location, which
+      // needs no extra click) must not be silently dropped just because it
+      // was still sitting in the dropdowns when they hit Submit.
+      let preferredLocations = form.preferredLocations;
+      if (form.preferredState && form.preferredLga && form.preferredArea) {
+        const stagedLocation = `${form.preferredArea}, ${form.preferredLga}, ${form.preferredState}`;
+        if (!preferredLocations.includes(stagedLocation)) {
+          preferredLocations = [...preferredLocations, stagedLocation];
+        }
+      }
+
       const payload = {
         fullname: form.fullname,
         email: form.email,
@@ -325,8 +363,8 @@ function RequestWizardModal({ onClose }) {
         bedrooms: form.bedrooms === "" ? undefined : Number(form.bedrooms),
         bathrooms: form.bathrooms === "" ? undefined : Number(form.bathrooms),
         furnishing: form.furnishing,
-        parkingSpaces:
-          form.parkingSpaces === "" ? undefined : Number(form.parkingSpaces),
+        parkingRequired:
+          form.parkingRequired === "" ? undefined : form.parkingRequired === "yes",
         amenities,
         householdSize:
           form.householdSize === "" ? undefined : Number(form.householdSize),
@@ -334,12 +372,10 @@ function RequestWizardModal({ onClose }) {
         budgetMax: unformatNumber(form.budgetMax),
         priceFrequency: form.priceFrequency,
         moveInTimeframe: form.moveInTimeframe,
-        presentlocation: form.presentlocation,
-        preferredLocations: form.preferredLocations
-          .split(",")
-          .map((item) => item.trim())
-          .filter(Boolean),
+        presentlocation: `${form.presentArea}, ${form.presentLga}, ${form.presentState}`,
+        preferredLocations,
         request: form.request,
+        listingId: listingId || undefined,
       };
 
       if (form.category === "shortlet") {
@@ -350,6 +386,15 @@ function RequestWizardModal({ onClose }) {
       }
       if (form.category === "rental") {
         payload.leaseDurationPreference = form.leaseDurationPreference;
+      }
+      if (form.category === "property-management") {
+        payload.occupancyStatus = form.occupancyStatus;
+        payload.managementServiceType = form.managementServiceType;
+      }
+      if (form.category === "land-sale") {
+        payload.landSize = form.landSize;
+        payload.titleDocumentType = form.titleDocumentType;
+        payload.landPurpose = form.landPurpose;
       }
 
       const res = await fetch("/api/userrequest", {
@@ -435,9 +480,28 @@ function RequestWizardModal({ onClose }) {
     }
 
     if (step === 1) {
+      // Land Sale is a fundamentally different request (buying land, not a
+      // house) -- none of the residential fields (type/bedrooms/furnishing/
+      // amenities/household size) apply. Property Management is a property
+      // owner asking Richlux to manage what they already own, so it keeps
+      // the fields that describe the property but drops the ones about
+      // moving into it (furnishing/parking/household size).
+      const isLandSale = form.category === "land-sale";
+      const isPropertyManagement = form.category === "property-management";
+      const showResidentialFields = !isLandSale;
+      const showTenancyFields = !isLandSale && !isPropertyManagement;
+
       return (
         <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {listingId ? (
+            <p className="text-sm text-ink-700 dark:text-slate-200">
+              Inquiring about a{" "}
+              <span className="font-semibold">
+                {LISTING_CATEGORY_LABELS[form.category] || form.category}
+              </span>{" "}
+              listing.
+            </p>
+          ) : (
             <Select
               label="Category"
               name="category"
@@ -447,81 +511,159 @@ function RequestWizardModal({ onClose }) {
               options={categoryOptions}
               placeholder="Select category"
             />
+          )}
+
+          {showResidentialFields && (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Select
+                  label="Type of apartment"
+                  name="type"
+                  value={form.type}
+                  error={errors.type}
+                  onChange={(e) => update("type", e.target.value)}
+                  options={typeOptions}
+                  placeholder="Select type"
+                />
+                <Select
+                  label="Bedrooms"
+                  name="bedrooms"
+                  value={form.bedrooms}
+                  error={errors.bedrooms}
+                  onChange={(e) => update("bedrooms", e.target.value)}
+                  options={bedroomOptions}
+                  placeholder="Select"
+                />
+              </div>
+              <div
+                className={`grid gap-4 ${
+                  showTenancyFields ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"
+                }`}
+              >
+                <Select
+                  label="Bathrooms"
+                  name="bathrooms"
+                  value={form.bathrooms}
+                  onChange={(e) => update("bathrooms", e.target.value)}
+                  options={bathroomOptions}
+                  placeholder="Select"
+                />
+                {showTenancyFields && (
+                  <>
+                    <Select
+                      label="Furnishing"
+                      name="furnishing"
+                      value={form.furnishing}
+                      onChange={(e) => update("furnishing", e.target.value)}
+                      options={furnishingOptions}
+                      placeholder="Select"
+                    />
+                    <Select
+                      label="Parking needed"
+                      name="parkingRequired"
+                      value={form.parkingRequired}
+                      onChange={(e) => update("parkingRequired", e.target.value)}
+                      options={parkingOptions}
+                      placeholder="Select"
+                    />
+                  </>
+                )}
+              </div>
+            </>
+          )}
+
+          {showTenancyFields && (
             <Select
-              label="Type of apartment"
-              name="type"
-              value={form.type}
-              error={errors.type}
-              onChange={(e) => update("type", e.target.value)}
-              options={typeOptions}
-              placeholder="Select type"
-            />
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <Select
-              label="Bedrooms"
-              name="bedrooms"
-              value={form.bedrooms}
-              error={errors.bedrooms}
-              onChange={(e) => update("bedrooms", e.target.value)}
-              options={bedroomOptions}
+              label="Household size"
+              name="householdSize"
+              value={form.householdSize}
+              onChange={(e) => update("householdSize", e.target.value)}
+              options={householdSizeOptions}
               placeholder="Select"
             />
-            <OptionalField
-              label="Bathrooms"
-              type="number"
-              min="0"
-              value={form.bathrooms}
-              onChange={(e) => update("bathrooms", e.target.value)}
-            />
-            <Select
-              label="Furnishing"
-              name="furnishing"
-              value={form.furnishing}
-              onChange={(e) => update("furnishing", e.target.value)}
-              options={furnishingOptions}
-              placeholder="Select"
-            />
-            <OptionalField
-              label="Parking spaces"
-              type="number"
-              min="0"
-              value={form.parkingSpaces}
-              onChange={(e) => update("parkingSpaces", e.target.value)}
-            />
-          </div>
-          <OptionalField
-            label="Household size"
-            type="number"
-            min="0"
-            value={form.householdSize}
-            onChange={(e) => update("householdSize", e.target.value)}
-          />
-          <div>
-            <label className="block text-sm font-medium text-ink-700 dark:text-slate-200 mb-2">
-              Amenities
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {SUGGESTED_AMENITIES.map((amenity) => (
-                <label
-                  key={amenity}
-                  className="flex items-center gap-2 text-sm text-ink-700 dark:text-slate-300"
-                >
-                  <input
-                    type="checkbox"
-                    checked={amenities.includes(amenity)}
-                    onChange={() => toggleAmenity(amenity)}
-                  />
-                  {amenity}
-                </label>
-              ))}
+          )}
+
+          {showResidentialFields && (
+            <div>
+              <label className="block text-sm font-medium text-ink-700 dark:text-slate-200 mb-2">
+                Amenities
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {SUGGESTED_AMENITIES.map((amenity) => (
+                  <label
+                    key={amenity}
+                    className="flex items-center gap-2 text-sm text-ink-700 dark:text-slate-300"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={amenities.includes(amenity)}
+                      onChange={() => toggleAmenity(amenity)}
+                    />
+                    {amenity}
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+          {isPropertyManagement && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Select
+                label="Occupancy status"
+                name="occupancyStatus"
+                value={form.occupancyStatus}
+                onChange={(e) => update("occupancyStatus", e.target.value)}
+                options={occupancyStatusOptions}
+                placeholder="Select status"
+              />
+              <Select
+                label="Management service needed"
+                name="managementServiceType"
+                value={form.managementServiceType}
+                onChange={(e) => update("managementServiceType", e.target.value)}
+                options={managementServiceTypeOptions}
+                placeholder="Select service"
+              />
+            </div>
+          )}
+
+          {isLandSale && (
+            <div className="space-y-4">
+              <OptionalField
+                label="Land size"
+                placeholder="e.g. 2 plots, 500 sqm"
+                value={form.landSize}
+                error={errors.landSize}
+                onChange={(e) => update("landSize", e.target.value)}
+              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Select
+                  label="Title document"
+                  name="titleDocumentType"
+                  value={form.titleDocumentType}
+                  onChange={(e) => update("titleDocumentType", e.target.value)}
+                  options={landTitleDocumentOptions}
+                  placeholder="Select document type"
+                />
+                <Select
+                  label="Purpose"
+                  name="landPurpose"
+                  value={form.landPurpose}
+                  onChange={(e) => update("landPurpose", e.target.value)}
+                  options={landPurposeOptions}
+                  placeholder="Select purpose"
+                />
+              </div>
+            </div>
+          )}
         </div>
       );
     }
 
     if (step === 2) {
+      const isLandSale = form.category === "land-sale";
+      const isPropertyManagement = form.category === "property-management";
+
       return (
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
@@ -555,14 +697,20 @@ function RequestWizardModal({ onClose }) {
               options={priceFrequencyOptions}
               placeholder="Select frequency"
             />
-            <Select
-              label="Move-in timeframe"
-              name="moveInTimeframe"
-              value={form.moveInTimeframe}
-              onChange={(e) => update("moveInTimeframe", e.target.value)}
-              options={moveInOptions}
-              placeholder="Select timeframe"
-            />
+            {!isLandSale && (
+              <Select
+                label={
+                  isPropertyManagement
+                    ? "When do you need management to start?"
+                    : "Move-in timeframe"
+                }
+                name="moveInTimeframe"
+                value={form.moveInTimeframe}
+                onChange={(e) => update("moveInTimeframe", e.target.value)}
+                options={moveInOptions}
+                placeholder="Select timeframe"
+              />
+            )}
           </div>
 
           {form.category === "shortlet" && (
@@ -590,11 +738,13 @@ function RequestWizardModal({ onClose }) {
           )}
 
           {form.category === "rental" && (
-            <OptionalField
+            <Select
               label="Lease duration preference"
-              placeholder="e.g. 1 year"
+              name="leaseDurationPreference"
               value={form.leaseDurationPreference}
               onChange={(e) => update("leaseDurationPreference", e.target.value)}
+              options={leaseDurationOptions}
+              placeholder="Select duration"
             />
           )}
         </div>
@@ -602,21 +752,88 @@ function RequestWizardModal({ onClose }) {
     }
 
     if (step === 3) {
+      const canAddPreferred = form.preferredState && form.preferredLga && form.preferredArea;
+      const addPreferredLocation = () => {
+        if (!canAddPreferred) return;
+        const formatted = `${form.preferredArea}, ${form.preferredLga}, ${form.preferredState}`;
+        if (!form.preferredLocations.includes(formatted)) {
+          update("preferredLocations", [...form.preferredLocations, formatted]);
+        }
+        update("preferredState", "");
+        update("preferredLga", "");
+        update("preferredArea", "");
+      };
+      const removePreferredLocation = (location) => {
+        update(
+          "preferredLocations",
+          form.preferredLocations.filter((item) => item !== location)
+        );
+      };
+
       return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input
-            label="Present location"
-            name="presentlocation"
-            value={form.presentlocation}
-            error={errors.presentlocation}
-            onChange={(e) => update("presentlocation", e.target.value)}
-          />
-          <OptionalField
-            label="Preferred locations"
-            helperText="separate multiple areas with commas"
-            value={form.preferredLocations}
-            onChange={(e) => update("preferredLocations", e.target.value)}
-          />
+        <div className="space-y-6">
+          <div>
+            <p className="text-sm font-medium text-ink-700 dark:text-slate-200 mb-1">
+              Present location
+            </p>
+            <LocationSelect
+              state={form.presentState}
+              lga={form.presentLga}
+              area={form.presentArea}
+              onStateChange={(value) => update("presentState", value)}
+              onLgaChange={(value) => update("presentLga", value)}
+              onAreaChange={(value) => update("presentArea", value)}
+            />
+            {errors.presentlocation && (
+              <p className="mt-1 text-caption text-danger">{errors.presentlocation}</p>
+            )}
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-ink-700 dark:text-slate-200 mb-1">
+              Preferred locations
+            </p>
+            <LocationSelect
+              state={form.preferredState}
+              lga={form.preferredLga}
+              area={form.preferredArea}
+              onStateChange={(value) => update("preferredState", value)}
+              onLgaChange={(value) => update("preferredLga", value)}
+              onAreaChange={(value) => update("preferredArea", value)}
+              stateLabel="Preferred state"
+              lgaLabel="Preferred LGA"
+              areaLabel="Preferred area"
+            />
+            <button
+              type="button"
+              onClick={addPreferredLocation}
+              disabled={!canAddPreferred}
+              className="mt-3 text-caption font-medium text-brand-500 dark:text-brand-400 hover:text-brand-600 dark:hover:text-brand-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              + Add to preferred locations
+            </button>
+
+            {form.preferredLocations.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {form.preferredLocations.map((location) => (
+                  <span
+                    key={location}
+                    className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-caption bg-ink-100 dark:bg-surface-700 text-ink-700 dark:text-slate-200"
+                  >
+                    {location}
+                    <button
+                      type="button"
+                      onClick={() => removePreferredLocation(location)}
+                      aria-label={`Remove ${location}`}
+                      className="text-ink-500 dark:text-slate-400 hover:text-danger"
+                    >
+                      &times;
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       );
     }
@@ -666,22 +883,18 @@ function RequestWizardModal({ onClose }) {
           <FaTimes size={14} />
         </button>
 
-        {status === "loading" ? (
-          <div className="p-16 text-center text-ink-500 dark:text-slate-400">
-            Loading...
-          </div>
-        ) : status === "unauthenticated" ? (
-          <SignInPrompt onClose={onClose} />
+        {status === "loading" || status === "unauthenticated" ? (
+          <Spinner className="text-brand-400 p-16" />
         ) : (
           <>
             <div>
-              <h1 className="text-h2 text-ink-900 dark:text-white px-5 sm:px-6 pt-5 pr-14">
-                Make a Request
+              <h1 className="text-lg font-semibold text-ink-900 dark:text-white px-5 sm:px-6 pt-5 pr-14">
+                {listingId ? "Make an Inquiry" : "Make a Request"}
               </h1>
               <ProgressSteps current={step} completed={completed} />
             </div>
 
-            <div className="relative flex-1 overflow-y-auto px-5 sm:px-6 py-6">
+            <div className="relative flex-1 overflow-y-auto px-5 sm:px-6 py-6 text-sm">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={step}
@@ -722,6 +935,7 @@ function RequestWizardModal({ onClose }) {
               <Button
                 type="button"
                 variant="secondary"
+                size="sm"
                 onClick={goBack}
                 disabled={step === 0}
                 className={step === 0 ? "invisible" : ""}
@@ -729,11 +943,11 @@ function RequestWizardModal({ onClose }) {
                 Back
               </Button>
               {isLastStep ? (
-                <Button type="button" isLoading={isSubmitting} onClick={handleSubmit}>
+                <Button type="button" size="sm" isLoading={isSubmitting} onClick={handleSubmit}>
                   Submit Request
                 </Button>
               ) : (
-                <Button type="button" onClick={goNext}>
+                <Button type="button" size="sm" onClick={goNext}>
                   Next
                 </Button>
               )}

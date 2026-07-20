@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import useSWR from "swr";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import {
@@ -13,6 +14,7 @@ import {
   FaClipboardList,
   FaSignOutAlt,
   FaBriefcase,
+  FaHourglassHalf,
 } from "react-icons/fa";
 import { LISTING_CATEGORIES, LISTING_CATEGORY_LABELS } from "@/constants/listing";
 import Container from "@/components/ui/Container";
@@ -27,6 +29,8 @@ const ROLE_LABELS = {
   user: "User",
 };
 
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
 function Header() {
   const router = useRouter();
   const { data: session } = useSession();
@@ -34,8 +38,20 @@ function Header() {
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
   const auth = session?.user;
-  const isStaff = ADMIN_ROLES.includes(auth?.role);
-  const roleLabel = ROLE_LABELS[auth?.role] || auth?.role;
+
+  // The session/JWT's role is frozen for the life of the token (see
+  // utils/authOptions.js) -- it won't reflect a superadmin approving this
+  // user's agent application until they log out/in again. Reading the same
+  // live endpoint app/become-agent/page.js already uses keeps the "Become an
+  // Agent" menu item (and its Admin-link replacement) in sync immediately.
+  const { data: agentAppData } = useSWR(
+    auth ? "/api/agent-applications" : null,
+    fetcher
+  );
+  const effectiveRole = agentAppData?.role || auth?.role;
+  const applicationStatus = agentAppData?.agentApplication?.status || "none";
+  const isStaff = ADMIN_ROLES.includes(effectiveRole);
+  const roleLabel = ROLE_LABELS[effectiveRole] || effectiveRole;
 
   const logOut = () => signOut();
 
@@ -78,7 +94,7 @@ function Header() {
               <Link
                 key={category}
                 href={`/listings?category=${category}`}
-                className="text-ink-700 dark:text-slate-200 hover:text-brand-500 dark:hover:text-brand-400 text-sm font-medium transition-colors"
+                className="text-ink-700 dark:text-slate-200 hover:text-brand-500 dark:hover:text-brand-400 text-sm font-semibold tracking-tight transition-colors"
               >
                 {LISTING_CATEGORY_LABELS[category]}
               </Link>
@@ -106,7 +122,7 @@ function Header() {
 
                 {profileOpen && (
                   <div className="absolute right-0 mt-2 w-52 rounded-lg bg-white dark:bg-surface-800 shadow-lg ring-1 ring-black/5 dark:ring-white/10 py-1.5 z-50">
-                    {isStaff ? (
+                    {isStaff && (
                       <Link
                         href="/admin"
                         onClick={() => setProfileOpen(false)}
@@ -115,11 +131,6 @@ function Header() {
                         <FaUserShield size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
                         <span>{roleLabel}</span>
                       </Link>
-                    ) : (
-                      <div className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-ink-700 dark:text-slate-200">
-                        <FaUserShield size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
-                        <span>{roleLabel}</span>
-                      </div>
                     )}
                     <Link
                       href="/my-requests"
@@ -129,16 +140,25 @@ function Header() {
                       <FaClipboardList size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
                       <span>My Requests</span>
                     </Link>
-                    {auth.role === "user" && (
-                      <Link
-                        href="/become-agent"
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-700 transition-colors"
-                      >
-                        <FaBriefcase size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
-                        <span>Become an Agent</span>
-                      </Link>
-                    )}
+                    {effectiveRole === "user" &&
+                      (applicationStatus === "pending" ? (
+                        <span
+                          className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-ink-400 dark:text-slate-500 cursor-not-allowed"
+                          title="A superadmin is reviewing your application"
+                        >
+                          <FaHourglassHalf size={15} className="shrink-0" />
+                          <span>Reviewing request</span>
+                        </span>
+                      ) : (
+                        <Link
+                          href="/become-agent"
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-700 transition-colors"
+                        >
+                          <FaBriefcase size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
+                          <span>Become an Agent</span>
+                        </Link>
+                      ))}
                     <button
                       onClick={() => {
                         setProfileOpen(false);
@@ -155,7 +175,7 @@ function Header() {
             ) : (
               <>
                 <Link
-                  href="/become-agent"
+                  href="/register?intent=agent"
                   className="flex items-center space-x-2 text-sm font-medium text-brand-500 dark:text-brand-400 hover:text-brand-600 dark:hover:text-brand-300"
                 >
                   <FaBriefcase size={16} />
@@ -190,7 +210,7 @@ function Header() {
               <Link
                 key={category}
                 href={`/listings?category=${category}`}
-                className="text-ink-700 dark:text-slate-200 hover:text-brand-500 dark:hover:text-brand-400 text-sm font-medium"
+                className="text-ink-700 dark:text-slate-200 hover:text-brand-500 dark:hover:text-brand-400 text-sm font-semibold tracking-tight"
                 onClick={() => setMenuOpen(false)}
               >
                 {LISTING_CATEGORY_LABELS[category]}
@@ -198,7 +218,7 @@ function Header() {
             ))}
             {auth ? (
               <>
-                {isStaff ? (
+                {isStaff && (
                   <Link
                     href="/admin"
                     className="flex items-center gap-3 pt-2 border-t border-ink-100 dark:border-surface-700 text-sm font-medium text-ink-700 dark:text-slate-200"
@@ -207,30 +227,33 @@ function Header() {
                     <FaUserShield size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
                     <span>{roleLabel}</span>
                   </Link>
-                ) : (
-                  <div className="flex items-center gap-3 pt-2 border-t border-ink-100 dark:border-surface-700 text-sm font-medium text-ink-700 dark:text-slate-200">
-                    <FaUserShield size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
-                    <span>{roleLabel}</span>
-                  </div>
                 )}
                 <Link
                   href="/my-requests"
-                  className="flex items-center gap-3 text-sm font-medium text-ink-700 dark:text-slate-200"
+                  className={`flex items-center gap-3 text-sm font-medium text-ink-700 dark:text-slate-200 ${
+                    isStaff ? "" : "pt-2 border-t border-ink-100 dark:border-surface-700"
+                  }`}
                   onClick={() => setMenuOpen(false)}
                 >
                   <FaClipboardList size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
                   <span>My Requests</span>
                 </Link>
-                {auth.role === "user" && (
-                  <Link
-                    href="/become-agent"
-                    className="flex items-center gap-3 text-sm font-medium text-ink-700 dark:text-slate-200"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    <FaBriefcase size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
-                    <span>Become an Agent</span>
-                  </Link>
-                )}
+                {effectiveRole === "user" &&
+                  (applicationStatus === "pending" ? (
+                    <span className="flex items-center gap-3 text-sm font-medium text-ink-400 dark:text-slate-500 cursor-not-allowed">
+                      <FaHourglassHalf size={15} className="shrink-0" />
+                      <span>Reviewing request</span>
+                    </span>
+                  ) : (
+                    <Link
+                      href="/become-agent"
+                      className="flex items-center gap-3 text-sm font-medium text-ink-700 dark:text-slate-200"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <FaBriefcase size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
+                      <span>Become an Agent</span>
+                    </Link>
+                  ))}
                 <button
                   onClick={() => {
                     setMenuOpen(false);
@@ -245,7 +268,7 @@ function Header() {
             ) : (
               <>
                 <Link
-                  href="/become-agent"
+                  href="/register?intent=agent"
                   className="flex items-center gap-2 text-sm font-medium text-brand-500 dark:text-brand-400"
                   onClick={() => setMenuOpen(false)}
                 >

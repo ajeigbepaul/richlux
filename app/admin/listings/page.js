@@ -7,7 +7,9 @@ import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import DataTable from "@/components/ui/DataTable";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 import Badge from "@/components/ui/Badge";
+import TableSkeleton from "@/components/ui/TableSkeleton";
 import { LISTING_CATEGORY_LABELS } from "@/constants/listing";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -153,6 +155,7 @@ function AdminListingsBrowser() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "Dashboard", href: "/admin" }, { label: "Listings" }]} />
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-xl sm:text-2xl font-bold text-ink-900 dark:text-white">Listings</h1>
         <Link
@@ -189,7 +192,7 @@ function AdminListingsBrowser() {
       </div>
 
       {isLoading ? (
-        <p className="text-ink-500 dark:text-surface-400">Loading listings...</p>
+        <TableSkeleton columns={7} />
       ) : (
         <DataTable
           columns={columns}

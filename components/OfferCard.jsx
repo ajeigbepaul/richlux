@@ -16,7 +16,12 @@ function formatNaira(price) {
 // "Accept this offer" on the requester side) so this component never needs
 // to know who's looking at it.
 function OfferCard({ offer, showAgent = true, highlighted = false, actions }) {
-  const location = [offer.location?.address, offer.location?.city, offer.location?.state]
+  const location = [
+    offer.location?.address,
+    offer.location?.area,
+    offer.location?.city,
+    offer.location?.state,
+  ]
     .filter(Boolean)
     .join(", ");
 

@@ -16,6 +16,14 @@ export async function POST(req) {
     if (!userRequest) {
       return NextResponse.json({ message: "Request not found" }, { status: 404 });
     }
+    // Agents only ever see/respond to rental requests -- mirrors the same
+    // restriction on GET /api/userrequest and /api/userrequest/[id].
+    if (session.user.role === "agent" && userRequest.category !== "rental") {
+      return NextResponse.json(
+        { message: "Agents can only respond to rental requests" },
+        { status: 403 }
+      );
+    }
     if (userRequest.listingId) {
       return NextResponse.json(
         { message: "This is a direct inquiry, not open for offers" },

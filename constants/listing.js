@@ -37,3 +37,11 @@ export const USER_ROLES = ["superadmin", "manager", "agent", "user"];
 export const AGENT_APPLICATION_STATUSES = ["none", "pending", "approved", "rejected"];
 
 export const LISTING_APPROVAL_STATUSES = ["pending", "approved", "rejected"];
+
+export const LISTING_SORT_OPTIONS = ["newest", "price-asc", "price-desc"];
+
+export const LISTING_SORT_LABELS = {
+  newest: "Newest",
+  "price-asc": "Price: Low to High",
+  "price-desc": "Price: High to Low",
+};

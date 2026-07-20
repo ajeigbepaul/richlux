@@ -20,7 +20,10 @@ export async function GET(req) {
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
     const bed = searchParams.get("bed");
+    const bathrooms = searchParams.get("bathrooms");
+    const state = searchParams.get("state");
     const location = searchParams.get("location");
+    const sort = searchParams.get("sort");
     const agentId = searchParams.get("agentId");
     const approvalStatus = searchParams.get("approvalStatus");
     const page = Math.max(Number(searchParams.get("page")) || 1, 1);
@@ -55,7 +58,16 @@ export async function GET(req) {
       if (maxPrice) query.price.$lte = Number(maxPrice);
     }
     if (bed) query.bedrooms = Number(bed);
+    if (bathrooms) query.bathrooms = Number(bathrooms);
+    if (state) query["location.state"] = state;
     if (location) query["location.city"] = new RegExp(location, "i");
+
+    const SORT_OPTIONS = {
+      newest: { createdAt: -1 },
+      "price-asc": { price: 1 },
+      "price-desc": { price: -1 },
+    };
+    const sortOrder = SORT_OPTIONS[sort] || SORT_OPTIONS.newest;
 
     // Agents only ever see their own listings in the admin views; never trust
     // a client-supplied agentId for anyone else.
@@ -67,7 +79,7 @@ export async function GET(req) {
 
     const total = await Listing.countDocuments(query);
     const items = await Listing.find(query)
-      .sort({ createdAt: -1 })
+      .sort(sortOrder)
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .populate("agent", "username email image");

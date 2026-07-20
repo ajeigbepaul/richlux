@@ -5,6 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import useSWR from "swr";
 import toast from "react-hot-toast";
 import ListingForm from "@/components/admin/ListingForm";
+import Spinner from "@/components/ui/Spinner";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -41,9 +43,16 @@ export default function EditListingPage() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", href: "/admin" },
+          { label: "Listings", href: "/admin/listings" },
+          { label: listing?.title ? `Edit: ${listing.title}` : "Edit Listing" },
+        ]}
+      />
       <h1 className="text-xl sm:text-2xl font-bold text-ink-900 dark:text-white">Edit Listing</h1>
       {isLoading ? (
-        <p className="text-ink-500 dark:text-surface-400">Loading listing...</p>
+        <Spinner className="text-brand-400 py-10" />
       ) : error || listing?.message === "Not found" ? (
         <p className="text-danger">Could not load this listing.</p>
       ) : (

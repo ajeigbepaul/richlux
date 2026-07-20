@@ -20,11 +20,21 @@ export const authOptions = {
         password: { label: "password", type: "password" },
       },
       async authorize(credentials) {
-        await connectToDB();
         const { email, password } = credentials;
-        const currentUser = await User.findOne({
-          email: email?.trim().toLowerCase(),
-        });
+        // A DB connectivity hiccup (e.g. a transient DNS timeout on the
+        // Atlas SRV lookup) must never leak its raw internal error message
+        // onto the login error page -- catch it separately from "wrong
+        // credentials" and surface a clean, generic message instead.
+        let currentUser;
+        try {
+          await connectToDB();
+          currentUser = await User.findOne({
+            email: email?.trim().toLowerCase(),
+          });
+        } catch (error) {
+          console.error("authorize() DB error", error);
+          throw new Error("Something went wrong, please try again");
+        }
         if (!currentUser) {
           throw new Error("Invalid Email or Password");
         }

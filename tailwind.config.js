@@ -38,7 +38,11 @@ module.exports = {
         caption: ["0.75rem", { lineHeight: "1.4" }],
       },
       boxShadow: {
-        card: "0 4px 20px rgba(0,0,0,0.08)",
+        // Card surfaces rely on background/border contrast, not a drop
+        // shadow, to read as elevated -- kept as a named token (rather than
+        // stripping the `shadow-card` class from every usage) so there's one
+        // place to change if that ever needs to come back.
+        card: "none",
         glow: "0 0 15px 0 rgba(58,183,227,0.4)",
       },
       backgroundImage: {
@@ -47,6 +51,12 @@ module.exports = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
         "brand-blob":
           "radial-gradient(ellipse at top right, theme(colors.brand.300), transparent 60%)",
+        // Tighter, corner-confined version for the landing page hero --
+        // light mode only (dark mode hides it entirely in favor of a solid
+        // background), so it reads as an accent in the corner rather than a
+        // wash across the whole section.
+        "brand-blob-corner":
+          "radial-gradient(ellipse 45% 55% at top right, theme(colors.brand.200), transparent 70%)",
       },
     },
   },

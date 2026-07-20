@@ -6,6 +6,11 @@ import {
   CONTACT_METHODS,
   CONTACT_TIMES,
   FURNISHING_OPTIONS,
+  OCCUPANCY_STATUSES,
+  MANAGEMENT_SERVICE_TYPES,
+  LAND_TITLE_DOCUMENTS,
+  LAND_PURPOSES,
+  LEASE_DURATION_OPTIONS,
 } from "@/constants/request";
 
 const userRequestSchema = new Schema(
@@ -26,7 +31,7 @@ const userRequestSchema = new Schema(
     bedrooms: Number,
     bathrooms: Number,
     furnishing: { type: String, enum: FURNISHING_OPTIONS },
-    parkingSpaces: Number,
+    parkingRequired: Boolean,
     amenities: [String],
     householdSize: Number,
 
@@ -40,7 +45,15 @@ const userRequestSchema = new Schema(
     checkOutDate: Date,
     numberOfGuests: Number,
     // Rental-only
-    leaseDurationPreference: String,
+    leaseDurationPreference: { type: String, enum: LEASE_DURATION_OPTIONS },
+    // Property-management-only -- the requester already owns the property
+    // and wants Richlux to manage it, not move into somewhere new.
+    occupancyStatus: { type: String, enum: OCCUPANCY_STATUSES },
+    managementServiceType: { type: String, enum: MANAGEMENT_SERVICE_TYPES },
+    // Land-sale-only
+    landSize: String,
+    titleDocumentType: { type: String, enum: LAND_TITLE_DOCUMENTS },
+    landPurpose: { type: String, enum: LAND_PURPOSES },
 
     // Location
     presentlocation: String,

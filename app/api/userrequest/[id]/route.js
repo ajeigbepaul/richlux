@@ -26,7 +26,13 @@ export async function GET(req, { params }) {
       return NextResponse.json({ message: "Not found" }, { status: 404 });
     }
 
-    const isStaff = STAFF_ROLES.includes(session.user.role);
+    // Agents only count as "staff" here for rental requests -- every other
+    // category is oversight-only (manager/superadmin); an agent falls back
+    // to the same ownership check a plain requester would (they can still
+    // see a non-rental request that happens to be their own).
+    const isAgentRestricted =
+      session.user.role === "agent" && userRequest.category !== "rental";
+    const isStaff = STAFF_ROLES.includes(session.user.role) && !isAgentRestricted;
     if (!isStaff && !canManageRequest(session, userRequest)) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }

@@ -1,4 +1,6 @@
-import Image from "next/image";
+"use client";
+
+import { CldImage } from "next-cloudinary";
 import Link from "next/link";
 import React from "react";
 import Card from "@/components/ui/Card";
@@ -27,8 +29,13 @@ function ListingItem({ listing }) {
       <Card hoverLift className="overflow-hidden h-full flex flex-col">
         <div className="relative w-full aspect-[4/3] bg-ink-200 dark:bg-surface-800">
           {cover ? (
-            <Image
-              src={cover.secureUrl}
+            // CldImage (not next/image + raw secureUrl) so the exact
+            // requested size + auto format/quality (WebP/AVIF, compressed)
+            // is what actually gets fetched, instead of Next re-optimizing
+            // an unoptimized Cloudinary original -- the biggest single win
+            // for a card grid rendering many of these at once.
+            <CldImage
+              src={cover.publicId}
               alt={title}
               fill
               sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"

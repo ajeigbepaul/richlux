@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import Input from "@/components/Input";
 import Button from "@/components/ui/Button";
 import AuthLayout from "@/components/ui/AuthLayout";
+import Spinner from "@/components/ui/Spinner";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -29,84 +30,6 @@ function MessageField({ value, onChange }) {
         onChange={(e) => onChange(e.target.value)}
       />
     </div>
-  );
-}
-
-// New-visitor lane: creates the account itself, records a pending
-// application. Role stays "user" until a superadmin approves it on
-// /admin/users -- self-registration never grants elevated roles directly.
-function NewApplicantForm() {
-  const router = useRouter();
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        body: JSON.stringify({
-          username,
-          email,
-          password,
-          phone,
-          message,
-          applyAsAgent: true,
-        }),
-      });
-      if (response.ok) {
-        toast.success("Application submitted -- we'll review it shortly.");
-        router.push("/login");
-      } else {
-        toast.error("Could not submit application, please try again");
-      }
-    } catch (error) {
-      toast.error("Could not submit application, please try again");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <form className="space-y-3" onSubmit={handleSubmit}>
-      <Input
-        type="text"
-        placeholder="Enter your Username"
-        name="username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <Input
-        type="email"
-        placeholder="Enter your email"
-        name="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <Input
-        type="password"
-        placeholder="Enter your password"
-        name="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <Input
-        type="tel"
-        placeholder="Enter your phone number"
-        name="phone"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-      />
-      <MessageField value={message} onChange={setMessage} />
-      <Button type="submit" className="w-full" isLoading={isLoading}>
-        Submit Application
-      </Button>
-    </form>
   );
 }
 
@@ -161,31 +84,25 @@ function StatusMessage({ children }) {
 }
 
 function BecomeAgentContent() {
+  const router = useRouter();
   const { data: session, status } = useSession();
   const { data, isLoading, mutate } = useSWR(
     status === "authenticated" ? "/api/agent-applications" : null,
     fetcher
   );
 
-  if (status === "loading" || (status === "authenticated" && isLoading)) {
-    return <StatusMessage>Loading...</StatusMessage>;
-  }
+  // Brand-new visitors now go through the unified /register role picker
+  // (Agent card preselected) instead of a separate form on this page -- this
+  // page only serves an already-authenticated plain "user" applying after
+  // the fact (ExistingUserForm below).
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/register?intent=agent");
+    }
+  }, [status, router]);
 
-  if (status !== "authenticated") {
-    return (
-      <>
-        <NewApplicantForm />
-        <p className="text-ink-500 dark:text-slate-400 w-full text-sm text-center mt-4">
-          Already applied?{" "}
-          <Link
-            href="/login"
-            className="mx-1 text-xs font-semibold text-brand-500 dark:text-brand-400"
-          >
-            Sign in
-          </Link>
-        </p>
-      </>
-    );
+  if (status === "loading" || status === "unauthenticated" || (status === "authenticated" && isLoading)) {
+    return <Spinner className="text-brand-400 py-10" />;
   }
 
   const role = data?.role || session?.user?.role;
@@ -211,7 +128,7 @@ function BecomeAgentContent() {
 
 export default function BecomeAgentPage() {
   return (
-    <AuthLayout title="Become a Richlux Agent">
+    <AuthLayout title="Become a Richlux Agent" backHref="/">
       <BecomeAgentContent />
     </AuthLayout>
   );

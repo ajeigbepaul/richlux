@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useState } from "react";
 import { useRef } from "react";
 import { signIn } from "next-auth/react";
+import toast from "react-hot-toast";
 import { FaGoogle } from "react-icons/fa";
 
 function Login() {
@@ -19,12 +20,20 @@ function Login() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await signIn("credentials", {
+      // redirect: false keeps the browser on this page on failure, so a bad
+      // password (or a transient DB hiccup) shows as a toast right here
+      // instead of navigating away to NextAuth's raw /api/auth/error page.
+      const result = await signIn("credentials", {
         email: email.current,
         password: password.current,
-        redirect: true,
+        redirect: false,
         callbackUrl,
       });
+      if (result?.error) {
+        toast.error(result.error);
+        return;
+      }
+      router.push(result?.url || callbackUrl);
     } finally {
       setIsLoading(false);
     }

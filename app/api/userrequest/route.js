@@ -9,19 +9,36 @@ import { NextResponse } from "next/server";
 // GET ALL REQUESTS. Staff-only (agents now need visibility to respond with offers).
 export const GET = async (req) => {
   try {
-    await requireRole(["superadmin", "manager", "agent"]);
+    const session = await requireRole(["superadmin", "manager", "agent"]);
     await connectToDB();
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
     const category = searchParams.get("category");
+    const hasListing = searchParams.get("hasListing");
 
     const query = {};
     if (status && USER_REQUEST_STATUSES.includes(status)) query.status = status;
     if (category && LISTING_CATEGORIES.includes(category)) query.category = category;
+    // Splits the general marketplace list (/admin/requests) from direct,
+    // single-listing inquiries (/admin/enquiries) -- querying `null` also
+    // matches documents where listingId was never set at all, not just an
+    // explicit null, so this covers both without a separate $exists check.
+    if (hasListing === "true") query.listingId = { $ne: null };
+    else if (hasListing === "false") query.listingId = null;
+
+    // Agents only ever see rental requests -- the multi-agent offer
+    // marketplace is a rental-hunting feature specifically; the other
+    // categories (land sale, property management, house sale, shortlet)
+    // are handled directly by oversight staff (manager/superadmin), never
+    // trust a client-supplied category to override this.
+    if (session.user.role === "agent") {
+      query.category = "rental";
+    }
 
     const items = await UserRequest.find(query)
       .sort({ createdAt: -1 })
-      .populate("userId", "username email image");
+      .populate("userId", "username email image")
+      .populate("listingId", "title");
 
     return NextResponse.json(items);
   } catch (error) {
@@ -34,13 +51,12 @@ export const GET = async (req) => {
 
 // Login required to submit a request -- ties every request to a real account.
 //
-// Two lanes hit this same endpoint: the full marketplace form (app/request)
-// sends the new field names directly; the older listing-specific quick
-// inquiry (app/modal/request/page.js) was deliberately left unchanged and
-// still sends its original simple fields (bed/budget/intendinglocation, no
-// category -- the linked listing already implies one). Normalize/fall back
-// so neither the requester's typed data nor the request itself gets silently
-// dropped or rejected.
+// Both lanes that hit this endpoint (the full marketplace form at
+// app/request, and a listing's "Make an Inquiry" via
+// components/ListingInquiryButton.jsx) go through the same
+// RequestWizardModal now, so they always send the same field shape --
+// category only needs the listingId fallback below for the inquiry lane,
+// which locks/prefills category from the listing but still sends it.
 export async function POST(req) {
   try {
     const session = await requireRole([]);
@@ -56,14 +72,6 @@ export async function POST(req) {
       return NextResponse.json({ message: "Invalid category" }, { status: 400 });
     }
 
-    const bedrooms =
-      body.bedrooms ??
-      (body.bed ? parseInt(body.bed, 10) || undefined : undefined);
-    const budgetMax =
-      body.budgetMax ?? (body.budget ? Number(body.budget) : undefined);
-    const preferredLocations =
-      body.preferredLocations ??
-      (body.intendinglocation ? [body.intendinglocation] : undefined);
     const sex = ["male", "female"].includes(String(body.sex).toLowerCase())
       ? String(body.sex).toLowerCase()
       : undefined;
@@ -83,22 +91,27 @@ export async function POST(req) {
       sex,
       category,
       type: body.type,
-      bedrooms,
+      bedrooms: body.bedrooms,
       bathrooms: body.bathrooms,
       furnishing: orUndefined(body.furnishing),
-      parkingSpaces: body.parkingSpaces,
+      parkingRequired: typeof body.parkingRequired === "boolean" ? body.parkingRequired : undefined,
       amenities: body.amenities,
       householdSize: body.householdSize,
       budgetMin: body.budgetMin,
-      budgetMax,
+      budgetMax: body.budgetMax,
       priceFrequency: orUndefined(body.priceFrequency),
       moveInTimeframe: orUndefined(body.moveInTimeframe),
       checkInDate: body.checkInDate,
       checkOutDate: body.checkOutDate,
       numberOfGuests: body.numberOfGuests,
-      leaseDurationPreference: body.leaseDurationPreference,
+      leaseDurationPreference: orUndefined(body.leaseDurationPreference),
+      occupancyStatus: orUndefined(body.occupancyStatus),
+      managementServiceType: orUndefined(body.managementServiceType),
+      landSize: body.landSize,
+      titleDocumentType: orUndefined(body.titleDocumentType),
+      landPurpose: orUndefined(body.landPurpose),
       presentlocation: body.presentlocation,
-      preferredLocations,
+      preferredLocations: body.preferredLocations,
       request: body.request,
       listingId: body.listingId || undefined,
     });

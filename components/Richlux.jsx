@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { BiHomeHeart, BiSupport, BiHomeCircle } from "react-icons/bi";
 import Container from "@/components/ui/Container";
 import RequestWizardModal from "@/components/RequestWizardModal";
@@ -12,26 +12,59 @@ const QUICK_LINKS = [
   { icon: BiSupport, label: "Contact", caption: "For all enquiries" },
 ];
 
+// Above-the-fold hero -- a staggered entrance on mount (not a scroll-triggered
+// whileInView) since this content is already in view on load.
+const heroStagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
+};
+const cardStagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08 } },
+};
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
+
 function Richlux() {
   const [requestOpen, setRequestOpen] = useState(false);
 
   return (
     <div className="w-full bg-white dark:bg-surface-900 relative overflow-hidden">
-      <div className="absolute inset-0 bg-brand-blob opacity-70 pointer-events-none" />
+      {/* Light mode: a soft accent confined to the top-right corner. Dark
+          mode: hidden entirely, falling back to the solid dark-mode
+          background above instead of a gradient wash. */}
+      <div className="absolute inset-0 bg-brand-blob-corner opacity-70 dark:opacity-0 pointer-events-none" />
       <Container>
-        <div className="relative py-20 flex flex-col items-center text-center">
-          <h1 className="font-display text-display-md md:text-display-lg text-ink-900 dark:text-white">
+        <motion.div
+          initial="hidden"
+          animate="show"
+          variants={heroStagger}
+          className="relative py-20 flex flex-col items-center text-center"
+        >
+          <motion.h1
+            variants={fadeUp}
+            className="font-display text-display-md md:text-display-lg text-ink-900 dark:text-white"
+          >
             Richlux Properties
-          </h1>
-          <p className="mt-4 max-w-2xl text-body text-ink-500 dark:text-slate-400">
+          </motion.h1>
+          <motion.p
+            variants={fadeUp}
+            className="mt-4 max-w-2xl text-body text-ink-500 dark:text-slate-400"
+          >
             Are you currently building or selling a new home? Let our real
             estate agency handle it.
-          </p>
+          </motion.p>
 
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <motion.div
+            variants={cardStagger}
+            className="mt-10 flex flex-wrap items-center justify-center gap-4"
+          >
             {QUICK_LINKS.map(({ icon: Icon, label, caption }) => (
-              <div
+              <motion.div
                 key={label}
+                variants={fadeUp}
                 className="flex flex-col items-center bg-white dark:bg-surface-800 shadow-card p-4 rounded-xl richtrans cursor-pointer w-32"
               >
                 <Icon size={28} className="text-brand-400" />
@@ -39,11 +72,12 @@ function Richlux() {
                 <span className="text-caption text-ink-500 dark:text-slate-400 text-center">
                   {caption}
                 </span>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
-          <button
+          <motion.button
+            variants={fadeUp}
             type="button"
             onClick={() => setRequestOpen(true)}
             className="mt-10 flex items-center bg-brand-400 hover:bg-brand-500 transition-colors text-white px-6 py-4 rounded-xl shadow-card cursor-pointer"
@@ -57,8 +91,8 @@ function Richlux() {
               </span>
             </div>
             <BiHomeHeart size={36} className="ml-4" />
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       </Container>
 
       <AnimatePresence>

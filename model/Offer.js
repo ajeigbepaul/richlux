@@ -31,8 +31,10 @@ const OfferSchema = new Schema(
     priceFrequency: { type: String, enum: LISTING_PRICE_FREQUENCIES, default: "one-time" },
     location: {
       address: String,
+      // Holds the LGA (naming kept from before the Area level was added).
       city: String,
       state: { type: String, default: "Oyo" },
+      area: String,
     },
     bedrooms: Number,
     bathrooms: Number,

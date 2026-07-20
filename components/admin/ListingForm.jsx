@@ -82,7 +82,7 @@ function OptionalField({ label, ...props }) {
 
 // Shared by app/admin/listings/new/page.js and app/admin/listings/[id]/edit/page.js.
 // The edit page only ever mounts this once `initialListing` has finished
-// loading (it renders a "Loading..." state until then), so the useState
+// loading (it renders a loading spinner until then), so the useState
 // lazy initializer below is enough -- no effect-based re-sync needed, which
 // also avoids clobbering in-progress edits if the underlying SWR data
 // happens to revalidate while the form is open.

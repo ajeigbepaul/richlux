@@ -1,16 +1,17 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import useSWR from "swr";
 import toast from "react-hot-toast";
 import { useParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Container from "@/components/ui/Container";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+import Spinner from "@/components/ui/Spinner";
 import OfferCard from "@/components/OfferCard";
 import { LISTING_CATEGORY_LABELS } from "@/constants/listing";
 import {
@@ -18,6 +19,11 @@ import {
   FURNISHING_LABELS,
   CONTACT_METHOD_LABELS,
   CONTACT_TIME_LABELS,
+  OCCUPANCY_STATUS_LABELS,
+  MANAGEMENT_SERVICE_TYPE_LABELS,
+  LAND_TITLE_DOCUMENT_LABELS,
+  LAND_PURPOSE_LABELS,
+  LEASE_DURATION_LABELS,
 } from "@/constants/request";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -54,6 +60,8 @@ function DetailRow({ label, value }) {
 function RequestDetailCard({ data }) {
   const isShortlet = data.category === "shortlet";
   const isRental = data.category === "rental";
+  const isPropertyManagement = data.category === "property-management";
+  const isLandSale = data.category === "land-sale";
 
   return (
     <Card className="p-6">
@@ -82,33 +90,59 @@ function RequestDetailCard({ data }) {
       )}
 
       <dl className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 mt-6">
-        <DetailRow label="Apartment type" value={data.type} />
-        <DetailRow
-          label="Bedrooms"
-          value={typeof data.bedrooms === "number" ? data.bedrooms : null}
-        />
-        <DetailRow
-          label="Bathrooms"
-          value={typeof data.bathrooms === "number" ? data.bathrooms : null}
-        />
-        <DetailRow
-          label="Furnishing"
-          value={FURNISHING_LABELS[data.furnishing]}
-        />
-        <DetailRow
-          label="Parking spaces"
-          value={typeof data.parkingSpaces === "number" ? data.parkingSpaces : null}
-        />
-        <DetailRow
-          label="Household size"
-          value={typeof data.householdSize === "number" ? data.householdSize : null}
-        />
-        <DetailRow
-          label="Move-in timeframe"
-          value={MOVE_IN_TIMEFRAME_LABELS[data.moveInTimeframe]}
-        />
+        {isLandSale ? (
+          <>
+            <DetailRow label="Land size" value={data.landSize} />
+            <DetailRow
+              label="Title document"
+              value={LAND_TITLE_DOCUMENT_LABELS[data.titleDocumentType]}
+            />
+            <DetailRow label="Purpose" value={LAND_PURPOSE_LABELS[data.landPurpose]} />
+          </>
+        ) : (
+          <>
+            <DetailRow label="Apartment type" value={data.type} />
+            <DetailRow
+              label="Bedrooms"
+              value={typeof data.bedrooms === "number" ? data.bedrooms : null}
+            />
+            <DetailRow
+              label="Bathrooms"
+              value={typeof data.bathrooms === "number" ? data.bathrooms : null}
+            />
+            {!isPropertyManagement && (
+              <>
+                <DetailRow
+                  label="Furnishing"
+                  value={FURNISHING_LABELS[data.furnishing]}
+                />
+                <DetailRow
+                  label="Parking needed"
+                  value={
+                    typeof data.parkingRequired === "boolean"
+                      ? data.parkingRequired
+                        ? "Yes"
+                        : "No"
+                      : null
+                  }
+                />
+                <DetailRow
+                  label="Household size"
+                  value={typeof data.householdSize === "number" ? data.householdSize : null}
+                />
+              </>
+            )}
+            <DetailRow
+              label={isPropertyManagement ? "Management start timeframe" : "Move-in timeframe"}
+              value={MOVE_IN_TIMEFRAME_LABELS[data.moveInTimeframe]}
+            />
+          </>
+        )}
         {isRental && (
-          <DetailRow label="Lease duration preference" value={data.leaseDurationPreference} />
+          <DetailRow
+            label="Lease duration preference"
+            value={LEASE_DURATION_LABELS[data.leaseDurationPreference]}
+          />
         )}
         {isShortlet && (
           <>
@@ -117,6 +151,18 @@ function RequestDetailCard({ data }) {
             <DetailRow
               label="Number of guests"
               value={typeof data.numberOfGuests === "number" ? data.numberOfGuests : null}
+            />
+          </>
+        )}
+        {isPropertyManagement && (
+          <>
+            <DetailRow
+              label="Occupancy status"
+              value={OCCUPANCY_STATUS_LABELS[data.occupancyStatus]}
+            />
+            <DetailRow
+              label="Management service needed"
+              value={MANAGEMENT_SERVICE_TYPE_LABELS[data.managementServiceType]}
             />
           </>
         )}
@@ -277,16 +323,21 @@ export default function MyRequestDetailPage() {
     <main className="w-full bg-white dark:bg-surface-900 min-h-screen flex flex-col">
       <Header />
       <Container className="py-10 flex-1">
-        <Link
-          href="/my-requests"
-          className="text-caption font-medium text-brand-500 dark:text-brand-400"
-        >
-          ← Back to My Requests
-        </Link>
+        <Breadcrumb
+          items={[
+            { label: "Home", href: "/" },
+            { label: "My Requests", href: "/my-requests" },
+            {
+              label: data?.category
+                ? LISTING_CATEGORY_LABELS[data.category] || data.category
+                : "Request Details",
+            },
+          ]}
+        />
 
         <div className="mt-4">
           {isLoading ? (
-            <p className="text-ink-500 dark:text-slate-400">Loading request...</p>
+            <Spinner className="text-brand-400 py-10" />
           ) : hasError ? (
             <p className="text-ink-500 dark:text-slate-400">
               {data.message === "Not found"

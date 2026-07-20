@@ -10,6 +10,8 @@ import Container from "@/components/ui/Container";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+import CardGridSkeleton from "@/components/ui/CardGridSkeleton";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 import { LISTING_CATEGORY_LABELS } from "@/constants/listing";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -21,17 +23,29 @@ function formatNaira(price) {
 }
 
 function RequestCard({ request }) {
+  const offersCount = request.offersCount || 0;
+
   return (
     <Link href={`/my-requests/${request._id}`} className="block w-full">
-      <Card hoverLift className="overflow-hidden h-full flex flex-col p-5">
+      <Card hoverLift className="relative overflow-hidden h-full flex flex-col p-5">
         <div className="flex items-start justify-between gap-2">
           <span className="text-caption uppercase tracking-wide text-brand-500 dark:text-brand-400 font-semibold">
             {LISTING_CATEGORY_LABELS[request.category] || request.category}
           </span>
-          <Badge status={request.status} />
+          <div className="flex items-center gap-2">
+            {offersCount > 0 && (
+              <span
+                title={`${offersCount} agent${offersCount > 1 ? "s" : ""} responded`}
+                className="flex items-center justify-center min-w-[1.5rem] h-6 px-1.5 rounded-full bg-brand-500 text-white text-caption font-bold"
+              >
+                {offersCount}
+              </span>
+            )}
+            <Badge status={request.status} />
+          </div>
         </div>
 
-        <h2 className="text-ink-900 dark:text-white font-semibold mt-2">
+        <h2 className="text-sm sm:text-base text-ink-900 dark:text-white font-semibold mt-2 break-words">
           {formatNaira(request.budgetMin)} – {formatNaira(request.budgetMax)}
         </h2>
 
@@ -46,10 +60,16 @@ function RequestCard({ request }) {
           </p>
         )}
 
-        {request.acceptedOffer && (
+        {request.acceptedOffer ? (
           <p className="text-caption font-medium text-success mt-3">
             Offer accepted
           </p>
+        ) : (
+          offersCount > 0 && (
+            <p className="text-caption font-medium text-brand-500 dark:text-brand-400 mt-3">
+              {offersCount} agent{offersCount > 1 ? "s" : ""} responded
+            </p>
+          )
         )}
 
         <span className="text-caption font-medium text-brand-500 dark:text-brand-400 mt-3">
@@ -66,6 +86,7 @@ function MyRequestsContent() {
 
   return (
     <Container className="py-10 flex-1">
+      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "My Requests" }]} />
       <h1 className="text-h1 text-ink-900 dark:text-white">My Requests</h1>
       <p className="text-body text-ink-500 dark:text-slate-400 mt-1">
         Track offers from agents on the housing requests you&apos;ve submitted.
@@ -73,7 +94,7 @@ function MyRequestsContent() {
 
       <div className="mt-8">
         {isLoading ? (
-          <p className="text-ink-500 dark:text-slate-400">Loading your requests...</p>
+          <CardGridSkeleton count={6} gridClassName="sm:grid-cols-2 lg:grid-cols-3" showImage={false} />
         ) : requests.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-ink-500 dark:text-slate-400">

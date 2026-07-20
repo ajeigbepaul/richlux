@@ -20,3 +20,14 @@
 .richtrans:hover {
   transform: translateY(-5px);
 }
+
+/* Just the admin sidenav's active-item glow -- richshadow itself stays as-is
+   everywhere else (dashboard cards, table skeletons, etc). Both rules need
+   higher specificity than .richshadow/.richshadow:hover to win regardless of
+   stylesheet order. */
+.dark .sidenav-active {
+  box-shadow: none;
+}
+.dark .sidenav-active:hover {
+  box-shadow: none;
+}
