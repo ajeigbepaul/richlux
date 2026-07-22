@@ -34,7 +34,7 @@ function LoginInterface() {
       <div className="text-ink-500 dark:text-slate-400 w-full text-sm text-center mt-4">
         Don&apos;t have an account?{" "}
         <span
-          className="mx-1 text-xs font-semibold text-brand-500 dark:text-brand-400 cursor-pointer"
+          className="mx-1 text-xs font-semibold text-brand-700 dark:text-brand-400 cursor-pointer"
           onClick={() => router.push("/register")}
         >
           Sign Up

@@ -11,9 +11,45 @@ import { Toaster } from "react-hot-toast";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const rochester = Rochester({ subsets: ["latin"], weight: "400", variable: "--font-rochester" });
 
+// Falls back to localhost since NEXTAUTH_URL isn't set to a real production
+// domain yet -- set NEXT_PUBLIC_SITE_URL once this is deployed so Open
+// Graph/canonical URLs (and app/sitemap.js) resolve to the real domain
+// instead of localhost.
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+
+const description =
+  "Richlux Properties connects you with verified house sales, rentals, shortlets, land sales, and property management across Lagos and Ibadan.";
+
 export const metadata = {
-  title: "Richlux Properties",
-  description: "Your No 1 realtor",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Richlux Properties",
+    template: "%s | Richlux Properties",
+  },
+  description,
+  keywords: [
+    "Richlux Properties",
+    "Lagos real estate",
+    "Ibadan real estate",
+    "house for sale Nigeria",
+    "apartment for rent Nigeria",
+    "shortlet Nigeria",
+    "land for sale Nigeria",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: "Richlux Properties",
+    title: "Richlux Properties",
+    description,
+    images: [{ url: "/richlux.png", width: 768, height: 325, alt: "Richlux Properties" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Richlux Properties",
+    description,
+    images: ["/richlux.png"],
+  },
 };
 
 // Sets the `dark` class before React hydrates so there's no flash of the

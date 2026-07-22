@@ -128,7 +128,7 @@ function Header() {
                         onClick={() => setProfileOpen(false)}
                         className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-700 transition-colors"
                       >
-                        <FaUserShield size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
+                        <FaUserShield size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
                         <span>{roleLabel}</span>
                       </Link>
                     )}
@@ -137,7 +137,7 @@ function Header() {
                       onClick={() => setProfileOpen(false)}
                       className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-700 transition-colors"
                     >
-                      <FaClipboardList size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
+                      <FaClipboardList size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
                       <span>My Requests</span>
                     </Link>
                     {effectiveRole === "user" &&
@@ -155,7 +155,7 @@ function Header() {
                           onClick={() => setProfileOpen(false)}
                           className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-700 transition-colors"
                         >
-                          <FaBriefcase size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
+                          <FaBriefcase size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
                           <span>Become an Agent</span>
                         </Link>
                       ))}
@@ -176,7 +176,7 @@ function Header() {
               <>
                 <Link
                   href="/register?intent=agent"
-                  className="flex items-center space-x-2 text-sm font-medium text-brand-500 dark:text-brand-400 hover:text-brand-600 dark:hover:text-brand-300"
+                  className="flex items-center space-x-2 text-sm font-medium text-brand-700 dark:text-brand-400 hover:text-brand-600 dark:hover:text-brand-300"
                 >
                   <FaBriefcase size={16} />
                   <span>Become an Agent</span>
@@ -224,7 +224,7 @@ function Header() {
                     className="flex items-center gap-3 pt-2 border-t border-ink-100 dark:border-surface-700 text-sm font-medium text-ink-700 dark:text-slate-200"
                     onClick={() => setMenuOpen(false)}
                   >
-                    <FaUserShield size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
+                    <FaUserShield size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
                     <span>{roleLabel}</span>
                   </Link>
                 )}
@@ -235,7 +235,7 @@ function Header() {
                   }`}
                   onClick={() => setMenuOpen(false)}
                 >
-                  <FaClipboardList size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
+                  <FaClipboardList size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
                   <span>My Requests</span>
                 </Link>
                 {effectiveRole === "user" &&
@@ -250,7 +250,7 @@ function Header() {
                       className="flex items-center gap-3 text-sm font-medium text-ink-700 dark:text-slate-200"
                       onClick={() => setMenuOpen(false)}
                     >
-                      <FaBriefcase size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
+                      <FaBriefcase size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
                       <span>Become an Agent</span>
                     </Link>
                   ))}
@@ -259,7 +259,7 @@ function Header() {
                     setMenuOpen(false);
                     logOut();
                   }}
-                  className="flex items-center gap-3 text-sm font-medium text-white bg-brand-400 rounded-md px-3 py-1.5 w-fit"
+                  className="flex items-center gap-3 text-sm font-medium text-white bg-brand-700 rounded-md px-3 py-1.5 w-fit"
                 >
                   <FaSignOutAlt size={15} className="shrink-0" />
                   <span>Logout</span>
@@ -269,7 +269,7 @@ function Header() {
               <>
                 <Link
                   href="/register?intent=agent"
-                  className="flex items-center gap-2 text-sm font-medium text-brand-500 dark:text-brand-400"
+                  className="flex items-center gap-2 text-sm font-medium text-brand-700 dark:text-brand-400"
                   onClick={() => setMenuOpen(false)}
                 >
                   <FaBriefcase size={15} className="shrink-0" />

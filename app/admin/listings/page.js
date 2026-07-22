@@ -166,7 +166,7 @@ function AdminListingsBrowser() {
         <h1 className="text-xl sm:text-2xl font-bold text-ink-900 dark:text-white">Listings</h1>
         <Link
           href="/admin/listings/new"
-          className="inline-flex items-center rounded-md bg-brand-400 hover:bg-brand-500 text-white text-sm font-medium px-4 py-2 transition-colors richtrans"
+          className="inline-flex items-center rounded-md bg-brand-700 hover:bg-brand-800 text-white text-sm font-medium px-4 py-2 transition-colors richtrans"
         >
           + New Listing
         </Link>
@@ -178,7 +178,7 @@ function AdminListingsBrowser() {
           onClick={() => setFilter("")}
           className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
             !approvalFilter
-              ? "bg-brand-400 text-white"
+              ? "bg-brand-700 text-white"
               : "bg-white dark:bg-surface-800 text-ink-700 dark:text-slate-200 border border-ink-300 dark:border-surface-700"
           }`}
         >
@@ -189,7 +189,7 @@ function AdminListingsBrowser() {
           onClick={() => setFilter("pending")}
           className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
             approvalFilter === "pending"
-              ? "bg-brand-400 text-white"
+              ? "bg-brand-700 text-white"
               : "bg-white dark:bg-surface-800 text-ink-700 dark:text-slate-200 border border-ink-300 dark:border-surface-700"
           }`}
         >

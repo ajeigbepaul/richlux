@@ -27,7 +27,7 @@ function VideoPlayer({ publicId, title }) {
         />
         <span className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
           <span className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
-            <FaPlay size={22} className="text-brand-500 ml-1" />
+            <FaPlay size={22} className="text-brand-700 ml-1" />
           </span>
         </span>
       </button>

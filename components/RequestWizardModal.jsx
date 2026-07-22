@@ -187,7 +187,7 @@ function ProgressSteps({ current, completed }) {
                 completed.includes(index)
                   ? "bg-success text-white"
                   : index === current
-                  ? "bg-brand-400 text-white"
+                  ? "bg-brand-700 text-white"
                   : "bg-ink-200 dark:bg-surface-700 text-ink-500 dark:text-slate-400"
               }`}
             >
@@ -811,7 +811,7 @@ function RequestWizardModal({ onClose, listingId, initialCategory }) {
               type="button"
               onClick={addPreferredLocation}
               disabled={!canAddPreferred}
-              className="mt-3 text-caption font-medium text-brand-500 dark:text-brand-400 hover:text-brand-600 dark:hover:text-brand-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-3 text-caption font-medium text-brand-700 dark:text-brand-400 hover:text-brand-600 dark:hover:text-brand-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               + Add to preferred locations
             </button>

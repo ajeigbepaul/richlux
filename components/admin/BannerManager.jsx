@@ -172,7 +172,7 @@ function ImageBanners({ images, mutate }) {
           accept="image/jpeg,image/png,image/webp"
           multiple
           onChange={handleUpload}
-          className="block w-full text-sm text-ink-700 dark:text-surface-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-brand-400 file:text-white file:font-medium hover:file:bg-brand-500 disabled:opacity-60"
+          className="block w-full text-sm text-ink-700 dark:text-surface-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-brand-700 file:text-white file:font-medium hover:file:bg-brand-800 disabled:opacity-60"
         />
         <ProgressBars entries={Object.entries(uploading)} />
       </div>
@@ -190,7 +190,7 @@ function ImageBanners({ images, mutate }) {
                 {!allThumbnailsLoaded && <Skeleton className="absolute inset-0 rounded-none" />}
                 <CldImage
                   src={banner.publicId}
-                  alt=""
+                  alt="Homepage banner image"
                   fill
                   sizes="112px"
                   className={`object-cover transition-opacity duration-300 ${
@@ -363,7 +363,7 @@ function VideoBanner({ video, mutate }) {
               {video.isActive ? "Live on homepage" : "Hidden"}
             </p>
             <div className="flex flex-wrap items-center gap-2">
-              <label className="cursor-pointer text-xs font-medium px-3 py-1.5 rounded-full bg-brand-400 text-white hover:bg-brand-500">
+              <label className="cursor-pointer text-xs font-medium px-3 py-1.5 rounded-full bg-brand-700 text-white hover:bg-brand-800">
                 Replace
                 <input
                   type="file"

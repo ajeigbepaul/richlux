@@ -1,4 +1,4 @@
-import React from "react";
+import React, { cache } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Container from "@/components/ui/Container";
@@ -19,7 +19,11 @@ function formatNaira(price) {
     .replace(/\d(?=(\d{3})+\.)/g, "$&,")}`;
 }
 
-async function getListing(id) {
+// Wrapped in React's cache() so generateMetadata and the page component
+// (both calling this with the same id, in the same request) share one
+// execution -- without it, the $inc: { views: 1 } below would fire twice per
+// real page load, double-counting views.
+const getListing = cache(async (id) => {
   await connectToDB();
   const listing = await Listing.findByIdAndUpdate(
     id,
@@ -29,7 +33,7 @@ async function getListing(id) {
     .populate("agent", "username email image")
     .lean();
   return listing;
-}
+});
 
 async function getRelated(category, excludeId) {
   await connectToDB();
@@ -42,6 +46,47 @@ async function getRelated(category, excludeId) {
     .limit(3)
     .lean();
   return related;
+}
+
+// Same "approved, or oversight/owner" visibility rule as the page itself
+// (and GET /api/listing/[id]) -- a pending listing's title/description
+// shouldn't leak into search results or link previews before it's public.
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  let listing;
+  try {
+    listing = await getListing(id);
+  } catch (error) {
+    listing = null;
+  }
+  if (!listing) {
+    return { title: "Listing not found" };
+  }
+
+  const session = await getCurrentSession();
+  const role = session?.user?.role;
+  const isOversight = role === "superadmin" || role === "manager";
+  const isOwner = role === "agent" && toIdString(listing.agent) === toIdString(session?.user?.id);
+  if (listing.approvalStatus !== "approved" && !isOversight && !isOwner) {
+    return { title: "Listing not found" };
+  }
+
+  const cover = listing.media?.find((item) => item.isCover) || listing.media?.[0];
+  const location = [listing.location?.city, listing.location?.state].filter(Boolean).join(", ");
+  const description =
+    listing.description?.slice(0, 160) ||
+    `${LISTING_CATEGORY_LABELS[listing.category] || listing.category}${location ? ` in ${location}` : ""}.`;
+
+  return {
+    title: listing.title,
+    description,
+    alternates: { canonical: `/listings/${id}` },
+    openGraph: {
+      title: listing.title,
+      description,
+      images: cover ? [{ url: cover.secureUrl }] : undefined,
+    },
+  };
 }
 
 export default async function ListingDetailPage({ params }) {
@@ -88,7 +133,7 @@ export default async function ListingDetailPage({ params }) {
             />
 
             <div className="mt-6">
-              <span className="text-caption uppercase tracking-wide text-brand-500 dark:text-brand-400 font-semibold">
+              <span className="text-caption uppercase tracking-wide text-brand-700 dark:text-brand-400 font-semibold">
                 {LISTING_CATEGORY_LABELS[serializedListing.category] ||
                   serializedListing.category}
               </span>

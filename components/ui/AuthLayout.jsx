@@ -46,7 +46,7 @@ function AuthLayout({ title, backHref, backLabel = "Back to home", children }) {
           {backHref && (
             <Link
               href={backHref}
-              className="inline-block mb-4 text-caption font-medium text-brand-500 dark:text-brand-400 hover:text-brand-600 dark:hover:text-brand-300"
+              className="inline-block mb-4 text-caption font-medium text-brand-700 dark:text-brand-400 hover:text-brand-600 dark:hover:text-brand-300"
             >
               ← {backLabel}
             </Link>

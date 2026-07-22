@@ -19,7 +19,7 @@ function trunc(sentence, limit) {
   return words.slice(0, limit).join(" ") + "...";
 }
 
-function ListingItem({ listing }) {
+function ListingItem({ listing, priority = false }) {
   const { _id, title, description, price, category, status, media, location } =
     listing;
   const cover = media?.find((item) => item.isCover) || media?.[0];
@@ -33,12 +33,16 @@ function ListingItem({ listing }) {
             // requested size + auto format/quality (WebP/AVIF, compressed)
             // is what actually gets fetched, instead of Next re-optimizing
             // an unoptimized Cloudinary original -- the biggest single win
-            // for a card grid rendering many of these at once.
+            // for a card grid rendering many of these at once. `priority` on
+            // just the first card (its actual grid position varies by
+            // caller/breakpoint, but it's always the LCP candidate) so it
+            // isn't lazy-loaded like the rest of the grid.
             <CldImage
               src={cover.publicId}
               alt={title}
               fill
               sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+              priority={priority}
               className="object-cover"
             />
           ) : (
@@ -49,7 +53,7 @@ function ListingItem({ listing }) {
           <Badge status={status} className="absolute top-3 left-3 bg-white/90 dark:bg-surface-800/90" />
         </div>
         <div className="p-4 flex flex-col flex-1">
-          <span className="text-caption uppercase tracking-wide text-brand-500 dark:text-brand-400 font-semibold">
+          <span className="text-caption uppercase tracking-wide text-brand-700 dark:text-brand-400 font-semibold">
             {LISTING_CATEGORY_LABELS[category] || category}
           </span>
           <h2 className="text-ink-900 dark:text-white font-semibold mt-1">{title}</h2>
@@ -63,7 +67,7 @@ function ListingItem({ listing }) {
           </p>
           <div className="flex items-center justify-between mt-3">
             <span className="font-bold text-ink-900 dark:text-white">{formatNaira(price)}</span>
-            <span className="text-caption font-medium text-brand-500 dark:text-brand-400">
+            <span className="text-caption font-medium text-brand-700 dark:text-brand-400">
               View details →
             </span>
           </div>

@@ -67,7 +67,7 @@ function RequestDetailCard({ data }) {
     <Card className="p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <span className="text-caption uppercase tracking-wide text-brand-500 dark:text-brand-400 font-semibold">
+          <span className="text-caption uppercase tracking-wide text-brand-700 dark:text-brand-400 font-semibold">
             {LISTING_CATEGORY_LABELS[data.category] || data.category}
           </span>
           <h1 className="text-h1 text-ink-900 dark:text-white mt-1">

@@ -232,7 +232,7 @@ export default function AdminAgentApplicationsPage() {
             type="button"
             onClick={() => setViewingRow(row)}
             title="View"
-            className="text-brand-500 hover:underline text-sm font-medium flex items-center gap-1"
+            className="text-brand-700 hover:underline text-sm font-medium flex items-center gap-1"
           >
             <FaEye size={13} />
             View
@@ -293,13 +293,15 @@ export default function AdminAgentApplicationsPage() {
                   <button
                     type="button"
                     onClick={() => setViewingRow(row)}
-                    className="text-brand-500 text-xs font-medium flex items-center gap-1"
+                    aria-label="View application"
+                    className="text-brand-700 text-xs font-medium flex items-center gap-1"
                   >
                     <FaEye size={12} />
                   </button>
                   <button
                     type="button"
                     onClick={() => setDeleteTarget(row)}
+                    aria-label="Remove application"
                     className="text-danger text-xs font-medium flex items-center gap-1"
                   >
                     <FaTrash size={12} />

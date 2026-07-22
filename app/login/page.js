@@ -76,14 +76,14 @@ function Login() {
       <div className="w-full flex flex-col mt-4 space-y-1">
         <div className="text-ink-500 dark:text-slate-400 w-full text-sm text-center">
           Forgot your password?{" "}
-          <span className="mx-1 text-xs font-semibold text-brand-500 dark:text-brand-400 cursor-pointer">
+          <span className="mx-1 text-xs font-semibold text-brand-700 dark:text-brand-400 cursor-pointer">
             Recover password
           </span>
         </div>
         <div className="text-ink-500 dark:text-slate-400 w-full text-sm text-center">
           You have not registered?{" "}
           <span
-            className="mx-1 text-xs font-semibold text-brand-500 dark:text-brand-400 cursor-pointer"
+            className="mx-1 text-xs font-semibold text-brand-700 dark:text-brand-400 cursor-pointer"
             onClick={() =>
               router.push(`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`)
             }

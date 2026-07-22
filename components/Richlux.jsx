@@ -86,7 +86,7 @@ function Richlux() {
             variants={fadeUp}
             type="button"
             onClick={() => setRequestOpen(true)}
-            className="mt-10 flex items-center bg-brand-400 hover:bg-brand-500 transition-colors text-white px-6 py-4 rounded-xl shadow-card cursor-pointer"
+            className="mt-10 flex items-center bg-brand-700 hover:bg-brand-800 transition-colors text-white px-6 py-4 rounded-xl shadow-card cursor-pointer"
           >
             <div className="flex flex-col text-left px-2">
               <span className="text-xl md:text-2xl font-bold">
