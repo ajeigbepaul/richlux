@@ -1,166 +1,111 @@
-// "use client";
-// import React, { useState } from "react";
-// import VaraComponent from "./Vara";
-// import { BiHomeHeart, BiSupport, BiHomeCircle } from "react-icons/bi";
-// import { MdOutlineSell, MdClose } from "react-icons/md";
-// import RequestModal from "@/app/modal/request/page";
-// import { useRouter } from "next/navigation";
-// async function Richlux() {
-
-//   // const { usersrequest } = await FetchUsersRequest();
-//   const router = useRouter();
-//   const [requestModal, setRequestModal] = useState(false);
-  
-//   const handleRequest = () => {
-//     setRequestModal(!requestModal);
-//   };
-//   const handleClose = () => {
-//     setRequestModal(!requestModal);
-//   };
-//   return (
-//     <div className="w-screen h-[90vh] bg-gray-900 flex items-center justify-center relative">
-//       <div className="items-center justify-center flex flex-col md:w-4/5 w-full">
-//         <VaraComponent text="Richlux Properties" />
-//         <div className="mt-5 flex flex-col items-center justify-between md:w-[50%] w-full md:px-0 px-4 ">
-//           <div className="w-full flex items-center justify-center space-x-4 px-4 mb-7">
-//             <div className="flex flex-col items-center text-white p-3 rounded-lg richshadow richtrans cursor-pointer ">
-//               <div className="flex items-center justify-center space-x-2">
-//                 <BiHomeCircle size={30} className="text-orange-300" />
-//                 <h2>Buy</h2>
-//               </div>
-//               <span className="text-xs text-gray-400 hidden md:flex">
-//                 We sell comfort
-//               </span>
-//             </div>
-//             <div className="flex flex-col items-center text-white p-3 rounded-lg richshadow richtrans cursor-pointer ">
-//               <div className="flex items-center justify-center space-x-2">
-//                 <MdOutlineSell size={30} className="text-orange-300" />
-//                 <h2>Rent</h2>
-//               </div>
-//               <span className="text-xs text-gray-400 hidden md:flex">
-//                 Peace of mind
-//               </span>
-//             </div>
-//             <div className="flex flex-col items-center text-white p-3 rounded-lg richshadow richtrans cursor-pointer">
-//               <div className="flex items-center justify-center space-x-2">
-//                 <BiSupport size={30} className="text-orange-300" />
-//                 <h2>Contact</h2>
-//               </div>
-//               <span className="text-xs text-gray-400 hidden md:flex">
-//                 For all enquiries
-//               </span>
-//             </div>
-//           </div>
-//           <div
-//             className="flex w-full items-center justify-center text-white p-2  richshadow richtrans cursor-pointer"
-//             onClick={handleRequest}
-//           >
-//             <div className="flex flex-col px-4">
-//               <span className="text-orange-300 text-xl md:text-3xl font-bold ">
-//                 Make Your Request
-//               </span>
-//               <span className="md:text-sm text-xs text-center">
-//                 What kind of house are you looking for?
-//               </span>
-//             </div>
-//             <BiHomeHeart size={40} className="text-red-400" />
-//           </div>
-//         </div>
-//       </div>
-//       <RequestModal
-//         visible={requestModal}
-//         handleClose={handleClose}
-//         CloseIcon={MdClose}
-//       />
-//     </div>
-//   );
-// }
-
-// export default Richlux;
 "use client";
 
 import React, { useState } from "react";
-import {Rochester} from "next/font/google"
-// import VaraComponent from "./Vara";
+import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import { BiHomeHeart, BiSupport, BiHomeCircle } from "react-icons/bi";
-import { MdOutlineSell, MdClose } from "react-icons/md";
-import RequestModal from "@/app/modal/request/page";
+import Container from "@/components/ui/Container";
+import RequestWizardModal from "@/components/RequestWizardModal";
 
-const stylish = Rochester({
-  subsets: ["latin"],
-  weight: "400",
-  style: "normal",
-});
+// "Contact" jumps to the footer's phone/email/Instagram row (id="contact")
+// rather than opening the request wizard -- that's already the "Make Your
+// Request" CTA just below, so this stays a distinct action instead of a
+// second path to the same modal.
+const QUICK_LINKS = [
+  { icon: BiHomeCircle, label: "Buy", caption: "We sell comfort", href: "/listings?category=house-sale" },
+  { icon: BiHomeHeart, label: "Rent", caption: "Peace of mind", href: "/listings?category=rental" },
+  { icon: BiSupport, label: "Contact", caption: "For all enquiries", href: "#contact" },
+];
+
+// Above-the-fold hero -- a staggered entrance on mount (not a scroll-triggered
+// whileInView) since this content is already in view on load.
+const heroStagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
+};
+const cardStagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08 } },
+};
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
+
 function Richlux() {
-  const [requestModal, setRequestModal] = useState(false);
-  const handleRequest = () => {
-    setRequestModal(!requestModal);
-  };
-  const handleClose = () => {
-    setRequestModal(!requestModal);
-  };
+  const [requestOpen, setRequestOpen] = useState(false);
+
   return (
-    <div className="w-screen h-[90vh] bg-gray-900 flex items-center justify-center relative">
-      <div className="items-center justify-center flex flex-col md:w-4/5 w-full">
-        {/* <VaraComponent text="Richlux Properties" /> */}
-        <div>
-          <h2
-            className={`${stylish.className} md:text-7xl text-4xl text-orange-300`}
+    <div className="w-full bg-white dark:bg-surface-900 relative overflow-hidden">
+      {/* Light mode: a soft accent confined to the top-right corner. Dark
+          mode: hidden entirely, falling back to the solid dark-mode
+          background above instead of a gradient wash. */}
+      <div className="absolute inset-0 bg-brand-blob-corner opacity-70 dark:opacity-0 pointer-events-none" />
+      <Container>
+        <motion.div
+          initial="hidden"
+          animate="show"
+          variants={heroStagger}
+          className="relative py-20 flex flex-col items-center text-center"
+        >
+          <motion.h1
+            variants={fadeUp}
+            className="font-display text-display-md md:text-display-lg text-ink-900 dark:text-white"
           >
             Richlux Properties
-          </h2>
-        </div>
-        <div className="mt-5 flex flex-col items-center justify-between md:w-[50%] w-full md:px-0 px-4 ">
-          <div className="w-full flex items-center justify-center space-x-4 px-4 mb-7">
-            <div className="flex flex-col items-center text-white p-3 rounded-lg richshadow richtrans cursor-pointer ">
-              <div className="flex items-center justify-center space-x-2">
-                <BiHomeCircle size={30} className="text-orange-300" />
-                <h2>Buy</h2>
-              </div>
-              <span className="text-xs text-gray-400 hidden md:flex">
-                We sell comfort
-              </span>
-            </div>
-            <div className="flex flex-col items-center text-white p-3 rounded-lg richshadow richtrans cursor-pointer ">
-              <div className="flex items-center justify-center space-x-2">
-                <MdOutlineSell size={30} className="text-orange-300" />
-                <h2>Rent</h2>
-              </div>
-              <span className="text-xs text-gray-400 hidden md:flex">
-                Peace of mind
-              </span>
-            </div>
-            <div className="flex flex-col items-center text-white p-3 rounded-lg richshadow richtrans cursor-pointer">
-              <div className="flex items-center justify-center space-x-2">
-                <BiSupport size={30} className="text-orange-300" />
-                <h2>Contact</h2>
-              </div>
-              <span className="text-xs text-gray-400 hidden md:flex">
-                For all enquiries
-              </span>
-            </div>
-          </div>
-          <div
-            className="flex w-full items-center justify-center text-white p-2  richshadow richtrans cursor-pointer"
-            onClick={handleRequest}
+          </motion.h1>
+          <motion.p
+            variants={fadeUp}
+            className="mt-4 max-w-2xl text-body text-ink-500 dark:text-slate-400"
           >
-            <div className="flex flex-col px-4">
-              <span className="text-orange-300 text-xl md:text-3xl font-bold ">
+            Are you currently building or selling a new home? Let our real
+            estate agency handle it.
+          </motion.p>
+
+          <motion.div
+            variants={cardStagger}
+            className="mt-10 flex flex-wrap items-center justify-center gap-4"
+          >
+            {QUICK_LINKS.map(({ icon: Icon, label, caption, href }) => (
+              <motion.div key={label} variants={fadeUp}>
+                <Link
+                  href={href}
+                  className="flex flex-col items-center bg-white dark:bg-surface-800 shadow-card p-4 rounded-xl richtrans cursor-pointer w-32"
+                >
+                  <Icon size={28} className="text-brand-400" />
+                  <h2 className="mt-1 font-semibold text-ink-900 dark:text-white">{label}</h2>
+                  <span className="text-caption text-ink-500 dark:text-slate-400 text-center">
+                    {caption}
+                  </span>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          <motion.button
+            variants={fadeUp}
+            type="button"
+            onClick={() => setRequestOpen(true)}
+            className="mt-10 flex items-center bg-brand-400 hover:bg-brand-500 transition-colors text-white px-6 py-4 rounded-xl shadow-card cursor-pointer"
+          >
+            <div className="flex flex-col text-left px-2">
+              <span className="text-xl md:text-2xl font-bold">
                 Make Your Request
               </span>
-              <span className="md:text-sm text-xs text-center">
+              <span className="text-caption md:text-sm">
                 What kind of house are you looking for?
               </span>
             </div>
-            <BiHomeHeart size={40} className="text-red-400" />
-          </div>
-        </div>
-      </div>
-      <RequestModal
-        visible={requestModal}
-        setRequestModal={setRequestModal}
-        requestModal={requestModal}
-      />
+            <BiHomeHeart size={36} className="ml-4" />
+          </motion.button>
+        </motion.div>
+      </Container>
+
+      <AnimatePresence>
+        {requestOpen && (
+          <RequestWizardModal onClose={() => setRequestOpen(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,16 +1,69 @@
 import mongoose, { Schema } from "mongoose";
+import { LISTING_CATEGORIES, LISTING_PRICE_FREQUENCIES } from "@/constants/listing";
+import {
+  MOVE_IN_TIMEFRAMES,
+  USER_REQUEST_STATUSES,
+  CONTACT_METHODS,
+  CONTACT_TIMES,
+  FURNISHING_OPTIONS,
+  OCCUPANCY_STATUSES,
+  MANAGEMENT_SERVICE_TYPES,
+  LAND_TITLE_DOCUMENTS,
+  LAND_PURPOSES,
+  LEASE_DURATION_OPTIONS,
+} from "@/constants/request";
+
 const userRequestSchema = new Schema(
   {
+    userId: { type: Schema.Types.ObjectId, ref: "user", required: true, index: true },
+
+    // Contact & preferences
     fullname: String,
     email: String,
     phonenumber: String,
-    request: String,
-    presentlocation: String,
-    sex: String,
+    preferredContactMethod: { type: String, enum: CONTACT_METHODS },
+    preferredContactTime: { type: String, enum: CONTACT_TIMES },
+    sex: { type: String, enum: ["male", "female"] },
+
+    // What they're looking for
+    category: { type: String, enum: LISTING_CATEGORIES, required: true, index: true },
     type: String,
-    bed: String,
-    budget: Number,
-    intendinglocation: String,
+    bedrooms: Number,
+    bathrooms: Number,
+    furnishing: { type: String, enum: FURNISHING_OPTIONS },
+    parkingRequired: Boolean,
+    amenities: [String],
+    householdSize: Number,
+
+    // Budget & timing
+    budgetMin: Number,
+    budgetMax: Number,
+    priceFrequency: { type: String, enum: LISTING_PRICE_FREQUENCIES },
+    moveInTimeframe: { type: String, enum: MOVE_IN_TIMEFRAMES },
+    // Shortlet-only
+    checkInDate: Date,
+    checkOutDate: Date,
+    numberOfGuests: Number,
+    // Rental-only
+    leaseDurationPreference: { type: String, enum: LEASE_DURATION_OPTIONS },
+    // Property-management-only -- the requester already owns the property
+    // and wants Richlux to manage it, not move into somewhere new.
+    occupancyStatus: { type: String, enum: OCCUPANCY_STATUSES },
+    managementServiceType: { type: String, enum: MANAGEMENT_SERVICE_TYPES },
+    // Land-sale-only
+    landSize: String,
+    titleDocumentType: { type: String, enum: LAND_TITLE_DOCUMENTS },
+    landPurpose: { type: String, enum: LAND_PURPOSES },
+
+    // Location
+    presentlocation: String,
+    preferredLocations: [String],
+
+    // Everything else
+    request: String,
+    listingId: { type: Schema.Types.ObjectId, ref: "Listing" },
+    status: { type: String, enum: USER_REQUEST_STATUSES, default: "open", index: true },
+    acceptedOffer: { type: Schema.Types.ObjectId, ref: "Offer" },
   },
   {
     timestamps: true,

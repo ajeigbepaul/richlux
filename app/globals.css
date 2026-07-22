@@ -3,43 +3,29 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-:root {
-  --swiper-navigation-color: #E49A38;
-  --swiper-pagination-color: #E49A38;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+  --swiper-navigation-color: theme("colors.brand.400");
+  --swiper-pagination-color: theme("colors.brand.400");
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
+/* Admin-only glow/lift utilities (dark back-office surfaces). */
 .richshadow {
   box-shadow: 0px 0px 10px 0px rgba(255, 255, 255, 0.4);
 }
-.richshadow:hover{
-  box-shadow: 0px 0px 15px 0px rgba(245, 184, 92, 0.4);
+.richshadow:hover {
+  box-shadow: 0px 0px 15px 0px rgba(58, 183, 227, 0.4);
 }
-.richtrans{
+.richtrans {
   transition: all ease 0.5s;
 }
-.richtrans:hover{
+.richtrans:hover {
   transform: translateY(-5px);
 }
-/* .css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input{
-  padding:0;
-} */
+
+/* Background color alone is enough to read as an elevated surface in dark
+   mode -- the white glow just looks like a lighting artifact against a dark
+   page. Covers every card that uses richshadow (dashboard stats, admin list
+   cards, table skeletons, the sidenav's active item, etc.) from one place. */
+.dark .richshadow,
+.dark .richshadow:hover {
+  box-shadow: none;
+}

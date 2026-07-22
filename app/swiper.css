@@ -39,3 +39,9 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
 .back {
     background-color: orange;
 }
+
+/* Dark-mode fallback for the slide backdrop (visible briefly while an
+   image loads, or if one fails) -- matches design-tokens surface.900. */
+.dark .swiperslide {
+    background: #0f172a;
+}
