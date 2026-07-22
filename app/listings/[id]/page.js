@@ -70,7 +70,7 @@ export default async function ListingDetailPage({ params }) {
   const serializedRelated = JSON.parse(JSON.stringify(related));
 
   return (
-    <main className="w-full bg-white dark:bg-surface-900 min-h-screen flex flex-col">
+    <main className="w-full bg-ink-100 dark:bg-surface-950 min-h-screen flex flex-col">
       <Header />
       <Container className="py-10 flex-1">
         <Breadcrumb
@@ -151,7 +151,7 @@ export default async function ListingDetailPage({ params }) {
         {serializedRelated.length > 0 && (
           <div className="mt-16">
             <h2 className="text-h2 text-ink-900 dark:text-white mb-6">Related Listings</h2>
-            <div className="grid md:grid-cols-3 grid-cols-1 gap-6">
+            <div className="grid md:grid-cols-3 grid-cols-1 gap-6 isolate">
               {serializedRelated.map((item) => (
                 <ListingItem key={item._id} listing={item} />
               ))}

@@ -10,6 +10,7 @@ import DataTable from "@/components/ui/DataTable";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import Badge from "@/components/ui/Badge";
 import TableSkeleton from "@/components/ui/TableSkeleton";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { LISTING_CATEGORY_LABELS } from "@/constants/listing";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -45,18 +46,23 @@ function AdminListingsBrowser() {
   const items = data?.items || [];
   const total = data?.total || 0;
 
-  const handleDelete = async (id) => {
-    if (!confirm("Delete this listing? This also removes its media from Cloudinary.")) {
-      return;
-    }
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
     try {
-      const res = await fetch(`/api/listing/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/listing/${deleteTarget._id}`, { method: "DELETE" });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.message || "Failed to delete listing");
       toast.success("Listing deleted");
+      setDeleteTarget(null);
       mutate();
     } catch (error) {
       toast.error(error.message || "Failed to delete listing");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -143,7 +149,7 @@ function AdminListingsBrowser() {
           </Link>
           <button
             type="button"
-            onClick={() => handleDelete(row._id)}
+            onClick={() => setDeleteTarget(row)}
             className="text-danger hover:underline text-sm font-medium"
           >
             Delete
@@ -255,7 +261,7 @@ function AdminListingsBrowser() {
                 </Link>
                 <button
                   type="button"
-                  onClick={() => handleDelete(row._id)}
+                  onClick={() => setDeleteTarget(row)}
                   className="text-danger text-sm font-medium"
                 >
                   Delete
@@ -265,6 +271,16 @@ function AdminListingsBrowser() {
           )}
         />
       )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete this listing?"
+        description="This also removes its media from Cloudinary. This can't be undone."
+        confirmLabel="Delete"
+        isLoading={isDeleting}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

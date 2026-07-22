@@ -14,13 +14,21 @@ function AuthLayout({ title, backHref, backLabel = "Back to home", children }) {
       <div className="md:w-1/2 w-full h-48 md:h-screen hidden md:flex items-center justify-center bg-white dark:bg-surface-900 p-12">
         {/* Same theme-driven logo swap as Header.jsx -- no gradient/brand
             color block, just the logo on a plain surface that matches the
-            rest of the app's light/dark treatment. */}
+            rest of the app's light/dark treatment.
+            richlux.png's real source is only 768x325 -- previously stretched
+            via w-full to fill this whole half-screen panel (700-900px+ on a
+            typical desktop), well past what a 768px-wide source can render
+            without visibly upscaling/blurring. Capped to max-w-xs (320px) so
+            even at 2x retina density (640px needed) it stays within the
+            source's native resolution; width/height corrected to match the
+            file's actual dimensions instead of the previously-wrong 871x369. */}
         <Image
           src="/richlux.png"
           alt="Richlux Property"
-          width={871}
-          height={369}
-          className="w-full h-auto object-contain dark:hidden"
+          width={768}
+          height={325}
+          sizes="320px"
+          className="w-full max-w-xs h-auto object-contain dark:hidden"
           priority
         />
         <Image
@@ -28,7 +36,8 @@ function AuthLayout({ title, backHref, backLabel = "Back to home", children }) {
           alt="Richlux Property"
           width={3264}
           height={1836}
-          className="w-full h-auto object-contain hidden dark:block"
+          sizes="320px"
+          className="w-full max-w-xs h-auto object-contain hidden dark:block"
           priority
         />
       </div>

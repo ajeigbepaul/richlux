@@ -10,6 +10,7 @@ import Badge from "@/components/ui/Badge";
 import Spinner from "@/components/ui/Spinner";
 import TableSkeleton from "@/components/ui/TableSkeleton";
 import Breadcrumb from "@/components/ui/Breadcrumb";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -83,6 +84,8 @@ export default function AdminAgentApplicationsPage() {
   const isSuperadmin = session?.user?.role === "superadmin";
   const { data, isLoading, mutate } = useSWR(isSuperadmin ? "/api/users" : null, fetcher);
   const [viewingRow, setViewingRow] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleApprove = async (id) => {
     try {
@@ -119,12 +122,11 @@ export default function AdminAgentApplicationsPage() {
   // Clears the application from this table (agentApplication.status -> "none")
   // without touching their role or account access -- a plain user keeps
   // their login, an already-approved agent keeps working normally.
-  const handleDelete = async (id) => {
-    if (!confirm("Remove this application from the list? This does not delete their account.")) {
-      return;
-    }
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
     try {
-      const res = await fetch(`/api/users/${id}`, {
+      const res = await fetch(`/api/users/${deleteTarget._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ agentApplicationStatus: "none" }),
@@ -132,9 +134,12 @@ export default function AdminAgentApplicationsPage() {
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.message || "Failed to remove application");
       toast.success("Application removed");
+      setDeleteTarget(null);
       mutate();
     } catch (error) {
       toast.error(error.message || "Failed to remove application");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -234,7 +239,7 @@ export default function AdminAgentApplicationsPage() {
           </button>
           <button
             type="button"
-            onClick={() => handleDelete(row._id)}
+            onClick={() => setDeleteTarget(row)}
             title="Delete"
             className="text-danger hover:underline text-sm font-medium flex items-center gap-1"
           >
@@ -294,7 +299,7 @@ export default function AdminAgentApplicationsPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleDelete(row._id)}
+                    onClick={() => setDeleteTarget(row)}
                     className="text-danger text-xs font-medium flex items-center gap-1"
                   >
                     <FaTrash size={12} />
@@ -306,6 +311,15 @@ export default function AdminAgentApplicationsPage() {
         />
       )}
       <ViewModal row={viewingRow} onClose={() => setViewingRow(null)} />
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Remove this application?"
+        description="This does not delete their account -- it just clears the application from this list."
+        confirmLabel="Remove"
+        isLoading={isDeleting}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

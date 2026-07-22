@@ -91,7 +91,7 @@ export default function AdminEnquiriesPage() {
 
   if (!isOversight) {
     return (
-      <div className="bg-white dark:bg-surface-800 rounded-2xl p-6 text-ink-500 dark:text-surface-300 richshadow dark:shadow-none">
+      <div className="bg-white dark:bg-surface-800 rounded-2xl p-6 text-ink-500 dark:text-surface-300 richshadow">
         You are not authorized to view this page.
       </div>
     );

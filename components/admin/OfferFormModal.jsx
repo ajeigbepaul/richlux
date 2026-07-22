@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { FaTimes } from "react-icons/fa";
 import OfferForm from "@/components/admin/OfferForm";
 import { LISTING_CATEGORY_LABELS } from "@/constants/listing";
+import { useBodyScrollLock } from "@/utils/useBodyScrollLock";
 
 function formatNaira(amount) {
   return `₦ ${Number(amount || 0)
@@ -47,30 +48,32 @@ function RequestSummary({ request }) {
 // styling for visual consistency, but as a single scrollable form (no
 // step-by-step wizard) -- the offer form isn't long enough to warrant one.
 function OfferFormModal({ request, existingOffer, onClose, onSuccess }) {
+  useBodyScrollLock();
+
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[300] flex items-start sm:items-center justify-center p-4 pt-20 sm:pt-4"
       onClick={onClose}
     >
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-ink-900/60 dark:bg-black/70 backdrop-blur-sm"
+        className="fixed inset-0 bg-ink-900/60 dark:bg-black/70 backdrop-blur-sm"
       />
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
         transition={{ duration: 0.2 }}
-        className="relative bg-white dark:bg-surface-900 rounded-2xl shadow-card w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
+        className="relative bg-white dark:bg-surface-900 rounded-2xl shadow-card w-full max-w-2xl max-h-[calc(100dvh-6rem)] sm:max-h-[90dvh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-ink-100 dark:bg-surface-800 flex items-center justify-center text-ink-700 dark:text-slate-200 hover:bg-ink-200 dark:hover:bg-surface-700"
+          className="absolute top-5 right-5 z-20 w-8 h-8 rounded-full bg-ink-100 dark:bg-surface-800 flex items-center justify-center text-ink-700 dark:text-slate-200 hover:bg-ink-200 dark:hover:bg-surface-700"
         >
           <FaTimes size={14} />
         </button>

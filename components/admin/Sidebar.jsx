@@ -3,6 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import {
+  FaTachometerAlt,
+  FaBuilding,
+  FaClipboardList,
+  FaEnvelopeOpenText,
+  FaImages,
+  FaUsers,
+  FaUserTie,
+} from "react-icons/fa";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
 // Nav is role-scoped. Requests are visible to all staff roles now (agents
@@ -12,23 +21,25 @@ import ThemeToggle from "@/components/ui/ThemeToggle";
 // (manager/superadmin), matching who can actually act on them.
 const NAV_BY_ROLE = {
   agent: [
-    { href: "/admin", label: "Dashboard" },
-    { href: "/admin/listings", label: "My Listings" },
-    { href: "/admin/requests", label: "Requests" },
+    { href: "/admin", label: "Dashboard", icon: FaTachometerAlt },
+    { href: "/admin/listings", label: "My Listings", icon: FaBuilding },
+    { href: "/admin/requests", label: "Requests", icon: FaClipboardList },
   ],
   manager: [
-    { href: "/admin", label: "Dashboard" },
-    { href: "/admin/listings", label: "All Listings" },
-    { href: "/admin/requests", label: "Requests" },
-    { href: "/admin/enquiries", label: "Enquiries" },
+    { href: "/admin", label: "Dashboard", icon: FaTachometerAlt },
+    { href: "/admin/listings", label: "All Listings", icon: FaBuilding },
+    { href: "/admin/requests", label: "Requests", icon: FaClipboardList },
+    { href: "/admin/enquiries", label: "Enquiries", icon: FaEnvelopeOpenText },
+    { href: "/admin/banners", label: "Banners", icon: FaImages },
   ],
   superadmin: [
-    { href: "/admin", label: "Dashboard" },
-    { href: "/admin/listings", label: "All Listings" },
-    { href: "/admin/requests", label: "Requests" },
-    { href: "/admin/enquiries", label: "Enquiries" },
-    { href: "/admin/users", label: "Users" },
-    { href: "/admin/agent-applications", label: "Agent Applications" },
+    { href: "/admin", label: "Dashboard", icon: FaTachometerAlt },
+    { href: "/admin/listings", label: "All Listings", icon: FaBuilding },
+    { href: "/admin/requests", label: "Requests", icon: FaClipboardList },
+    { href: "/admin/enquiries", label: "Enquiries", icon: FaEnvelopeOpenText },
+    { href: "/admin/banners", label: "Banners", icon: FaImages },
+    { href: "/admin/users", label: "Users", icon: FaUsers },
+    { href: "/admin/agent-applications", label: "Agent Applications", icon: FaUserTie },
   ],
 };
 
@@ -58,16 +69,18 @@ function Sidebar() {
           const active =
             pathname === item.href ||
             (item.href !== "/admin" && pathname?.startsWith(`${item.href}/`));
+          const Icon = item.icon;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`whitespace-nowrap px-3 py-2 rounded-md text-sm font-medium richtrans ${
+              className={`flex items-center gap-2 whitespace-nowrap px-3 py-2 rounded-md text-sm font-medium richtrans ${
                 active
-                  ? "bg-brand-400/10 text-brand-400 richshadow sidenav-active"
+                  ? "bg-brand-400/10 text-brand-400 richshadow"
                   : "text-ink-500 dark:text-surface-300 hover:bg-ink-200 dark:hover:bg-surface-800 hover:text-ink-900 dark:hover:text-white"
               }`}
             >
+              <Icon size={14} className="shrink-0" />
               {item.label}
             </Link>
           );

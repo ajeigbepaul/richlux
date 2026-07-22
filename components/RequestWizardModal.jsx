@@ -10,6 +10,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/Input";
 import Select from "@/components/Select";
+import { useBodyScrollLock } from "@/utils/useBodyScrollLock";
 import {
   LISTING_CATEGORIES,
   LISTING_CATEGORY_LABELS,
@@ -252,6 +253,8 @@ function RequestWizardModal({ onClose, listingId, initialCategory }) {
       router.push(`/login?callbackUrl=${encodeURIComponent("/request")}`);
     }
   }, [status, router]);
+
+  useBodyScrollLock();
 
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
@@ -857,28 +860,41 @@ function RequestWizardModal({ onClose, listingId, initialCategory }) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      // items-start + pt-20 on mobile -- a fixed, deterministic gap below
+      // the sticky header, rather than items-center's proportional centering
+      // (which barely shifts the panel even when its own top padding grows).
+      // Reverts to plain centering from sm: up, where the header isn't tall
+      // enough relative to the viewport for this to matter.
+      className="fixed inset-0 z-[300] flex items-start sm:items-center justify-center p-4 pt-20 sm:pt-4"
       onClick={onClose}
     >
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-ink-900/60 dark:bg-black/70 backdrop-blur-sm"
+        className="fixed inset-0 bg-ink-900/60 dark:bg-black/70 backdrop-blur-sm"
       />
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
         transition={{ duration: 0.2 }}
-        className="relative bg-white dark:bg-surface-900 rounded-2xl shadow-card w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
+        // dvh (dynamic viewport height), not vh -- vh is based on the
+        // *largest* possible mobile viewport (address bar hidden), so a
+        // panel sized against it can end up taller than what's actually
+        // visible whenever the address bar is showing, pushing the close
+        // button and footer buttons off-screen. dvh tracks the real,
+        // currently-visible viewport instead. Capped tighter on mobile to
+        // leave room for the pt-20 gap above without pushing the footer
+        // buttons below the fold.
+        className="relative bg-white dark:bg-surface-900 rounded-2xl shadow-card w-full max-w-2xl max-h-[calc(100dvh-6rem)] sm:max-h-[90dvh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-ink-100 dark:bg-surface-800 flex items-center justify-center text-ink-700 dark:text-slate-200 hover:bg-ink-200 dark:hover:bg-surface-700"
+          className="absolute top-5 right-5 z-20 w-8 h-8 rounded-full bg-ink-100 dark:bg-surface-800 flex items-center justify-center text-ink-700 dark:text-slate-200 hover:bg-ink-200 dark:hover:bg-surface-700"
         >
           <FaTimes size={14} />
         </button>
@@ -888,7 +904,7 @@ function RequestWizardModal({ onClose, listingId, initialCategory }) {
         ) : (
           <>
             <div>
-              <h1 className="text-lg font-semibold text-ink-900 dark:text-white px-5 sm:px-6 pt-5 pr-14">
+              <h1 className="text-lg font-semibold text-ink-900 dark:text-white px-5 sm:px-6 pt-7 pr-14">
                 {listingId ? "Make an Inquiry" : "Make a Request"}
               </h1>
               <ProgressSteps current={step} completed={completed} />

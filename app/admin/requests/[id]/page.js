@@ -11,6 +11,7 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Spinner from "@/components/ui/Spinner";
 import Breadcrumb from "@/components/ui/Breadcrumb";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import OfferCard from "@/components/OfferCard";
 import OfferFormModal from "@/components/admin/OfferFormModal";
 import {
@@ -59,6 +60,10 @@ export default function RequestDetailPage() {
 
   const [showNewOfferForm, setShowNewOfferForm] = useState(false);
   const [editingOfferId, setEditingOfferId] = useState(null);
+  // Both withdraw and force-decline are the same PATCH with a different
+  // target status -- one confirm dialog covers both instead of duplicating it.
+  const [confirmAction, setConfirmAction] = useState(null); // { offerId, status, verb, successMessage } | null
+  const [isSubmittingAction, setIsSubmittingAction] = useState(false);
 
   const role = session?.user?.role;
   const viewerId = session?.user?.id;
@@ -99,38 +104,43 @@ export default function RequestDetailPage() {
     setEditingOfferId(null);
   };
 
-  const handleWithdraw = async (offerId) => {
-    if (!confirm("Withdraw this offer? This cannot be undone.")) return;
+  const runConfirmedAction = async () => {
+    if (!confirmAction) return;
+    setIsSubmittingAction(true);
     try {
-      const res = await fetch(`/api/offers/${offerId}`, {
+      const res = await fetch(`/api/offers/${confirmAction.offerId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "withdrawn" }),
+        body: JSON.stringify({ status: confirmAction.status }),
       });
       const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body.message || "Failed to withdraw offer");
-      toast.success("Offer withdrawn");
+      if (!res.ok) throw new Error(body.message || `Failed to ${confirmAction.verb} offer`);
+      toast.success(confirmAction.successMessage);
+      setConfirmAction(null);
       mutate();
     } catch (err) {
-      toast.error(err.message || "Failed to withdraw offer");
+      toast.error(err.message || `Failed to ${confirmAction.verb} offer`);
+    } finally {
+      setIsSubmittingAction(false);
     }
   };
 
-  const handleForceDecline = async (offerId) => {
-    if (!confirm("Decline this offer on behalf of the agent?")) return;
-    try {
-      const res = await fetch(`/api/offers/${offerId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "declined" }),
-      });
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body.message || "Failed to decline offer");
-      toast.success("Offer declined");
-      mutate();
-    } catch (err) {
-      toast.error(err.message || "Failed to decline offer");
-    }
+  const handleWithdraw = (offerId) => {
+    setConfirmAction({
+      offerId,
+      status: "withdrawn",
+      verb: "withdraw",
+      successMessage: "Offer withdrawn",
+    });
+  };
+
+  const handleForceDecline = (offerId) => {
+    setConfirmAction({
+      offerId,
+      status: "declined",
+      verb: "decline",
+      successMessage: "Offer declined",
+    });
   };
 
   // Land Sale and Property Management requests carry a fundamentally
@@ -230,7 +240,7 @@ export default function RequestDetailPage() {
         <Badge status={data.status} />
       </div>
 
-      <div className="bg-white dark:bg-surface-800 rounded-2xl p-4 sm:p-6 richshadow dark:shadow-none space-y-4">
+      <div className="bg-white dark:bg-surface-800 rounded-2xl p-4 sm:p-6 richshadow space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
             <p className="font-semibold text-ink-900 dark:text-white">{data.fullname}</p>
@@ -279,7 +289,7 @@ export default function RequestDetailPage() {
       </div>
 
       {data.listingId ? (
-        <div className="bg-white dark:bg-surface-800 rounded-2xl p-4 sm:p-6 richshadow dark:shadow-none space-y-2">
+        <div className="bg-white dark:bg-surface-800 rounded-2xl p-4 sm:p-6 richshadow space-y-2">
           <h2 className="text-h2 text-ink-900 dark:text-white">Direct Inquiry</h2>
           <p className="text-sm text-ink-500 dark:text-surface-400">
             This request is a direct inquiry for a specific listing, not eligible for the
@@ -381,6 +391,20 @@ export default function RequestDetailPage() {
           />
         )}
       </AnimatePresence>
+
+      <ConfirmDialog
+        open={!!confirmAction}
+        title={confirmAction?.status === "withdrawn" ? "Withdraw this offer?" : "Decline this offer?"}
+        description={
+          confirmAction?.status === "withdrawn"
+            ? "This cannot be undone."
+            : "This declines it on behalf of the agent."
+        }
+        confirmLabel={confirmAction?.status === "withdrawn" ? "Withdraw" : "Decline"}
+        isLoading={isSubmittingAction}
+        onConfirm={runConfirmedAction}
+        onCancel={() => setConfirmAction(null)}
+      />
     </div>
   );
 }

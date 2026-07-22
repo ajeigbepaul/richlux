@@ -1,15 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { BiHomeHeart, BiSupport, BiHomeCircle } from "react-icons/bi";
 import Container from "@/components/ui/Container";
 import RequestWizardModal from "@/components/RequestWizardModal";
 
+// "Contact" jumps to the footer's phone/email/Instagram row (id="contact")
+// rather than opening the request wizard -- that's already the "Make Your
+// Request" CTA just below, so this stays a distinct action instead of a
+// second path to the same modal.
 const QUICK_LINKS = [
-  { icon: BiHomeCircle, label: "Buy", caption: "We sell comfort" },
-  { icon: BiHomeHeart, label: "Rent", caption: "Peace of mind" },
-  { icon: BiSupport, label: "Contact", caption: "For all enquiries" },
+  { icon: BiHomeCircle, label: "Buy", caption: "We sell comfort", href: "/listings?category=house-sale" },
+  { icon: BiHomeHeart, label: "Rent", caption: "Peace of mind", href: "/listings?category=rental" },
+  { icon: BiSupport, label: "Contact", caption: "For all enquiries", href: "#contact" },
 ];
 
 // Above-the-fold hero -- a staggered entrance on mount (not a scroll-triggered
@@ -61,17 +66,18 @@ function Richlux() {
             variants={cardStagger}
             className="mt-10 flex flex-wrap items-center justify-center gap-4"
           >
-            {QUICK_LINKS.map(({ icon: Icon, label, caption }) => (
-              <motion.div
-                key={label}
-                variants={fadeUp}
-                className="flex flex-col items-center bg-white dark:bg-surface-800 shadow-card p-4 rounded-xl richtrans cursor-pointer w-32"
-              >
-                <Icon size={28} className="text-brand-400" />
-                <h2 className="mt-1 font-semibold text-ink-900 dark:text-white">{label}</h2>
-                <span className="text-caption text-ink-500 dark:text-slate-400 text-center">
-                  {caption}
-                </span>
+            {QUICK_LINKS.map(({ icon: Icon, label, caption, href }) => (
+              <motion.div key={label} variants={fadeUp}>
+                <Link
+                  href={href}
+                  className="flex flex-col items-center bg-white dark:bg-surface-800 shadow-card p-4 rounded-xl richtrans cursor-pointer w-32"
+                >
+                  <Icon size={28} className="text-brand-400" />
+                  <h2 className="mt-1 font-semibold text-ink-900 dark:text-white">{label}</h2>
+                  <span className="text-caption text-ink-500 dark:text-slate-400 text-center">
+                    {caption}
+                  </span>
+                </Link>
               </motion.div>
             ))}
           </motion.div>

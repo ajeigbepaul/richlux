@@ -3,12 +3,15 @@
 import React, { useState } from "react";
 import { CldImage } from "next-cloudinary";
 import { FaExpand, FaTimes, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { useBodyScrollLock } from "@/utils/useBodyScrollLock";
 import VideoPlayer from "./VideoPlayer";
 
 function MediaGallery({ media = [], title }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(false);
   const active = media[activeIndex];
+
+  useBodyScrollLock(previewOpen);
 
   // Stop propagation so arrow clicks inside the preview don't bubble up to
   // the overlay's own onClick (which closes the preview on backdrop click).

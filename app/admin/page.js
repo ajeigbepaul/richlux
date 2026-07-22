@@ -3,17 +3,29 @@
 import Link from "next/link";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
+import {
+  FaClipboardList,
+  FaBuilding,
+  FaHourglassHalf,
+  FaUsers,
+  FaUserTie,
+} from "react-icons/fa";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-function StatCard({ title, value, subtitle, href, isLoading }) {
+function StatCard({ title, value, subtitle, href, isLoading, icon: Icon }) {
   return (
     <Link
       href={href}
-      className="block bg-white dark:bg-surface-800 rounded-2xl p-6 richshadow richtrans hover:-translate-y-0.5"
+      className="block bg-white dark:bg-surface-800 border border-ink-200 dark:border-transparent rounded-2xl p-6 richshadow richtrans hover:-translate-y-0.5"
     >
-      <p className="text-sm text-ink-500 dark:text-surface-400">{title}</p>
-      <p className="mt-2 text-3xl font-bold text-ink-900 dark:text-white">
+      <div className="flex items-center gap-3">
+        <span className="w-10 h-10 rounded-lg bg-brand-400/10 text-brand-400 flex items-center justify-center shrink-0">
+          <Icon size={18} />
+        </span>
+        <p className="text-sm text-ink-500 dark:text-surface-400">{title}</p>
+      </div>
+      <p className="mt-3 text-3xl font-bold text-ink-900 dark:text-white">
         {isLoading ? "..." : value}
       </p>
       {subtitle && !isLoading && (
@@ -74,6 +86,7 @@ export default function AdminDashboardPage() {
           value={openRequestsCount}
           isLoading={openRequestsLoading}
           href="/admin/requests"
+          icon={FaClipboardList}
         />
         {role === "agent" && (
           <StatCard
@@ -82,6 +95,7 @@ export default function AdminDashboardPage() {
             subtitle={`${pendingCount} pending · ${approvedCount} approved · ${rejectedCount} rejected`}
             isLoading={myListingsLoading}
             href="/admin/listings"
+            icon={FaBuilding}
           />
         )}
         {(role === "manager" || role === "superadmin") && (
@@ -90,6 +104,7 @@ export default function AdminDashboardPage() {
             value={pendingListingsCount}
             isLoading={pendingListingsLoading}
             href="/admin/listings?approvalStatus=pending"
+            icon={FaHourglassHalf}
           />
         )}
         {role === "superadmin" && (
@@ -98,6 +113,7 @@ export default function AdminDashboardPage() {
             value={usersCount}
             isLoading={usersLoading}
             href="/admin/users"
+            icon={FaUsers}
           />
         )}
         {role === "superadmin" && (
@@ -106,6 +122,7 @@ export default function AdminDashboardPage() {
             value={pendingApplicationsCount}
             isLoading={usersLoading}
             href="/admin/agent-applications"
+            icon={FaUserTie}
           />
         )}
       </div>

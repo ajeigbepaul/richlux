@@ -21,13 +21,11 @@
   transform: translateY(-5px);
 }
 
-/* Just the admin sidenav's active-item glow -- richshadow itself stays as-is
-   everywhere else (dashboard cards, table skeletons, etc). Both rules need
-   higher specificity than .richshadow/.richshadow:hover to win regardless of
-   stylesheet order. */
-.dark .sidenav-active {
-  box-shadow: none;
-}
-.dark .sidenav-active:hover {
+/* Background color alone is enough to read as an elevated surface in dark
+   mode -- the white glow just looks like a lighting artifact against a dark
+   page. Covers every card that uses richshadow (dashboard stats, admin list
+   cards, table skeletons, the sidenav's active item, etc.) from one place. */
+.dark .richshadow,
+.dark .richshadow:hover {
   box-shadow: none;
 }

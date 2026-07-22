@@ -43,7 +43,10 @@ function Footer() {
               secure, and rewarding.
             </p>
 
-            <div className="mt-6 flex items-center flex-wrap gap-x-4 gap-y-3">
+            {/* Target for the homepage hero's "Contact" quick-link card --
+                scroll-mt offsets for Header's sticky height so this row
+                doesn't land tucked underneath it. */}
+            <div id="contact" className="scroll-mt-24 mt-6 flex items-center flex-wrap gap-x-4 gap-y-3">
               <span className="text-caption text-ink-500 dark:text-slate-500">
                 © {new Date().getFullYear()} Richlux
               </span>

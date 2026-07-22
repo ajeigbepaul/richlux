@@ -318,7 +318,13 @@ function ListingsBrowserContent({ title, basePath, pageSize }) {
 
       <FilterPanel searchParams={searchParams} onApply={applyFilters} onClear={clearFilters} />
 
-      <div className="mt-8">
+      {/* isolate: contains the animated cards inside their own stacking
+          context, capped below anything outside it (e.g. a modal). Without
+          it, a card's own actively-animating transform can get promoted to
+          a compositing layer that some mobile browsers paint out of order,
+          letting it render above a higher z-index fixed overlay regardless
+          of the actual z-index numbers. */}
+      <div className="mt-8 isolate">
         {isLoading ? (
           <CardGridSkeleton
             count={pageSize}
