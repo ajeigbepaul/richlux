@@ -29,7 +29,7 @@ function RequestCard({ request }) {
     <Link href={`/my-requests/${request._id}`} className="block w-full">
       <Card hoverLift className="relative overflow-hidden h-full flex flex-col p-5">
         <div className="flex items-start justify-between gap-2">
-          <span className="text-caption uppercase tracking-wide text-brand-500 dark:text-brand-400 font-semibold">
+          <span className="text-caption uppercase tracking-wide text-brand-700 dark:text-brand-400 font-semibold">
             {LISTING_CATEGORY_LABELS[request.category] || request.category}
           </span>
           <div className="flex items-center gap-2">
@@ -66,13 +66,13 @@ function RequestCard({ request }) {
           </p>
         ) : (
           offersCount > 0 && (
-            <p className="text-caption font-medium text-brand-500 dark:text-brand-400 mt-3">
+            <p className="text-caption font-medium text-brand-700 dark:text-brand-400 mt-3">
               {offersCount} agent{offersCount > 1 ? "s" : ""} responded
             </p>
           )
         )}
 
-        <span className="text-caption font-medium text-brand-500 dark:text-brand-400 mt-3">
+        <span className="text-caption font-medium text-brand-700 dark:text-brand-400 mt-3">
           View details →
         </span>
       </Card>

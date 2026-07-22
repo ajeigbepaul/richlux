@@ -93,7 +93,7 @@ function FilterPanel({ searchParams, onApply, onClear }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-500 dark:text-brand-400 hover:text-brand-600 dark:hover:text-brand-300 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 dark:text-brand-400 hover:text-brand-600 dark:hover:text-brand-300 transition-colors"
       >
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
@@ -295,7 +295,7 @@ function ListingsBrowserContent({ title, basePath, pageSize }) {
           onClick={() => setCategory("")}
           className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
             !activeCategory
-              ? "bg-brand-400 text-white"
+              ? "bg-brand-700 text-white"
               : "bg-white dark:bg-surface-800 text-ink-700 dark:text-slate-200 border border-ink-300 dark:border-surface-700"
           }`}
         >
@@ -307,7 +307,7 @@ function ListingsBrowserContent({ title, basePath, pageSize }) {
             onClick={() => setCategory(category)}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               activeCategory === category
-                ? "bg-brand-400 text-white"
+                ? "bg-brand-700 text-white"
                 : "bg-white dark:bg-surface-800 text-ink-700 dark:text-slate-200 border border-ink-300 dark:border-surface-700"
             }`}
           >
@@ -344,7 +344,7 @@ function ListingsBrowserContent({ title, basePath, pageSize }) {
               }}
               className="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6"
             >
-              {items.map((listing) => (
+              {items.map((listing, index) => (
                 <motion.div
                   key={listing._id}
                   variants={{
@@ -353,7 +353,7 @@ function ListingsBrowserContent({ title, basePath, pageSize }) {
                   }}
                   className="h-full"
                 >
-                  <ListingItem listing={listing} />
+                  <ListingItem listing={listing} priority={index === 0} />
                 </motion.div>
               ))}
             </motion.div>
@@ -366,7 +366,7 @@ function ListingsBrowserContent({ title, basePath, pageSize }) {
           <button
             disabled={page <= 1}
             onClick={() => setPage((p) => p - 1)}
-            className="text-sm font-medium text-brand-500 dark:text-brand-400 disabled:text-ink-300 dark:disabled:text-surface-700"
+            className="text-sm font-medium text-brand-700 dark:text-brand-400 disabled:text-ink-300 dark:disabled:text-surface-700"
           >
             ← Previous
           </button>
@@ -376,7 +376,7 @@ function ListingsBrowserContent({ title, basePath, pageSize }) {
           <button
             disabled={page >= data.pages}
             onClick={() => setPage((p) => p + 1)}
-            className="text-sm font-medium text-brand-500 dark:text-brand-400 disabled:text-ink-300 dark:disabled:text-surface-700"
+            className="text-sm font-medium text-brand-700 dark:text-brand-400 disabled:text-ink-300 dark:disabled:text-surface-700"
           >
             Next →
           </button>

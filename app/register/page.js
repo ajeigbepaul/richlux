@@ -36,7 +36,7 @@ function RoleCard({ icon: Icon, title, description, onClick }) {
       onClick={onClick}
       className="text-left w-full p-4 rounded-xl border border-ink-300 dark:border-surface-700 bg-white dark:bg-surface-800 hover:border-brand-400 dark:hover:border-brand-400 richtrans"
     >
-      <Icon size={20} className="text-brand-500 dark:text-brand-400 mb-2" />
+      <Icon size={20} className="text-brand-700 dark:text-brand-400 mb-2" />
       <p className="font-semibold text-ink-900 dark:text-white">{title}</p>
       <p className="text-caption text-ink-500 dark:text-slate-400 mt-1">{description}</p>
     </button>
@@ -50,7 +50,7 @@ function LoginPrompt({ callbackUrl }) {
       <div className="text-ink-500 dark:text-slate-400 w-full text-sm text-center">
         Already have an account?{" "}
         <span
-          className="mx-1 text-xs font-semibold text-brand-500 dark:text-brand-400 cursor-pointer"
+          className="mx-1 text-xs font-semibold text-brand-700 dark:text-brand-400 cursor-pointer"
           onClick={() =>
             router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`)
           }
@@ -258,7 +258,7 @@ function Register() {
       <button
         type="button"
         onClick={() => setIntent(null)}
-        className="inline-block mb-4 text-caption font-medium text-brand-500 dark:text-brand-400 hover:text-brand-600 dark:hover:text-brand-300"
+        className="inline-block mb-4 text-caption font-medium text-brand-700 dark:text-brand-400 hover:text-brand-600 dark:hover:text-brand-300"
       >
         ← Choose a different option
       </button>

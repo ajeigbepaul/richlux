@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lighthouse": "lighthouse http://localhost:3000 --output=json --output=html --output-path=./.lighthouse/report --chrome-flags=\"--headless\" --view=false"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -36,5 +37,8 @@
     "swiper": "^14.0.5",
     "swr": "^2.2.4",
     "tailwindcss": "3.3.3"
+  },
+  "devDependencies": {
+    "lighthouse": "^13.4.1"
   }
 }

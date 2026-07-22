@@ -132,7 +132,7 @@ function MediaUploader({ value = [], onChange, folder = "richlux/listings" }) {
           <div className="relative w-full max-w-xs aspect-video rounded-lg overflow-hidden bg-ink-200 dark:bg-surface-700 group">
             <Image
               src={coverItem.secureUrl}
-              alt=""
+              alt="Cover photo"
               fill
               sizes="320px"
               className="object-cover"
@@ -187,7 +187,7 @@ function MediaUploader({ value = [], onChange, folder = "richlux/listings" }) {
           accept="image/jpeg,image/png,image/webp,video/mp4"
           multiple
           onChange={handleGalleryFiles}
-          className="block w-full text-sm text-ink-700 dark:text-surface-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-brand-400 file:text-white file:font-medium hover:file:bg-brand-500"
+          className="block w-full text-sm text-ink-700 dark:text-surface-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-brand-700 file:text-white file:font-medium hover:file:bg-brand-800"
         />
 
         <div className="mt-2">
@@ -206,7 +206,7 @@ function MediaUploader({ value = [], onChange, folder = "richlux/listings" }) {
                 ) : (
                   <Image
                     src={item.secureUrl}
-                    alt=""
+                    alt="Uploaded photo"
                     fill
                     sizes="200px"
                     className="object-cover"

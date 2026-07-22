@@ -9,7 +9,8 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
 import { EffectFade, Navigation, Pagination, Autoplay } from "swiper/modules";
-import { CldImage, getCldImageUrl, getCldVideoUrl } from "next-cloudinary";
+import Image from "next/image";
+import { CldImage, getCldVideoUrl } from "next-cloudinary";
 import { FaPlay, FaPause } from "react-icons/fa";
 import Spinner from "@/components/ui/Spinner";
 
@@ -23,7 +24,11 @@ function ImageSlide({ banner, preload }) {
         alt={banner.title || "Richlux property banner"}
         fill
         sizes="100vw"
-        preload={preload}
+        priority={preload}
+        // This Next.js version doesn't derive fetchPriority from `priority`
+        // automatically -- it has to be set explicitly or the LCP image
+        // fetch never actually gets bumped ahead of everything else.
+        fetchPriority={preload ? "high" : undefined}
         loading={preload ? undefined : "lazy"}
         className="object-cover"
       />
@@ -75,6 +80,11 @@ function VideoSection({ video }) {
   // just tracking button clicks, so it stays correct even if autoplay gets
   // blocked or the video is paused some other way.
   const [isPlaying, setIsPlaying] = useState(true);
+  // The native <video poster> attribute has no load event to hook into, so
+  // the poster is rendered as a real <Image> instead (with its own onLoad)
+  // -- lets the spinner cover the actual gap instead of guessing at a delay.
+  const [posterLoaded, setPosterLoaded] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -94,11 +104,15 @@ function VideoSection({ video }) {
 
   if (!video) return null;
 
-  // Cloudinary derives a poster frame from the same publicId requested
-  // through the image (not video) delivery URL -- shows instantly instead of
-  // a blank box while the actual video is still deferred/buffering.
-  const poster = getCldImageUrl({ src: video.publicId, quality: "auto" });
   const src = inView ? getCldVideoUrl({ src: video.publicId, quality: "auto" }) : undefined;
+  // CldImage always resolves against Cloudinary's *image* resource type, but
+  // this asset is stored as a *video* -- requesting a video's public_id
+  // through the image endpoint genuinely 404s ("Resource not found"), it's
+  // a different namespace. getCldVideoUrl targets the video endpoint and
+  // `format: "jpg"` there is what actually gets Cloudinary to hand back a
+  // still frame instead of the video itself.
+  const poster = getCldVideoUrl({ src: video.publicId, format: "jpg", quality: "auto" });
+  const showSpinner = !posterLoaded && !videoReady;
 
   const togglePlay = () => {
     const el = videoRef.current;
@@ -112,18 +126,32 @@ function VideoSection({ video }) {
 
   return (
     <div ref={containerRef} className="relative w-full h-[90vh] bg-ink-900">
+      {showSpinner && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center">
+          <Spinner size={44} className="text-brand-400" />
+        </div>
+      )}
+      <Image
+        src={poster}
+        alt=""
+        fill
+        sizes="100vw"
+        unoptimized
+        className="object-cover"
+        onLoad={() => setPosterLoaded(true)}
+      />
       <video
         ref={videoRef}
         src={src}
-        poster={poster}
         muted
         loop
         autoPlay
         playsInline
         preload="none"
+        onLoadedData={() => setVideoReady(true)}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
-        className="w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover"
       />
       <button
         type="button"
@@ -137,14 +165,27 @@ function VideoSection({ video }) {
   );
 }
 
-function Hero() {
+function Hero({ initialBanners = [] }) {
   // Public endpoint, active banners only, already sorted by display order.
-  const { data, isLoading } = useSWR("/api/banners", fetcher);
+  // fallbackData is the server-fetched initial list (see app/page.js) so the
+  // first paint already has real banner data -- the carousel's <img> src is
+  // in the HTML immediately instead of waiting on this client-side fetch to
+  // resolve before the LCP image can even start downloading. SWR still
+  // revalidates in the background to pick up admin changes.
+  //
+  // Gating on `data` (not `isLoading`) deliberately -- SWR's `isLoading`
+  // is computed from its internal cache and stays true on the very first
+  // render regardless of fallbackData ("bypasses fallback data", per SWR's
+  // own source), so checking it here would show the spinner over the
+  // already-available fallback banners on first paint.
+  const { data } = useSWR("/api/banners", fetcher, {
+    fallbackData: initialBanners,
+  });
   const banners = Array.isArray(data) ? data : [];
   const images = banners.filter((banner) => banner.type === "image");
   const video = banners.find((banner) => banner.type === "video") || null;
 
-  if (isLoading) {
+  if (!data) {
     return (
       <div className="w-full h-[90vh] bg-ink-100 dark:bg-surface-900 flex items-center justify-center">
         <Spinner size={44} className="text-brand-400" />

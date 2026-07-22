@@ -25,7 +25,11 @@ const tokens = {
   ink: {
     900: "#3a3a3a",
     700: "#545454",
-    500: "#7a7a7a",
+    // Darkened from the originally-sampled #7a7a7a (4.29:1 against white --
+    // just under WCAG AA's 4.5:1 for normal text, and this token is used
+    // everywhere as caption/secondary text). #707070 clears it at ~4.94:1
+    // while staying visually all but identical.
+    500: "#707070",
     300: "#d4d4d4",
     200: "#e8e8e8",
     100: "#f5f5f5",

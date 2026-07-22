@@ -5,11 +5,14 @@ const RETRY_DELAY_MS = 700;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const connectToDB = async () => {
-  if (mongoose.connection.readyState === 1) {
-    return;
-  }
+// Several requests can land before the very first connection settles (e.g.
+// the homepage's server-rendered fetch and a couple of client-side API
+// calls, all in the same cold-start burst) -- without sharing one in-flight
+// attempt, each of them called mongoose.connect() independently and raced,
+// which surfaced as intermittent 500s right after a fresh server start.
+let connectingPromise = null;
 
+async function attemptConnect() {
   // Previously this swallowed connection errors, so every caller assumed
   // success and went on to query anyway -- the query then hung on Mongoose's
   // command buffering until its own timeout, doubling the delay before a
@@ -36,4 +39,18 @@ export const connectToDB = async () => {
     }
   }
   throw lastError;
+}
+
+export const connectToDB = async () => {
+  if (mongoose.connection.readyState === 1) {
+    return;
+  }
+
+  if (!connectingPromise) {
+    connectingPromise = attemptConnect().finally(() => {
+      connectingPromise = null;
+    });
+  }
+
+  return connectingPromise;
 };

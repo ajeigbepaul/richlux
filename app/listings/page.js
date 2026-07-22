@@ -4,6 +4,13 @@ import Container from "@/components/ui/Container";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import ListingsBrowser from "@/components/ListingsBrowser";
 
+export const metadata = {
+  title: "All Listings",
+  description:
+    "Browse house sales, rentals, shortlets, land sales, and property management listings across Lagos and Ibadan.",
+  alternates: { canonical: "/listings" },
+};
+
 export default function ListingsPage() {
   return (
     <main className="w-full bg-white dark:bg-surface-900 min-h-screen flex flex-col">

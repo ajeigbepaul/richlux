@@ -47,7 +47,7 @@ function Footer() {
                 scroll-mt offsets for Header's sticky height so this row
                 doesn't land tucked underneath it. */}
             <div id="contact" className="scroll-mt-24 mt-6 flex items-center flex-wrap gap-x-4 gap-y-3">
-              <span className="text-caption text-ink-500 dark:text-slate-500">
+              <span className="text-caption text-ink-300 dark:text-slate-400">
                 © {new Date().getFullYear()} Richlux
               </span>
               <div className="flex items-center gap-2">
