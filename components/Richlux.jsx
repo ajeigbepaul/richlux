@@ -66,8 +66,14 @@ function Richlux() {
             variants={cardStagger}
             className="mt-10 flex flex-wrap items-stretch justify-center gap-4"
           >
+            {/* No h-full on this motion.div -- an explicit (non-auto)
+                cross-size on the flex item itself disqualifies it from
+                align-items:stretch per the flexbox spec, which is exactly
+                what silently broke this the first time. Leave this item's
+                height auto and let stretch size it; h-full only goes on the
+                Link below, which isn't itself a flex item of the row. */}
             {QUICK_LINKS.map(({ icon: Icon, label, caption, href }) => (
-              <motion.div key={label} variants={fadeUp} className="h-full">
+              <motion.div key={label} variants={fadeUp}>
                 <Link
                   href={href}
                   className="flex flex-col items-center bg-white dark:bg-surface-800 shadow-card p-4 rounded-xl richtrans cursor-pointer w-32 h-full"
