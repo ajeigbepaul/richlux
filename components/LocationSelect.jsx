@@ -64,7 +64,10 @@ function LocationSelect({
         value={lga}
         onChange={handleLgaChange}
         options={lgaOptions}
-        placeholder={state ? "Select an LGA" : "Select a state first"}
+        // Before a state is chosen there's nothing to select yet -- just
+        // repeat the label instead of a "Select a state first" placeholder
+        // that gets clipped mid-word in the select's fixed width.
+        placeholder={state ? "Select an LGA" : lgaLabel}
       />
       <Select
         label={areaLabel}
@@ -72,7 +75,7 @@ function LocationSelect({
         value={area}
         onChange={(e) => onAreaChange(e.target.value)}
         options={areaOptions}
-        placeholder={lga ? "Select an area" : "Select an LGA first"}
+        placeholder={lga ? "Select an area" : areaLabel}
       />
     </div>
   );
