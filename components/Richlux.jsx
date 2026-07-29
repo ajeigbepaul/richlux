@@ -64,13 +64,13 @@ function Richlux() {
 
           <motion.div
             variants={cardStagger}
-            className="mt-10 flex flex-wrap items-center justify-center gap-4"
+            className="mt-10 flex flex-wrap items-stretch justify-center gap-4"
           >
             {QUICK_LINKS.map(({ icon: Icon, label, caption, href }) => (
-              <motion.div key={label} variants={fadeUp}>
+              <motion.div key={label} variants={fadeUp} className="h-full">
                 <Link
                   href={href}
-                  className="flex flex-col items-center bg-white dark:bg-surface-800 shadow-card p-4 rounded-xl richtrans cursor-pointer w-32"
+                  className="flex flex-col items-center bg-white dark:bg-surface-800 shadow-card p-4 rounded-xl richtrans cursor-pointer w-32 h-full"
                 >
                   <Icon size={28} className="text-brand-400" />
                   <h2 className="mt-1 font-semibold text-ink-900 dark:text-white">{label}</h2>

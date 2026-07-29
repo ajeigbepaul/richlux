@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import useSWR from "swr";
+import { AnimatePresence, motion } from "framer-motion";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import {
@@ -15,12 +16,26 @@ import {
   FaSignOutAlt,
   FaBriefcase,
   FaHourglassHalf,
+  FaHome,
+  FaBuilding,
+  FaUmbrellaBeach,
+  FaKey,
+  FaMapMarkedAlt,
 } from "react-icons/fa";
 import { LISTING_CATEGORIES, LISTING_CATEGORY_LABELS } from "@/constants/listing";
 import Container from "@/components/ui/Container";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import { useBodyScrollLock } from "@/utils/useBodyScrollLock";
 
 const ADMIN_ROLES = ["superadmin", "manager", "agent"];
+
+const CATEGORY_ICONS = {
+  "house-sale": FaHome,
+  "property-management": FaBuilding,
+  shortlet: FaUmbrellaBeach,
+  rental: FaKey,
+  "land-sale": FaMapMarkedAlt,
+};
 
 const ROLE_LABELS = {
   superadmin: "Super Admin",
@@ -66,10 +81,22 @@ function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [profileOpen]);
 
+  useBodyScrollLock(menuOpen);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleEscape(event) {
+      if (event.key === "Escape") setMenuOpen(false);
+    }
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [menuOpen]);
+
   return (
-    <header className="w-full bg-white/90 dark:bg-surface-900/90 backdrop-blur sticky top-0 z-50 shadow-sm">
-      <Container>
-        <div className="flex items-center justify-between py-3">
+    <>
+      <header className="w-full bg-white/90 dark:bg-surface-900/90 backdrop-blur sticky top-0 z-50 shadow-sm">
+        <Container>
+          <div className="flex items-center justify-between py-3">
           <Link href="/" className="flex items-center shrink-0">
             <Image
               src="/richlux.png"
@@ -192,102 +219,173 @@ function Header() {
             )}
           </div>
 
-          <div className="flex items-center space-x-2 lg:hidden">
-            <ThemeToggle className="text-ink-700 dark:text-slate-200 hover:bg-ink-100 dark:hover:bg-surface-800" />
+          <div className="flex items-center lg:hidden">
             <button
-              className="text-ink-700 dark:text-slate-200"
+              className="text-ink-700 dark:text-slate-200 p-1"
               onClick={() => setMenuOpen((open) => !open)}
               aria-label="Toggle menu"
+              aria-expanded={menuOpen}
             >
-              {menuOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
+              <FaBars size={22} />
             </button>
           </div>
-        </div>
-
-        {menuOpen && (
-          <div className="lg:hidden pb-4 flex flex-col space-y-3">
-            {LISTING_CATEGORIES.map((category) => (
-              <Link
-                key={category}
-                href={`/listings?category=${category}`}
-                className="text-ink-700 dark:text-slate-200 hover:text-brand-500 dark:hover:text-brand-400 text-sm font-semibold tracking-tight"
-                onClick={() => setMenuOpen(false)}
-              >
-                {LISTING_CATEGORY_LABELS[category]}
-              </Link>
-            ))}
-            {auth ? (
-              <>
-                {isStaff && (
-                  <Link
-                    href="/admin"
-                    className="flex items-center gap-3 pt-2 border-t border-ink-100 dark:border-surface-700 text-sm font-medium text-ink-700 dark:text-slate-200"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    <FaUserShield size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
-                    <span>{roleLabel}</span>
-                  </Link>
-                )}
-                <Link
-                  href="/my-requests"
-                  className={`flex items-center gap-3 text-sm font-medium text-ink-700 dark:text-slate-200 ${
-                    isStaff ? "" : "pt-2 border-t border-ink-100 dark:border-surface-700"
-                  }`}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <FaClipboardList size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
-                  <span>My Requests</span>
-                </Link>
-                {effectiveRole === "user" &&
-                  (applicationStatus === "pending" ? (
-                    <span className="flex items-center gap-3 text-sm font-medium text-ink-400 dark:text-slate-500 cursor-not-allowed">
-                      <FaHourglassHalf size={15} className="shrink-0" />
-                      <span>Reviewing request</span>
-                    </span>
-                  ) : (
-                    <Link
-                      href="/become-agent"
-                      className="flex items-center gap-3 text-sm font-medium text-ink-700 dark:text-slate-200"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <FaBriefcase size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
-                      <span>Become an Agent</span>
-                    </Link>
-                  ))}
-                <button
-                  onClick={() => {
-                    setMenuOpen(false);
-                    logOut();
-                  }}
-                  className="flex items-center gap-3 text-sm font-medium text-white bg-brand-700 rounded-md px-3 py-1.5 w-fit"
-                >
-                  <FaSignOutAlt size={15} className="shrink-0" />
-                  <span>Logout</span>
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/register?intent=agent"
-                  className="flex items-center gap-2 text-sm font-medium text-brand-700 dark:text-brand-400"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <FaBriefcase size={15} className="shrink-0" />
-                  <span>Become an Agent</span>
-                </Link>
-                <Link
-                  href="/logininterface"
-                  className="text-sm font-medium text-ink-700 dark:text-slate-200"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Sign In
-                </Link>
-              </>
-            )}
           </div>
-        )}
-      </Container>
-    </header>
+        </Container>
+      </header>
+
+      <AnimatePresence>
+          {menuOpen && (
+            <React.Fragment key="mobile-nav">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="lg:hidden fixed inset-0 bg-black/50 z-40"
+                onClick={() => setMenuOpen(false)}
+              />
+              <motion.div
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="lg:hidden fixed top-0 right-0 h-full w-[82%] max-w-xs bg-white dark:bg-surface-900 shadow-elevation-lg dark:shadow-none z-50 flex flex-col overflow-y-auto"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Site menu"
+              >
+                <div className="flex items-center justify-between px-5 py-4 border-b border-ink-100 dark:border-surface-700">
+                  <span className="font-serif font-semibold text-lg text-ink-900 dark:text-white">
+                    Menu
+                  </span>
+                  <button
+                    onClick={() => setMenuOpen(false)}
+                    aria-label="Close menu"
+                    className="text-ink-700 dark:text-slate-200 p-1"
+                  >
+                    <FaTimes size={20} />
+                  </button>
+                </div>
+
+                <div className="px-5 py-4 border-b border-ink-100 dark:border-surface-700">
+                  {auth ? (
+                    <div className="flex items-center gap-3">
+                      <Image
+                        src={auth.image || "/profilepic.jpg"}
+                        alt={auth.name || "Profile"}
+                        width={40}
+                        height={40}
+                        className="w-10 h-10 rounded-full object-cover shrink-0"
+                      />
+                      <div className="min-w-0">
+                        <p className="font-medium text-ink-900 dark:text-white text-sm truncate">
+                          {auth.name || auth.email}
+                        </p>
+                        {isStaff && (
+                          <p className="text-caption text-ink-500 dark:text-slate-400">{roleLabel}</p>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        href="/logininterface"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center justify-center gap-2 text-sm font-medium bg-brand-700 hover:bg-brand-800 transition-colors duration-300 text-white rounded-md px-4 py-2.5"
+                      >
+                        <FaUser size={14} />
+                        Sign In
+                      </Link>
+                      <Link
+                        href="/register?intent=agent"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center justify-center gap-2 text-sm font-medium text-brand-700 dark:text-brand-400 border border-brand-400 rounded-md px-4 py-2.5"
+                      >
+                        <FaBriefcase size={14} />
+                        Become an Agent
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+                <nav className="flex flex-col px-2 py-3">
+                  {LISTING_CATEGORIES.map((category) => {
+                    const Icon = CATEGORY_ICONS[category];
+                    return (
+                      <Link
+                        key={category}
+                        href={`/listings?category=${category}`}
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-semibold text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-800 transition-colors duration-300"
+                      >
+                        {Icon && (
+                          <Icon size={16} className="text-brand-700 dark:text-brand-400 shrink-0" />
+                        )}
+                        {LISTING_CATEGORY_LABELS[category]}
+                      </Link>
+                    );
+                  })}
+                </nav>
+
+                {auth && (
+                  <nav className="flex flex-col px-2 py-3 border-t border-ink-100 dark:border-surface-700">
+                    {isStaff && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-800 transition-colors duration-300"
+                      >
+                        <FaUserShield size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
+                        {roleLabel}
+                      </Link>
+                    )}
+                    <Link
+                      href="/my-requests"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-800 transition-colors duration-300"
+                    >
+                      <FaClipboardList size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
+                      My Requests
+                    </Link>
+                    {effectiveRole === "user" &&
+                      (applicationStatus === "pending" ? (
+                        <span className="flex items-center gap-3 px-3 py-3 text-sm font-medium text-ink-400 dark:text-slate-500 cursor-not-allowed">
+                          <FaHourglassHalf size={15} className="shrink-0" />
+                          Reviewing request
+                        </span>
+                      ) : (
+                        <Link
+                          href="/become-agent"
+                          onClick={() => setMenuOpen(false)}
+                          className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-800 transition-colors duration-300"
+                        >
+                          <FaBriefcase size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
+                          Become an Agent
+                        </Link>
+                      ))}
+                  </nav>
+                )}
+
+                <div className="mt-auto px-5 py-4 border-t border-ink-100 dark:border-surface-700 flex items-center justify-between">
+                  <ThemeToggle className="text-ink-700 dark:text-slate-200 hover:bg-ink-100 dark:hover:bg-surface-800" />
+                  {auth && (
+                    <button
+                      onClick={() => {
+                        setMenuOpen(false);
+                        logOut();
+                      }}
+                      className="flex items-center gap-2 text-sm font-medium text-red-600 dark:text-red-400"
+                    >
+                      <FaSignOutAlt size={15} />
+                      Logout
+                    </button>
+                  )}
+                </div>
+              </motion.div>
+            </React.Fragment>
+          )}
+        </AnimatePresence>
+    </>
   );
 }
 
