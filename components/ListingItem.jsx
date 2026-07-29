@@ -14,12 +14,6 @@ function formatNaira(price) {
     .replace(/\d(?=(\d{3})+\.)/g, "$&,")}`;
 }
 
-function trunc(sentence, limit) {
-  const words = sentence?.split(" ") || [];
-  if (words.length <= limit) return sentence;
-  return words.slice(0, limit).join(" ") + "...";
-}
-
 function ListingItem({ listing, priority = false }) {
   const {
     _id,
@@ -38,7 +32,7 @@ function ListingItem({ listing, priority = false }) {
   const cover = media?.find((item) => item.isCover) || media?.[0];
 
   return (
-    <Link href={`/listings/${_id}`} className="block w-full">
+    <Link href={`/listings/${_id}`} className="block w-full h-full">
       <Card hoverLift className="overflow-hidden h-full flex flex-col">
         <div className="relative w-full aspect-[4/3] bg-ink-200 dark:bg-surface-800 overflow-hidden group">
           {cover ? (
@@ -104,8 +98,8 @@ function ListingItem({ listing, priority = false }) {
               )}
             </div>
           )}
-          <p className="text-caption text-ink-500 dark:text-slate-400 mt-2 flex-1">
-            {trunc(description, 15)}
+          <p className="text-caption text-ink-500 dark:text-slate-400 mt-2 flex-1 line-clamp-2">
+            {description}
           </p>
           <div className="flex items-center justify-between mt-2">
             <span className="font-serif font-semibold text-lg text-ink-900 dark:text-white">
