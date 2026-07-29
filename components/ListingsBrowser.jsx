@@ -288,7 +288,7 @@ function ListingsBrowserContent({ title, basePath, pageSize }) {
 
   return (
     <>
-      <h1 className="text-h1 text-ink-900 dark:text-white">{title}</h1>
+      <h1 className="font-serif text-h1 text-ink-900 dark:text-white">{title}</h1>
 
       <div className="mt-6 flex flex-wrap gap-2">
         <button

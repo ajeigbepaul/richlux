@@ -29,3 +29,36 @@
 .dark .richshadow:hover {
   box-shadow: none;
 }
+
+/* Quiet-luxury theming for the homepage banner carousel -- thinner, glass-chip
+   nav buttons instead of Swiper's stock circular chrome, and a pill-shaped
+   gold active pagination dot instead of the default round dot, so this reads
+   as a deliberate brand moment rather than an off-the-shelf carousel. Scoped
+   to this one class -- it's the only Swiper instance in the app. */
+.richlux-hero-swiper .swiper-button-next,
+.richlux-hero-swiper .swiper-button-prev {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+  border-radius: 9999px;
+  transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.richlux-hero-swiper .swiper-button-next:hover,
+.richlux-hero-swiper .swiper-button-prev:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+.richlux-hero-swiper .swiper-button-next::after,
+.richlux-hero-swiper .swiper-button-prev::after {
+  font-size: 16px;
+}
+.richlux-hero-swiper .swiper-pagination-bullet {
+  background: #fff;
+  opacity: 0.5;
+}
+.richlux-hero-swiper .swiper-pagination-bullet-active {
+  background: theme("colors.gold.400");
+  opacity: 1;
+  width: 20px;
+  border-radius: 9999px;
+}

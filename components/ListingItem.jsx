@@ -4,7 +4,7 @@ import { CldImage } from "next-cloudinary";
 import Link from "next/link";
 import React from "react";
 import Card from "@/components/ui/Card";
-import Badge from "@/components/ui/Badge";
+import Badge, { FeaturedBadge } from "@/components/ui/Badge";
 import { LISTING_CATEGORY_LABELS } from "@/constants/listing";
 
 function formatNaira(price) {
@@ -20,14 +20,14 @@ function trunc(sentence, limit) {
 }
 
 function ListingItem({ listing, priority = false }) {
-  const { _id, title, description, price, category, status, media, location } =
+  const { _id, title, description, price, category, status, media, location, isFeatured } =
     listing;
   const cover = media?.find((item) => item.isCover) || media?.[0];
 
   return (
     <Link href={`/listings/${_id}`} className="block w-full">
       <Card hoverLift className="overflow-hidden h-full flex flex-col">
-        <div className="relative w-full aspect-[4/3] bg-ink-200 dark:bg-surface-800">
+        <div className="relative w-full aspect-[4/3] bg-ink-200 dark:bg-surface-800 overflow-hidden group">
           {cover ? (
             // CldImage (not next/image + raw secureUrl) so the exact
             // requested size + auto format/quality (WebP/AVIF, compressed)
@@ -43,14 +43,18 @@ function ListingItem({ listing, priority = false }) {
               fill
               sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
               priority={priority}
-              className="object-cover"
+              className="object-cover transition-transform duration-300 ease-luxury group-hover:scale-105"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-ink-500 dark:text-slate-400 text-sm">
               No image yet
             </div>
           )}
+          {/* Legibility floor for the status badge against varied photo
+              content, not a caption background -- kept subtle and top-only. */}
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
           <Badge status={status} className="absolute top-3 left-3 bg-white/90 dark:bg-surface-800/90" />
+          {isFeatured && <FeaturedBadge className="absolute top-3 right-3" />}
         </div>
         <div className="p-4 flex flex-col flex-1">
           <span className="text-caption uppercase tracking-wide text-brand-700 dark:text-brand-400 font-semibold">
@@ -58,15 +62,17 @@ function ListingItem({ listing, priority = false }) {
           </span>
           <h2 className="text-ink-900 dark:text-white font-semibold mt-1">{title}</h2>
           {location?.city && (
-            <p className="text-caption text-ink-500 dark:text-slate-400 mt-0.5">
+            <p className="text-caption text-ink-500 dark:text-slate-400 mt-1">
               {[location.address, location.city].filter(Boolean).join(", ")}
             </p>
           )}
           <p className="text-caption text-ink-500 dark:text-slate-400 mt-2 flex-1">
             {trunc(description, 15)}
           </p>
-          <div className="flex items-center justify-between mt-3">
-            <span className="font-bold text-ink-900 dark:text-white">{formatNaira(price)}</span>
+          <div className="flex items-center justify-between mt-2">
+            <span className="font-serif font-semibold text-lg text-ink-900 dark:text-white">
+              {formatNaira(price)}
+            </span>
             <span className="text-caption font-medium text-brand-700 dark:text-brand-400">
               View details →
             </span>

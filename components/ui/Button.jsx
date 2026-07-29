@@ -41,7 +41,7 @@ function Button({
     <button
       type={type}
       disabled={disabled || isLoading}
-      className={`rounded-md font-medium transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
+      className={`rounded-md font-medium transition-all duration-300 ease-luxury hover:shadow-elevation-sm dark:hover:shadow-none disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
       {...props}
     >
       {isLoading ? (
