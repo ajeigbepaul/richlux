@@ -46,12 +46,22 @@ const tokens = {
     700: "#3f3f46",
     600: "#52525b",
   },
-  // Legacy accent, kept as a named token so it's phased out deliberately
-  // rather than mixed ad hoc with the new brand blue.
-  accent: {
+  // Rare luxury accent (formerly "legacy accent, being phased out" -- this
+  // is that same amber/brass hue given one deliberate purpose instead:
+  // Featured badges and other rare "quiet luxury" moments, not a general
+  // UI color). 300/400/500 unchanged from the original values.
+  gold: {
+    50: "#fdf8ef",
     300: "#f5b85c",
     400: "#e49a38",
     500: "#d9822a",
+    // Darkened for AA text-on-white contrast (mirrors the brand-700/ink-500
+    // fixes) -- #d9822a measures ~2.93:1 against white, well under WCAG
+    // AA's 4.5:1. Checked against gold.50 specifically (the FeaturedBadge's
+    // own background, slightly darker than pure white) since #a8641a
+    // measured 4.41:1 there -- just under 4.5:1. #9c5e18 clears both:
+    // ~4.93:1 against gold.50, ~5.21:1 against white.
+    700: "#9c5e18",
   },
   success: "#22c55e",
   warning: "#f59e0b",

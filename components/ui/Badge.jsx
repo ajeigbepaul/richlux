@@ -31,4 +31,19 @@ function Badge({ status, children, className = "" }) {
   );
 }
 
+// Separate from STATUS_STYLES above -- isFeatured is a boolean flag on the
+// Listing model, not a status enum, so it doesn't fit the status->style map.
+// Styled with the gold accent since this is exactly the "rare accent" moment
+// the brand's quiet-luxury direction reserves gold for.
+function FeaturedBadge({ className = "" }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-caption font-semibold bg-gold-50 text-gold-700 dark:bg-gold-500/10 dark:text-gold-300 ${className}`}
+    >
+      Featured
+    </span>
+  );
+}
+
 export default Badge;
+export { FeaturedBadge };

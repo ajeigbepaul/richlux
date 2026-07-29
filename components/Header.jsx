@@ -94,7 +94,7 @@ function Header() {
               <Link
                 key={category}
                 href={`/listings?category=${category}`}
-                className="text-ink-700 dark:text-slate-200 hover:text-brand-500 dark:hover:text-brand-400 text-sm font-semibold tracking-tight transition-colors"
+                className="text-ink-700 dark:text-slate-200 hover:text-brand-500 dark:hover:text-brand-400 text-sm font-semibold tracking-tight transition-colors duration-300"
               >
                 {LISTING_CATEGORY_LABELS[category]}
               </Link>
@@ -121,12 +121,12 @@ function Header() {
                 </button>
 
                 {profileOpen && (
-                  <div className="absolute right-0 mt-2 w-52 rounded-lg bg-white dark:bg-surface-800 shadow-lg ring-1 ring-black/5 dark:ring-white/10 py-1.5 z-50">
+                  <div className="absolute right-0 mt-2 w-52 rounded-xl bg-white dark:bg-surface-800 shadow-elevation-md dark:shadow-none ring-1 ring-ink-900/5 dark:ring-0 py-1.5 z-50">
                     {isStaff && (
                       <Link
                         href="/admin"
                         onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-700 transition-colors"
+                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-700 transition-colors duration-300"
                       >
                         <FaUserShield size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
                         <span>{roleLabel}</span>
@@ -135,7 +135,7 @@ function Header() {
                     <Link
                       href="/my-requests"
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-700 transition-colors"
+                      className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-700 transition-colors duration-300"
                     >
                       <FaClipboardList size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
                       <span>My Requests</span>
@@ -153,7 +153,7 @@ function Header() {
                         <Link
                           href="/become-agent"
                           onClick={() => setProfileOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-700 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-ink-700 dark:text-slate-200 hover:bg-ink-50 dark:hover:bg-surface-700 transition-colors duration-300"
                         >
                           <FaBriefcase size={15} className="text-brand-700 dark:text-brand-400 shrink-0" />
                           <span>Become an Agent</span>
@@ -164,7 +164,7 @@ function Header() {
                         setProfileOpen(false);
                         logOut();
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-ink-50 dark:hover:bg-surface-700 transition-colors"
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-ink-50 dark:hover:bg-surface-700 transition-colors duration-300"
                     >
                       <FaSignOutAlt size={15} className="shrink-0" />
                       <span>Logout</span>

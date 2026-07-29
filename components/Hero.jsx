@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import useSWR from "swr";
 import { Swiper, SwiperSlide } from "swiper/react";
 // Import Swiper styles
@@ -32,6 +33,10 @@ function ImageSlide({ banner, preload }) {
         loading={preload ? undefined : "lazy"}
         className="object-cover"
       />
+      {/* Keeps the nav arrows/pagination dots legible against bright photos
+          and reads as graded rather than flat -- not a caption background,
+          stays subtle and fades out well before mid-frame. */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
     </div>
   );
 }
@@ -56,7 +61,7 @@ function ImageCarousel({ images }) {
         clickable: true,
       }}
       modules={[Navigation, Pagination, EffectFade, Autoplay]}
-      className="mySwiper"
+      className="richlux-hero-swiper"
     >
       {images.map((banner, i) => (
         <SwiperSlide key={banner._id} className="swiperslide">
@@ -125,7 +130,13 @@ function VideoSection({ video }) {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-[90vh] bg-ink-900">
+    <motion.div
+      ref={containerRef}
+      initial={{ opacity: 0, y: 16 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className="relative w-full h-[90vh] bg-ink-900"
+    >
       {showSpinner && (
         <div className="absolute inset-0 z-10 flex items-center justify-center">
           <Spinner size={44} className="text-brand-400" />
@@ -157,11 +168,11 @@ function VideoSection({ video }) {
         type="button"
         onClick={togglePlay}
         aria-label={isPlaying ? "Pause video" : "Play video"}
-        className="absolute bottom-6 left-6 z-10 w-12 h-12 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white transition-colors"
+        className="absolute bottom-6 left-6 z-10 w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 hover:shadow-elevation-sm flex items-center justify-center text-white transition-all duration-300 ease-luxury"
       >
         {isPlaying ? <FaPause size={16} /> : <FaPlay size={16} className="ml-0.5" />}
       </button>
-    </div>
+    </motion.div>
   );
 }
 

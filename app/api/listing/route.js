@@ -63,7 +63,10 @@ export async function GET(req) {
     if (location) query["location.city"] = new RegExp(location, "i");
 
     const SORT_OPTIONS = {
-      newest: { createdAt: -1 },
+      // Featured listings float to the top of the default view -- gives the
+      // admin-settable isFeatured flag real functional weight, not just a
+      // cosmetic badge.
+      newest: { isFeatured: -1, createdAt: -1 },
       "price-asc": { price: 1 },
       "price-desc": { price: -1 },
     };

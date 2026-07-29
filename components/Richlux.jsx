@@ -12,9 +12,9 @@ import RequestWizardModal from "@/components/RequestWizardModal";
 // Request" CTA just below, so this stays a distinct action instead of a
 // second path to the same modal.
 const QUICK_LINKS = [
-  { icon: BiHomeCircle, label: "Buy", caption: "We sell comfort", href: "/listings?category=house-sale" },
+  { icon: BiHomeCircle, label: "Buy", caption: "Curated for you", href: "/listings?category=house-sale" },
   { icon: BiHomeHeart, label: "Rent", caption: "Peace of mind", href: "/listings?category=rental" },
-  { icon: BiSupport, label: "Contact", caption: "For all enquiries", href: "#contact" },
+  { icon: BiSupport, label: "Contact", caption: "We're here to help", href: "#contact" },
 ];
 
 // Above-the-fold hero -- a staggered entrance on mount (not a scroll-triggered
@@ -58,8 +58,8 @@ function Richlux() {
             variants={fadeUp}
             className="mt-4 max-w-2xl text-body text-ink-500 dark:text-slate-400"
           >
-            Are you currently building or selling a new home? Let our real
-            estate agency handle it.
+            Considered properties, handled with care — whether you're
+            building, buying, or selling.
           </motion.p>
 
           <motion.div
@@ -93,7 +93,7 @@ function Richlux() {
                 Make Your Request
               </span>
               <span className="text-caption md:text-sm">
-                What kind of house are you looking for?
+                Tell us what you're looking for.
               </span>
             </div>
             <BiHomeHeart size={36} className="ml-4" />

@@ -1,15 +1,21 @@
 import Provider from "@/components/Provider";
 import "./globals.css";
-import { Inter, Rochester } from "next/font/google";
+import { Inter, Rochester, Playfair_Display } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 
-// tailwind.config.js's fontFamily.sans/display reference `var(--font-inter)`/
-// `var(--font-rochester)` -- these `variable` names are what actually define
-// those CSS custom properties. Without them, both utilities silently fall
-// back to their generic last resort (system-ui, or the browser's default
-// cursive font) instead of the fonts actually being loaded below.
+// tailwind.config.js's fontFamily.sans/display/serif reference `var(--font-
+// inter)`/`var(--font-rochester)`/`var(--font-playfair)` -- these `variable`
+// names are what actually define those CSS custom properties. Without them,
+// the utilities silently fall back to their generic last resort (system-ui,
+// the browser's default cursive font, or plain serif) instead of the fonts
+// actually being loaded below.
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const rochester = Rochester({ subsets: ["latin"], weight: "400", variable: "--font-rochester" });
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-playfair",
+});
 
 // Falls back to localhost since NEXTAUTH_URL isn't set to a real production
 // domain yet -- set NEXT_PUBLIC_SITE_URL once this is deployed so Open
@@ -72,7 +78,11 @@ const themeInitScript = `
 // doesn't inherit the light public-site footer.
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${rochester.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${inter.variable} ${rochester.variable} ${playfair.variable}`}
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
