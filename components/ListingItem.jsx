@@ -3,6 +3,7 @@
 import { CldImage } from "next-cloudinary";
 import Link from "next/link";
 import React from "react";
+import { FaBed, FaBath, FaMapMarkerAlt, FaRulerCombined, FaChevronRight } from "react-icons/fa";
 import Card from "@/components/ui/Card";
 import Badge, { FeaturedBadge } from "@/components/ui/Badge";
 import { LISTING_CATEGORY_LABELS } from "@/constants/listing";
@@ -20,8 +21,20 @@ function trunc(sentence, limit) {
 }
 
 function ListingItem({ listing, priority = false }) {
-  const { _id, title, description, price, category, status, media, location, isFeatured } =
-    listing;
+  const {
+    _id,
+    title,
+    description,
+    price,
+    category,
+    status,
+    media,
+    location,
+    isFeatured,
+    bedrooms,
+    bathrooms,
+    landSize,
+  } = listing;
   const cover = media?.find((item) => item.isCover) || media?.[0];
 
   return (
@@ -62,9 +75,34 @@ function ListingItem({ listing, priority = false }) {
           </span>
           <h2 className="text-ink-900 dark:text-white font-semibold mt-1">{title}</h2>
           {location?.city && (
-            <p className="text-caption text-ink-500 dark:text-slate-400 mt-1">
-              {[location.address, location.city].filter(Boolean).join(", ")}
+            <p className="flex items-center gap-1 text-caption text-ink-500 dark:text-slate-400 mt-1">
+              <FaMapMarkerAlt size={11} className="shrink-0 text-ink-400 dark:text-slate-500" />
+              <span className="truncate">
+                {[location.address, location.city].filter(Boolean).join(", ")}
+              </span>
             </p>
+          )}
+          {(typeof bedrooms === "number" || typeof bathrooms === "number" || landSize) && (
+            <div className="flex items-center gap-3 text-caption text-ink-700 dark:text-slate-200 mt-2">
+              {typeof bedrooms === "number" && (
+                <span className="flex items-center gap-1">
+                  <FaBed size={13} className="text-brand-700 dark:text-brand-400" />
+                  {bedrooms}
+                </span>
+              )}
+              {typeof bathrooms === "number" && (
+                <span className="flex items-center gap-1">
+                  <FaBath size={13} className="text-brand-700 dark:text-brand-400" />
+                  {bathrooms}
+                </span>
+              )}
+              {landSize && (
+                <span className="flex items-center gap-1">
+                  <FaRulerCombined size={13} className="text-brand-700 dark:text-brand-400" />
+                  {landSize}
+                </span>
+              )}
+            </div>
           )}
           <p className="text-caption text-ink-500 dark:text-slate-400 mt-2 flex-1">
             {trunc(description, 15)}
@@ -73,8 +111,9 @@ function ListingItem({ listing, priority = false }) {
             <span className="font-serif font-semibold text-lg text-ink-900 dark:text-white">
               {formatNaira(price)}
             </span>
-            <span className="text-caption font-medium text-brand-700 dark:text-brand-400">
-              View details →
+            <span className="flex items-center gap-1 text-caption font-medium text-brand-700 dark:text-brand-400">
+              View details
+              <FaChevronRight size={10} />
             </span>
           </div>
         </div>

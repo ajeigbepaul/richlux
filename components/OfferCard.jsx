@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import { FaBed, FaBath, FaMapMarkerAlt } from "react-icons/fa";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import MediaGallery from "@/components/ui/MediaGallery";
@@ -71,11 +72,26 @@ function OfferCard({ offer, showAgent = true, highlighted = false, actions }) {
           )}
         </p>
 
-        {location && <p className="text-caption text-ink-500 dark:text-slate-400">{location}</p>}
+        {location && (
+          <p className="flex items-center gap-1 text-caption text-ink-500 dark:text-slate-400">
+            <FaMapMarkerAlt size={11} className="shrink-0 text-ink-400 dark:text-slate-500" />
+            {location}
+          </p>
+        )}
 
         <div className="flex flex-wrap gap-3 text-caption text-ink-700 dark:text-slate-200">
-          {typeof offer.bedrooms === "number" && <span>{offer.bedrooms} bed</span>}
-          {typeof offer.bathrooms === "number" && <span>{offer.bathrooms} bath</span>}
+          {typeof offer.bedrooms === "number" && (
+            <span className="flex items-center gap-1">
+              <FaBed size={13} className="text-brand-700 dark:text-brand-400" />
+              {offer.bedrooms}
+            </span>
+          )}
+          {typeof offer.bathrooms === "number" && (
+            <span className="flex items-center gap-1">
+              <FaBath size={13} className="text-brand-700 dark:text-brand-400" />
+              {offer.bathrooms}
+            </span>
+          )}
         </div>
 
         <p className="text-caption text-ink-700 dark:text-slate-300">{offer.description}</p>
